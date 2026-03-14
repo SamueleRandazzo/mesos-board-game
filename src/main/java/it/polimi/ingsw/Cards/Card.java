@@ -1,4 +1,4 @@
-package it.polimi.ingsw;
+package it.polimi.ingsw.Cards;
 
 public abstract class Card {
     private final int era;
