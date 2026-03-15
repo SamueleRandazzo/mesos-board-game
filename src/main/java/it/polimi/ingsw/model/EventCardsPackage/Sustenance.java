@@ -9,8 +9,9 @@ public class Sustenance extends EventCard {
         super(era, minPlayer, isObtainable, isFinal);
     }
 
+
     @Override
-    public void eventHandler(Player player){
+    protected void eventHandler(Player player){
         int toFeed=player.getTribe().numberOfCharacterCards() - player.getTribe().numberOf(CharacterType.GATHERER) * 3;
         if(toFeed>0){
             player.changeFoodAmount(-toFeed);

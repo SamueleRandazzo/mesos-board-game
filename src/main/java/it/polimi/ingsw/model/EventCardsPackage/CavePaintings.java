@@ -9,8 +9,9 @@ public class CavePaintings extends EventCard {
         super(era, minPlayer, isObtainable, isFinal);
     }
 
+
     @Override
-    public void eventHandler(Player player) {
+    protected void eventHandler(Player player) {
         int numberOfArtists=player.getTribe().numberOf(CharacterType.ARTIST);
         if(numberOfArtists<getEra())
             player.changePrestigePoints(-2);
@@ -18,3 +19,22 @@ public class CavePaintings extends EventCard {
             player.changePrestigePoints(getEra() * numberOfArtists);
     }
 }
+
+/*
+Cave Painting Event card structure (1 for each era)
+era 1
+	0: -2
+	1+: 1 * numberOfArtists
+
+era 2
+	0-1: -2
+	2+: 2 * numberOfArtists
+
+era 3
+	0-2: -2
+	3+: 3 * numberOfArtists
+
+era X
+    <X: -2
+    X+: X * numberOfArtists
+ */

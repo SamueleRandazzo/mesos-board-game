@@ -10,7 +10,7 @@ public class Hunt extends EventCard {
     }
 
     @Override
-    public void eventHandler(Player player){
+    protected void eventHandler(Player player){
         int numberOfHunters=player.getTribe().numberOf(CharacterType.HUNTER);
         player.changeFoodAmount(numberOfHunters);
         player.changePrestigePoints(numberOfHunters * getEra());
