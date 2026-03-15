@@ -1,5 +1,6 @@
 package it.polimi.ingsw.EventCardsPackage;
 import it.polimi.ingsw.Cards.*;
+import it.polimi.ingsw.Enum.CharacterType;
 import it.polimi.ingsw.Player;
 
 public class CavePaintings extends EventCard {
@@ -9,6 +10,10 @@ public class CavePaintings extends EventCard {
 
     @Override
     public void eventHandler(Player player) {
-
+        int numberOfArtists=player.getTribe().numberOf(CharacterType.ARTIST);
+        if(numberOfArtists<getEra())
+            player.changePrestigePoints(-2);
+        else
+            player.changePrestigePoints(getEra() * numberOfArtists);
     }
 }

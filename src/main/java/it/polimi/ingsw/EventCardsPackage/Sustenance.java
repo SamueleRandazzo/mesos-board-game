@@ -15,7 +15,7 @@ public class Sustenance extends EventCard {
         if(toFeed>0){
             player.changeFoodAmount(-toFeed);
             if(player.getFoodAmount()<0){
-                player.changePrestigePoints(player.getFoodAmount() * this.getEra());
+                player.changePrestigePoints(player.getFoodAmount() * getEra());
                 player.setFoodAmount(0);
             }
         }

@@ -1,5 +1,6 @@
 package it.polimi.ingsw.EventCardsPackage;
 import it.polimi.ingsw.Cards.*;
+import it.polimi.ingsw.Enum.CharacterType;
 import it.polimi.ingsw.Player;
 
 public class Hunt extends EventCard {
@@ -9,6 +10,8 @@ public class Hunt extends EventCard {
 
     @Override
     public void eventHandler(Player player){
-
+        int numberOfHunters=player.getTribe().numberOf(CharacterType.HUNTER);
+        player.changeFoodAmount(numberOfHunters);
+        player.changePrestigePoints(numberOfHunters * getEra());
     }
 }
