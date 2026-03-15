@@ -1,7 +1,8 @@
-package it.polimi.ingsw.Cards;
+package it.polimi.ingsw.CharacterCardsPackage;
+import it.polimi.ingsw.Cards.CharacterCard;
 import it.polimi.ingsw.Enum.CharacterType;
 
-public class Builder extends CharacterCard{
+public class Builder extends CharacterCard {
     private final int foodDiscount;
     private final int prestigePoints;
     public Builder(int era, int minPlayer, boolean isObtainable, int foodDiscount, int prestigePoints) {

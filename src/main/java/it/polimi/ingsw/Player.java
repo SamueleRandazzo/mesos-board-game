@@ -1,5 +1,6 @@
 package it.polimi.ingsw;
 import it.polimi.ingsw.Enum.Color;
+import it.polimi.ingsw.Enum.EventType;
 import it.polimi.ingsw.Cards.*;
 
 public class Player
@@ -10,19 +11,21 @@ public class Player
     private int foodAmount;
     private Color color;
     private Tribe tribe;
-    private void sustenance(){
 
+    public Player(Color color){ //perhaps a different implementation is needed
+        this.nickname = "";
+        this.password = "";
+        this.prestigePoints = 0;
+        this.foodAmount = 0;
+        this.color = color;
+        tribe = new Tribe();
     }
-    private void hunt(){
 
-    }
-    private void shamanicRitual(){
-
-    }
-    private void cavePaintings(){
-
-    }
     public void changePrestigePoints(int variation){
         prestigePoints += variation;
+    }
+
+    public void getTribe(){
+
     }
 }
