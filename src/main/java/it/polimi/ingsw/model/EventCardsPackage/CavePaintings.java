@@ -1,5 +1,4 @@
 package it.polimi.ingsw.model.EventCardsPackage;
-import it.polimi.ingsw.Cards.*;
 import it.polimi.ingsw.model.Cards.EventCard;
 import it.polimi.ingsw.model.Enum.CharacterType;
 import it.polimi.ingsw.model.Player;
