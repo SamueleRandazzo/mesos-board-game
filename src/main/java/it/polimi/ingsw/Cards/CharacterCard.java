@@ -10,4 +10,8 @@ abstract public class CharacterCard extends Card{
     public CharacterType getType() {
         return type;
     }
+
+    public int getShamanStars(){
+        return 0;
+    }
 }

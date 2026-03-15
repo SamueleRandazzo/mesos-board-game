@@ -8,6 +8,8 @@ public class Shaman extends CharacterCard {
         super(era, minPlayer, isObtainable, CharacterType.SHAMAN);
         this.shamanStars = shamanStars;
     }
+
+    @Override
     public int getShamanStars(){
         return this.shamanStars;
     }

@@ -9,6 +9,7 @@ public class Tribe {
     private final Set<BuildingCard> buildingCards; //verify duplicates presence
     private final Set<CharacterCard> characterCards; //verify duplicates presence
     private final Map<CharacterType, Integer> count;
+    public int shamanicStars;
 
     public Tribe(){
         buildingCards = new HashSet<>();
@@ -19,9 +20,14 @@ public class Tribe {
         }
     }
 
+    public int getShamanicStars(){
+        return shamanicStars;
+    }
+
     public void addCard(CharacterCard card){
         characterCards.add(card);
         count.put(card.getType(), count.get(card.getType()) + 1);
+        shamanicStars += card.getShamanStars();
     }
 
     public void addCard(BuildingCard card){
