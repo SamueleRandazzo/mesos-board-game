@@ -1,0 +1,23 @@
+package it.polimi.ingsw.model.Cards;
+import it.polimi.ingsw.model.Game;
+import it.polimi.ingsw.model.Player;
+
+public abstract class EventCard extends Card {
+    private final boolean isFinal;
+    public EventCard(int era, int minPlayer, boolean isObtainable, boolean isFinal) {
+        super(era, minPlayer, isObtainable);
+        this.isFinal = isFinal;
+    } //does it make sense to make a constructor with three arguments in father class?
+
+    public void raiseEvent(){
+        for(Player player: Game.game().getPlayers()){
+            eventHandler(player);
+        }
+    }
+
+    public abstract void eventHandler(Player player);
+
+    public boolean isFinal(){
+        return this.isFinal;
+    }
+}
