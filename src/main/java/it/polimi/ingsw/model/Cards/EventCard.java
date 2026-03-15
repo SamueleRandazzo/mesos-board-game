@@ -10,7 +10,7 @@ public abstract class EventCard extends Card {
     public EventCard(int era, int minPlayer, boolean isObtainable, boolean isFinal) {
         super(era, minPlayer, isObtainable);
         this.isFinal = isFinal;
-    } //does it make sense to make a constructor with three arguments in father class?
+    }
 
     //this method calls eventHandler on every Player playing the Game.
     //this is the method to call to make the event take place.
