@@ -10,16 +10,19 @@ public class Player
     private int foodAmount;
     private Color color;
     private Tribe tribe;
-    public void sustenance(){
+    private void sustenance(){
 
     }
-    public void hunt(){
+    private void hunt(){
 
     }
-    public void shamanicRitual(){
+    private void shamanicRitual(){
 
     }
-    public void cavePaintings(){
+    private void cavePaintings(){
 
+    }
+    public void changePrestigePoints(int variation){
+        prestigePoints += variation;
     }
 }
