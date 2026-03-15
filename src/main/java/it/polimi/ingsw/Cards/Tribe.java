@@ -1,4 +1,5 @@
 package it.polimi.ingsw.Cards;
+import java.util.Map;
 import it.polimi.ingsw.Enum.CharacterType;
 import it.polimi.ingsw.Enum.EventType;
 
@@ -6,24 +7,25 @@ import it.polimi.ingsw.Enum.EventType;
 import java.util.*;
 
 public class Tribe {
-    private Set<BuildingCard> buildingCards; //verify duplicates presence
-    private Set<CharacterCard> characterCards; //verify duplicates presence
-    Map<CharacterType, Integer> count;
+    private final Set<BuildingCard> buildingCards; //verify duplicates presence
+    private final Set<CharacterCard> characterCards; //verify duplicates presence
+    private final Map<CharacterType, Integer> count;
     public Tribe(){
         buildingCards = new HashSet<>();
         characterCards = new HashSet<>();
         count= new EnumMap<>(CharacterType.class);
+        for (CharacterType type : CharacterType.values()) {
+            count.put(type, 0);
+        }
     }
     public void addCard(CharacterCard card){
         characterCards.add(card);
-        /*if(count.containsKey(card.getType())){
-
-        }*/
+        count.put(card.getType(), count.get(card.getType()) + 1);
     }
     public void addCard(BuildingCard card){
         buildingCards.add(card);
     }
-    /*public int numberOf(CharacterType characterType){
-
-    }*/
+    public int numberOf(CharacterType characterType){
+        return count.get(characterType);
+    }
 }
