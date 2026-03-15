@@ -1,9 +1,6 @@
 package it.polimi.ingsw.Cards;
 import it.polimi.ingsw.Game;
 import it.polimi.ingsw.Player;
-import it.polimi.ingsw.Enum.EventType;
-
-import java.util.*;
 
 public abstract class EventCard extends Card {
     private final boolean isFinal;

@@ -1,7 +1,6 @@
 package it.polimi.ingsw.Cards;
 import java.util.Map;
 import it.polimi.ingsw.Enum.CharacterType;
-import it.polimi.ingsw.Enum.EventType;
 
 
 import java.util.*;
@@ -31,5 +30,13 @@ public class Tribe {
 
     public int numberOf(CharacterType characterType){
         return count.get(characterType);
+    }
+
+    public int numberOfCharacterCards(){
+        int sum = 0;
+        for (CharacterType type : CharacterType.values()) {
+            sum += numberOf(type);
+        }
+        return sum;
     }
 }
