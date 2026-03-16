@@ -246,30 +246,25 @@ public class Board {
     // -------------------------------------------------------------------------
 
     /**
-     * Handles the start of a new era (rulebook p. 7).
+     * Handles the start of a new era.
      *
-     * Must be called by Game as soon as a card of the next era is revealed
-     * while refilling the upper row. The new era's building deck must already
-     * have been loaded via {@link #setBuildingDeck(List)} before this call.
+     * Clears any building cards remaining in the lower building row (will be
+     * empty on the first era transition, so clear() is always safe to call),
+     * moves all building cards from the upper building row down to the lower
+     * building row, then places the new era's building cards in the upper row.
      *
-     * Steps executed in order:
-     *  1. (Era III only) Discard all building cards still in the lower building row.
-     *  2. Move all building cards from the upper building row to the lower building row.
-     *  3. Place the new era's building cards face-up in the upper building row.
-     *
-     * @param newEra the Era that has just started (ERA_II or ERA_III)
+     * Game is responsible for calling setBuildingDeck() with the new era's
+     * building cards before calling this method.
      */
-    public void updateEra(Era newEra) {
-        // Step 1 — at Era III start, discard leftover buildings from the lower row
-        if (newEra == Era.ERA_III) {
-            lowerBuildingCards.clear();
-        }
+    public void updateEra() {
+        // Discard any building cards left in the lower row
+        lowerBuildingCards.clear();
 
-        // Step 2 — move upper building cards down to the lower building row
+        // Move upper building cards down to the lower building row
         lowerBuildingCards.addAll(upperBuildingCards);
         upperBuildingCards.clear();
 
-        // Step 3 — place new era's building cards in the upper row
+        // Place the new era's building cards in the upper row
         upperBuildingCards.addAll(buildingDeck);
         buildingDeck.clear();
     }
@@ -280,12 +275,16 @@ public class Board {
 
     /**
      * Replaces the current building deck with the cards of the upcoming era.
-     * Game must call this before {@link #updateEra(Era)} when transitioning
-     * to Era II or Era III.
+     * Game must call this before {@link #updateEra()} when transitioning
+     * to a new era.
      *
      * @param newEraBuildings building cards for the new era
+     * @throws NullPointerException if newEraBuildings is null
      */
     public void setBuildingDeck(List<BuildingCard> newEraBuildings) {
+        if (newEraBuildings == null) {
+            throw new NullPointerException("newEraBuildings cannot be null.");
+        }
         this.buildingDeck = new ArrayList<>(newEraBuildings);
     }
 
