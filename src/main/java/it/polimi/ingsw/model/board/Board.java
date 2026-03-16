@@ -1,5 +1,8 @@
 package it.polimi.ingsw.model.board;
 
+import it.polimi.ingsw.model.Cards.*;
+import it.polimi.ingsw.model.Interfaces.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,10 +21,10 @@ import java.util.List;
 public class Board {
 
     /** Tribe cards visible in the upper row (CharacterCard or EventCard). */
-    private List<TribeDecable> upperTribeCards;
+    private List<TribeDeck> upperTribeCards;
 
     /** Tribe cards visible in the lower row (CharacterCard or EventCard). */
-    private List<TribeDecable> lowerTribeCards;
+    private List<TribeDeck> lowerTribeCards;
 
     /** Building cards visible in the upper row. */
     private List<BuildingCard> upperBuildingCards;
@@ -33,7 +36,7 @@ public class Board {
     private List<BuildingCard> buildingDeck;
 
     /** Draw pile for tribe cards (Era I on top, Final Events at the bottom). */
-    private List<TribeDecable> tribeDeck;
+    private List<TribeDeck> tribeDeck;
 
     /**
      * Number of players in this game.
@@ -57,7 +60,7 @@ public class Board {
      * @param buildingDeck the Era-I building cards
      * @param numPlayers   number of players (2-5), used to compute row sizes
      */
-    public Board(List<TribeDecable> tribeDeck, List<BuildingCard> buildingDeck, int numPlayers) {
+    public Board(List<TribeDeck> tribeDeck, List<BuildingCard> buildingDeck, int numPlayers) {
         this.tribeDeck          = new ArrayList<>(tribeDeck);
         this.buildingDeck       = new ArrayList<>(buildingDeck);
         this.numPlayers         = numPlayers;
@@ -74,18 +77,18 @@ public class Board {
     /**
      * Returns a defensive copy of the upper tribe row.
      *
-     * @return list of TribeDecable currently in the upper row
+     * @return list of TribeDeck currently in the upper row
      */
-    public List<TribeDecable> getTopRow() {
+    public List<TribeDeck> getTopRow() {
         return new ArrayList<>(upperTribeCards);
     }
 
     /**
      * Returns a defensive copy of the lower tribe row.
      *
-     * @return list of TribeDecable currently in the lower row
+     * @return list of TribeDeck currently in the lower row
      */
-    public List<TribeDecable> getBottomRow() {
+    public List<TribeDeck> getBottomRow() {
         return new ArrayList<>(lowerTribeCards);
     }
 
@@ -94,10 +97,10 @@ public class Board {
      * Called when a player picks a card from the upper row during their turn.
      *
      * @param index 0-based position in the upper row
-     * @return the TribeDecable card that was at that position
+     * @return the TribeDeck card that was at that position
      * @throws IndexOutOfBoundsException if index is out of range
      */
-    public TribeDecable takeCardFromTopRow(int index) {
+    public TribeDeck takeCardFromTopRow(int index) {
         if (index < 0 || index >= upperTribeCards.size()) {
             throw new IndexOutOfBoundsException(
                     "Invalid index " + index + " for upper tribe row of size " + upperTribeCards.size()
@@ -111,10 +114,10 @@ public class Board {
      * Called when a player picks a card from the lower row during their turn.
      *
      * @param index 0-based position in the lower row
-     * @return the TribeDecable card that was at that position
+     * @return the TribeDeck card that was at that position
      * @throws IndexOutOfBoundsException if index is out of range
      */
-    public TribeDecable takeCardFromBottomRow(int index) {
+    public TribeDeck takeCardFromBottomRow(int index) {
         if (index < 0 || index >= lowerTribeCards.size()) {
             throw new IndexOutOfBoundsException(
                     "Invalid index " + index + " for lower tribe row of size " + lowerTribeCards.size()
