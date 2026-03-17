@@ -8,10 +8,10 @@ import java.util.List;
 
 /**
  * Represents the game board of Mesos.
- *
+ * <p>
  * Board is owned by Game (1-to-1 composition): Game instantiates it and
  * exposes it via Game.getBoard(). Board itself is NOT a Singleton.
- *
+ * <p>
  * Responsibilities:
  *  - Maintaining the four visible card rows (upper/lower tribe, upper/lower building)
  *  - Holding the tribe deck and the current-era building deck
@@ -45,7 +45,7 @@ public class Board {
     /**
      * Creates the Board.
      * Called once by Game during game setup (preparazione).
-     *
+     * <p>
      * After construction the rows are empty; Game must call
      * {@link #fillRows(int)} and set up the initial lower row separately
      * following the setup rules (p. 2-3 of the rulebook).
@@ -181,13 +181,13 @@ public class Board {
     /**
      * Draws tribe cards from the deck and places them in the upper tribe row
      * until the row reaches (numPlayers + 4) cards, or the deck is exhausted.
-     *
+     * <p>
      * Cards already present in the upper row count towards the target, so this
      * method is safe to call both for initial setup and for end-of-round refill.
-     *
+     * <p>
      * Rules reference (rulebook p. 2 step 5, p. 6 step 4):
      *  - Upper row target size = numPlayers + 4
-     *
+     * <p>
      * Note: detection of era changes when a next-era card is drawn, and the
      * special handling of Event cards that must go to the upper row during
      * initial lower-row setup, are the responsibility of Game, which calls
@@ -212,14 +212,14 @@ public class Board {
 
     /**
      * Performs the end-of-round board cleanup (rulebook p. 6):
-     *
+     * <p>
      *  1. Discard all Character and Event cards from the lower tribe row.
      *     Building cards in the lower row are NOT affected (they stay).
      *  2. Move all Character and Event cards from the upper tribe row
      *     down to the lower tribe row.
      *     Building cards in the upper row are NOT affected (they stay).
      *  3. Refill the upper tribe row via {@link #fillRows(int)}.
-     *
+     * <p>
      * Event resolution and era-change detection happen in Game, which calls
      * this method after all players have taken their turns.
      *
@@ -238,12 +238,12 @@ public class Board {
 
     /**
      * Handles the start of a new era.
-     *
+     * <p>
      * Clears any building cards remaining in the lower building row (will be
      * empty on the first era transition, so clear() is always safe to call),
      * moves all building cards from the upper building row down to the lower
      * building row, then places the new era's building cards in the upper row.
-     *
+     * <p>
      * Game is responsible for calling setBuildingDeck() with the new era's
      * building cards before calling this method.
      */

@@ -12,17 +12,17 @@ import java.util.stream.Collectors;
 
 /**
  * Central orchestrator of a Mesos game session.
- *
+ * <p>
  * Each instance represents one independent game, supporting multiple
  * concurrent games (e.g. on a server) without Singleton constraints.
- *
+ * <p>
  * Responsibilities:
  *  - Initialising and holding all model objects (Board, Players, OfferTrack)
  *  - Managing the current era and detecting era transitions
  *  - Driving the 10-round game loop (place totems → resolve actions → end-of-round)
  *  - Resolving events found in the lower row at end of round
  *  - Computing and declaring the winner at game end
- *
+ * <p>
  * What Game does NOT do (delegated to other classes):
  *  - Filling / rotating board rows mechanically  → Board
  *  - Applying event effects to players           → EventCard.raiseEvent()
@@ -80,7 +80,7 @@ public class Game {
 
     /**
      * Creates and fully initialises a new Game instance.
-     *
+     * <p>
      * The caller (e.g. a controller or factory) is responsible for building
      * the decks according to the setup rules (rulebook p. 2-3) before passing
      * them in.
@@ -135,13 +135,13 @@ public class Game {
 
     /**
      * Runs the full game from start to finish.
-     *
+     * <p>
      * Flow per round (rulebook p. 4-6):
      *  1. Players place their totems on the offer track (in turn-order-tile order).
      *  2. Players resolve their offer tile actions (left to right on the track).
      *  3. End-of-round: resolve events, rotate rows, refill upper row,
      *     check for era transition.
-     *
+     * <p>
      * After round 10: resolve all remaining visible events, compute final
      * scores, declare the winner.
      */
@@ -163,7 +163,7 @@ public class Game {
     /**
      * Fills the lower row (numPlayers + 1 cards) and then the upper row
      * (numPlayers + 4 cards) during initial setup (rulebook p. 2, steps 4-5).
-     *
+     * <p>
      * Event cards drawn for the lower row are redirected to the upper row
      * as required by the rules.
      */
@@ -192,11 +192,11 @@ public class Game {
     /**
      * Phase 1: each player places their totem on a free offer tile,
      * following the order defined by the turn-order tile (top to bottom).
-     *
+     * <p>
      * After placing, the player returns their totem to the turn-order tile
      * in the first available slot (top to bottom), gaining or paying food
      * as indicated by that slot (rulebook p. 4).
-     *
+     * <p>
      * TODO: actual player input / AI decision needed here.
      * TODO: occupy() method name to be confirmed with OfferTile owner.
      * TODO: getColor() method to be added to Player.
@@ -220,10 +220,10 @@ public class Game {
     /**
      * Phase 2: players resolve their offer tile actions in left-to-right order
      * on the offer track (rulebook p. 4).
-     *
+     * <p>
      * Each tile tells the player how many cards to take and from which row.
      * Board provides the pick operations; this method orchestrates who acts when.
-     *
+     * <p>
      * TODO: card selection requires player input / controller integration.
      */
     private void resolveActions() {
@@ -260,7 +260,7 @@ public class Game {
      * Resolves all Event cards currently in the lower tribe row (rulebook p. 6).
      * Sustenance is always resolved last.
      * If two events of the same type appear, they are resolved in era order.
-     *
+     * <p>
      * Non-event cards (Character, Building) are ignored here.
      */
     private void resolveEventsInLowerRow() {
@@ -352,7 +352,7 @@ public class Game {
      *  - Inventor PP (numInventors x numDistinctInventionIcons)
      *  - 10 PP per every 2 Artist cards
      *  - Building card PP (printed + end-game effects)
-     *
+     * <p>
      * TODO: implement once Tribe exposes the required query methods.
      */
     private void computeFinalScores() {
