@@ -1,8 +1,9 @@
-package it.polimi.ingsw.model.board;
+package it.polimi.ingsw.model.Board;
 
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class OfferTrack {
 
@@ -20,7 +21,7 @@ public class OfferTrack {
     public List<OfferTile> getAvailableOffers(){
 
         return tiles.stream()
-                .filter(OfferTile::isAvailable).toList();
+                .filter(OfferTile::isAvailable).collect(Collectors.toList());
     }
 
     /*Returns a copy of the tiles on the track*/

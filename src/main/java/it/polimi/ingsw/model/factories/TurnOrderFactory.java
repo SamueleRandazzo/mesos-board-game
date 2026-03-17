@@ -1,8 +1,6 @@
 package it.polimi.ingsw.model.factories;
 
-
-import it.polimi.ingsw.model.board.TurnOrderSlot;
-import it.polimi.ingsw.model.board.TurnOrderTile;
+import it.polimi.ingsw.model.Board.*;
 
 import java.util.ArrayList;
 import java.util.List;

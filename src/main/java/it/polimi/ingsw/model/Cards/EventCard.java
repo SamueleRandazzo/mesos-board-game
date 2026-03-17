@@ -2,6 +2,8 @@ package it.polimi.ingsw.model.Cards;
 import it.polimi.ingsw.model.Game;
 import it.polimi.ingsw.model.Player;
 
+import java.util.List;
+
 public abstract class EventCard extends Card {
     private final boolean isFinal;
 
@@ -14,8 +16,8 @@ public abstract class EventCard extends Card {
 
     //this method calls eventHandler on every Player playing the Game.
     //this is the method to call to make the event take place.
-    public void raiseEvent(){
-        for(Player player: Game.game().getPlayers()){
+    public void raiseEvent(List<Player> players){
+        for(Player player: players){
             eventHandler(player);
         }
     }

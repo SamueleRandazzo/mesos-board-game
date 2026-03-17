@@ -1,4 +1,4 @@
-package it.polimi.ingsw.model.board;
+package it.polimi.ingsw.model.Board;
 
 import it.polimi.ingsw.model.Cards.*;
 import it.polimi.ingsw.model.Interfaces.*;

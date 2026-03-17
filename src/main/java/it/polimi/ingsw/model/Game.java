@@ -2,7 +2,7 @@ package it.polimi.ingsw.model;
 
 import it.polimi.ingsw.model.Cards.*;
 import it.polimi.ingsw.model.Interfaces.*;
-import it.polimi.ingsw.model.board.*;
+import it.polimi.ingsw.model.Board.*;
 import it.polimi.ingsw.model.factories.TurnOrderFactory;
 
 import java.util.ArrayList;
@@ -285,7 +285,7 @@ public class Game {
         events.sort(Comparator.comparingInt(EventCard::getEra));
 
         for (EventCard event : events) {
-            event.raiseEvent(); // NOTE: raiseEvent() still uses Game.game() singleton — to fix later.
+            event.raiseEvent(getPlayers()); // NOTE: raiseEvent() still uses Game.game() singleton — to fix later.
         }
     }
 
@@ -347,7 +347,7 @@ public class Game {
         events.sort(Comparator.comparingInt(EventCard::getEra));
 
         for (EventCard event : events) {
-            event.raiseEvent(); // NOTE: to fix after EventCard Singleton dependency is removed.
+            event.raiseEvent(getPlayers()); // NOTE: to fix after EventCard Singleton dependency is removed.
         }
     }
 

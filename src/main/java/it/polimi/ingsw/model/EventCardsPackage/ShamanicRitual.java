@@ -24,7 +24,8 @@ public class ShamanicRitual extends EventCard {
         List<Player> maxPlayers = new ArrayList<>();
         List<Player> minPlayers = new ArrayList<>();
 
-        for(Player pl: Game.game().getPlayers()) shamanicStarsForPlayer.put(pl, pl.getTribe().getShamanicStars());
+        // TODO
+        //for(Player pl: Game.game().getPlayers()) shamanicStarsForPlayer.put(pl, pl.getTribe().getShamanicStars());
 
         for (int stars : shamanicStarsForPlayer.values()) {
             if (stars > maxStars) maxStars = stars;
