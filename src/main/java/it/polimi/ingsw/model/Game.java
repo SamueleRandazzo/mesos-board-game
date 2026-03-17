@@ -3,6 +3,7 @@ package it.polimi.ingsw.model;
 import it.polimi.ingsw.model.Cards.*;
 import it.polimi.ingsw.model.Interfaces.*;
 import it.polimi.ingsw.model.board.*;
+import it.polimi.ingsw.model.factories.TurnOrderFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,6 +58,9 @@ public class Game {
     /** The offer track (tiles where players place their totems). */
     private final OfferTrack offerTrack;
 
+    /** The TurnOrderTrack*/
+    private TurnOrderTile TurnOrderTile;
+
     /**
      * Current era (1, 2 or 3).
      * Starts at 1; advances when a card of the next era is revealed during fillRows().
@@ -99,7 +103,8 @@ public class Game {
                 List<BuildingCard> era1Buildings,
                 List<BuildingCard> era2Buildings,
                 List<BuildingCard> era3Buildings,
-                OfferTrack offerTrack) {
+                OfferTrack offerTrack, TurnOrderTile turnOrderTile) {
+                TurnOrderTile = turnOrderTile;
 
         if (players == null)       throw new NullPointerException("players cannot be null.");
         if (tribeDeck == null)     throw new NullPointerException("tribeDeck cannot be null.");
@@ -446,5 +451,14 @@ public class Game {
      */
     public OfferTrack getOfferTrack() {
         return offerTrack;
+    }
+
+    //create the TurnOrderTile using the TurnOrderFactory
+    public boolean createTurnOrderTile(int numPlayers){
+
+        this.TurnOrderTile = TurnOrderFactory.createTrack(numPlayers);
+
+        return true;
+        //l' eccezione sul numero di players è già gestita
     }
 }

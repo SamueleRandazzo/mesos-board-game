@@ -46,16 +46,15 @@ public class OfferTile {
         return placedTotem == null;
     }
 
-    /* places a totem on this tile, param "totem" is the totem to place, returns 1*/
-    public int placeTotem(Totem totem){
+    /* places a totem on this tile, param "totem" is the totem to place*/
+    public void placeTotem(Totem totem){
         this.placedTotem = totem;
-        return 1;
+
     }
 
-    /*remove the totem from this tile at the end of the phase, returns 1*/
-    public int removeTotem(){
+    /*remove the totem from this tile at the end of the phase*/
+    public void removeTotem(){
 
         this.placedTotem = null;
-        return 1;
     }
 }
