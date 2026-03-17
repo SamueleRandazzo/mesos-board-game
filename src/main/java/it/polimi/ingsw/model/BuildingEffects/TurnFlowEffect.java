@@ -1,6 +1,10 @@
 package it.polimi.ingsw.model.BuildingEffects;
 
-import it.polimi.ingsw.model.Interfaces.BuildingEffect;
+import it.polimi.ingsw.model.Cards.*;
+import it.polimi.ingsw.model.Enum.BuildingType;
+import it.polimi.ingsw.model.Interfaces.*;
+
+import java.util.List;
 
 public class TurnFlowEffect implements BuildingEffect {
     private final boolean extraCardFromUpper;
@@ -11,18 +15,19 @@ public class TurnFlowEffect implements BuildingEffect {
         this.extraFoodFromBonus = extraFoodFromBonus;
     }
 
-    // Return extra card from upper flag
+    /** Return extra card from upper flag */
     public boolean isExtraCardFromUpper() {
         return extraCardFromUpper;
     }
 
-    // Return is extra food from bonus flag
+    /** Return is extra food from bonus flag */
     public boolean isExtraFoodFromBonus() {
-        return this.extraFoodFromBonus;
+        return extraFoodFromBonus;
     }
 
-    // Apply building effect
-    public void applyEffect() {
-
+    /** Apply building effect */
+    public void applyEffect(Tribe t, List<BuildingType> l) {
+        if (!l.contains(BuildingType.TURN_FLOW))
+            return;
     }
 }

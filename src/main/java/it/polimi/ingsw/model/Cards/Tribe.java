@@ -1,6 +1,9 @@
 package it.polimi.ingsw.model.Cards;
 import java.util.Map;
+
+import it.polimi.ingsw.model.Enum.BuildingType;
 import it.polimi.ingsw.model.Enum.CharacterType;
+import it.polimi.ingsw.model.Utility.*;
 
 
 import java.util.*;
@@ -9,25 +12,26 @@ public class Tribe {
     private final Set<BuildingCard> buildingCards; //verify duplicates presence
     private final Set<CharacterCard> characterCards; //verify duplicates presence
     private final Map<CharacterType, Integer> count;
-    public int shamanicStars;
+    private ShamanicAttributes shamanicAttr;
 
     public Tribe(){
         buildingCards = new HashSet<>();
         characterCards = new HashSet<>();
-        count= new EnumMap<>(CharacterType.class);
+        count = new EnumMap<>(CharacterType.class);
         for (CharacterType type : CharacterType.values()) {
             count.put(type, 0);
         }
+        shamanicAttr = new ShamanicAttributes();
     }
 
     public int getShamanicStars(){
-        return shamanicStars;
+        return shamanicAttr.getStars();
     }
 
     public void addCard(CharacterCard card){
         characterCards.add(card);
         count.put(card.getType(), count.get(card.getType()) + 1);
-        shamanicStars += card.getShamanStars();
+        shamanicAttr.addStarsFromCards(card.getShamanStars());
     }
 
     public void addCard(BuildingCard card){
@@ -44,5 +48,9 @@ public class Tribe {
             sum += numberOf(type);
         }
         return sum;
+    }
+
+    public ShamanicAttributes getShamanicAttr() {
+        return shamanicAttr;
     }
 }
