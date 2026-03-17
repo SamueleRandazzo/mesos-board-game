@@ -53,4 +53,15 @@ public class Tribe {
     public ShamanicAttributes getShamanicAttr() {
         return shamanicAttr;
     }
+
+    public int getTotalPrestigePointsByType(CharacterType type) {
+        int i = 0;
+
+        for(CharacterCard c: characterCards) {
+            if (c.getType() == type)
+                i += c.getPrestigePoints();
+        }
+
+        return  i;
+    }
 }

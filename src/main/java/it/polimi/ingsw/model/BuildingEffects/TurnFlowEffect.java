@@ -3,6 +3,7 @@ package it.polimi.ingsw.model.BuildingEffects;
 import it.polimi.ingsw.model.Cards.*;
 import it.polimi.ingsw.model.Enum.BuildingType;
 import it.polimi.ingsw.model.Interfaces.*;
+import it.polimi.ingsw.model.*;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class TurnFlowEffect implements BuildingEffect {
     }
 
     /** Apply building effect */
-    public void applyEffect(Tribe t, List<BuildingType> l) {
+    public void applyEffect(Player p, List<BuildingType> l) {
         if (!l.contains(BuildingType.TURN_FLOW))
             return;
     }

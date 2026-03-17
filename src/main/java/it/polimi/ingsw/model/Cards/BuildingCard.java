@@ -4,6 +4,7 @@ import it.polimi.ingsw.model.Enum.BuildingType;
 import it.polimi.ingsw.model.Interfaces.BuildingEffect;
 import it.polimi.ingsw.model.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class BuildingCard extends Card {
@@ -12,11 +13,12 @@ public class BuildingCard extends Card {
     private List<BuildingEffect> effectList;
     private final boolean isFinalBuilding;
 
-    BuildingCard(int era, int minPlayer, boolean isObtainable, int foodCost, int prestigePoints, boolean isFinalBuilding) {
+    BuildingCard(int era, int minPlayer, boolean isObtainable, int foodCost, int prestigePoints, boolean isFinalBuilding, List<BuildingEffect> effectList) {
         super(era, minPlayer, isObtainable);
         this.foodCost = foodCost;
         this.prestigePoints = prestigePoints;
         this.isFinalBuilding = isFinalBuilding;
+        this.effectList = new ArrayList<>(effectList);
     }
 
     /** Return building food cost */
