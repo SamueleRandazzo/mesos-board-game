@@ -38,12 +38,6 @@ public class Board {
     /** Draw pile for tribe cards (Era I on top, Final Events at the bottom). */
     private List<TribeDeck> tribeDeck;
 
-    /**
-     * Number of players in this game.
-     * Stored here so Board does not need to call back to Game for basic draw logic.
-     */
-    private final int numPlayers;
-
     // -------------------------------------------------------------------------
     // Constructor
     // -------------------------------------------------------------------------
@@ -53,17 +47,15 @@ public class Board {
      * Called once by Game during game setup (preparazione).
      *
      * After construction the rows are empty; Game must call
-     * {@link #fillRows()} and set up the initial lower row separately
+     * {@link #fillRows(int)} and set up the initial lower row separately
      * following the setup rules (p. 2-3 of the rulebook).
      *
      * @param tribeDeck    the full, ordered tribe deck (Era I on top, Final Events at bottom)
      * @param buildingDeck the Era-I building cards
-     * @param numPlayers   number of players (2-5), used to compute row sizes
      */
-    public Board(List<TribeDeck> tribeDeck, List<BuildingCard> buildingDeck, int numPlayers) {
+    public Board(List<TribeDeck> tribeDeck, List<BuildingCard> buildingDeck) {
         this.tribeDeck          = new ArrayList<>(tribeDeck);
         this.buildingDeck       = new ArrayList<>(buildingDeck);
-        this.numPlayers         = numPlayers;
         this.upperTribeCards    = new ArrayList<>();
         this.lowerTribeCards    = new ArrayList<>();
         this.upperBuildingCards = new ArrayList<>();
@@ -200,11 +192,13 @@ public class Board {
      * special handling of Event cards that must go to the upper row during
      * initial lower-row setup, are the responsibility of Game, which calls
      * this method and inspects the result.
+     *
+     * @param numPlayers number of players, used to compute the upper row target size
      */
-    public void fillRows() {
-        int target        = numPlayers + 4;
-        int alreadyInRow  = upperTribeCards.size();
-        int needed        = target - alreadyInRow;
+    public void fillRows(int numPlayers) {
+        int target       = numPlayers + 4;
+        int alreadyInRow = upperTribeCards.size();
+        int needed       = target - alreadyInRow;
 
         for (int i = 0; i < needed; i++) {
             if (tribeDeck.isEmpty()) break;
@@ -224,21 +218,18 @@ public class Board {
      *  2. Move all Character and Event cards from the upper tribe row
      *     down to the lower tribe row.
      *     Building cards in the upper row are NOT affected (they stay).
-     *  3. Refill the upper tribe row via {@link #fillRows()}.
+     *  3. Refill the upper tribe row via {@link #fillRows(int)}.
      *
      * Event resolution and era-change detection happen in Game, which calls
      * this method after all players have taken their turns.
+     *
+     * @param numPlayers number of players, used to compute the upper row target size
      */
-    public void cleanUpAtRoundEnd() {
-        // Step 1 — discard tribe/event cards from lower row (buildings stay)
+    public void cleanUpAtRoundEnd(int numPlayers) {
         lowerTribeCards.clear();
-
-        // Step 2 — move tribe/event cards from upper row to lower row (buildings stay)
         lowerTribeCards.addAll(upperTribeCards);
         upperTribeCards.clear();
-
-        // Step 3 — refill upper row from tribe deck
-        fillRows();
+        fillRows(numPlayers);
     }
 
     // -------------------------------------------------------------------------
