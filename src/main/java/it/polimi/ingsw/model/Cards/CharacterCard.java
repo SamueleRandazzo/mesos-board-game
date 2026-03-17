@@ -1,8 +1,7 @@
 package it.polimi.ingsw.model.Cards;
-import it.polimi.ingsw.model.Enum.CharacterType;
-import it.polimi.ingsw.model.Enum.InventionIcon;
+import it.polimi.ingsw.model.Enum.*;
 
-abstract public class CharacterCard extends Card{
+public class CharacterCard extends Card{
     private final CharacterType type;
     private final int foodDiscount;
     private final int prestigePoints;
@@ -20,6 +19,7 @@ abstract public class CharacterCard extends Card{
         this.shamanStars = shamanStars;
     }
 
+    //region Specific
     //only for Artist and Gatherer
     public CharacterCard(int era, int minPlayer, boolean isObtainable, CharacterType type) {
         this(era, minPlayer, isObtainable, type, 0, 0, false, null, 0);
@@ -44,6 +44,7 @@ abstract public class CharacterCard extends Card{
     public CharacterCard(int era, int minPlayer, boolean isObtainable, CharacterType type, int shamanStars) {
         this(era, minPlayer, isObtainable, type, 0, 0, false, null, shamanStars);
     }
+    //endregion
 
     public CharacterType getType() {
         return type;
@@ -60,7 +61,7 @@ abstract public class CharacterCard extends Card{
 
     //Hunter
     public boolean hasFoodIcon(){
-        return this.foodIcon;
+        return foodIcon;
     }
 
     //Inventor

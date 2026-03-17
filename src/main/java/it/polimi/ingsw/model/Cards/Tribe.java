@@ -64,4 +64,10 @@ public class Tribe {
 
         return  i;
     }
+
+    // TODO
+    public int getSetNumOfDifferentCard(int setDim) {
+        int i = 0;
+        return i;
+    }
 }
