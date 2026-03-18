@@ -1,6 +1,5 @@
 package it.polimi.ingsw.model.EventEffects;
 
-import it.polimi.ingsw.model.Enum.CharacterType;
 import it.polimi.ingsw.model.Interfaces.EventEffect;
 import it.polimi.ingsw.model.Player;
 
