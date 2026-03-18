@@ -34,8 +34,8 @@ public class ShamanicRitualEffect implements BuildingEffect {
     }
 
     /** Apply building effect */
-    public void applyEffect(Player p, List<BuildingType> l) {
-        if (!l.contains(BuildingType.SHAMANIC))
+    public void applyEffect(Player p, BuildingType l) {
+        if (l != BuildingType.SHAMANIC)
             return;
 
         p.getTribe().getShamanicAttr().addStars(this.getExtraStars());

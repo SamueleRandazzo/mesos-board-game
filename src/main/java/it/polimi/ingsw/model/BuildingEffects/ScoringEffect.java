@@ -25,8 +25,8 @@ public class ScoringEffect implements BuildingEffect {
         this.setDim = setDim;
     }
 
-    public void applyEffect(Player p, List<BuildingType> l) {
-        if (!l.contains(BuildingType.SCORING))
+    public void applyEffect(Player p, BuildingType l) {
+        if (l != BuildingType.SCORING)
             return;
 
         int total = getTotalPoints(p);

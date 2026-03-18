@@ -24,8 +24,8 @@ public class CharacterModifierEffect implements BuildingEffect {
         return eventType;
     }
 
-    public void applyEffect(Player p, List<BuildingType> l) {
-        if (!l.contains(BuildingType.CHARACTER_MOD))
+    public void applyEffect(Player p, BuildingType l) {
+        if (l != BuildingType.CHARACTER_MOD)
             return;
 
         p.changeFoodAmount(extraFood * p.getTribe().numberOf(characterType));
