@@ -3,112 +3,114 @@ package it.polimi.ingsw.model.Cards;
 import java.util.*;
 
 import it.polimi.ingsw.model.BuildingCards.*;
-import it.polimi.ingsw.model.Enum.CharacterType;
+import it.polimi.ingsw.model.CharacterCards.*;
 import it.polimi.ingsw.model.Utility.*;
 
-/**
- * Represents the tribe of a player, containing all acquired
- * {@link BuildingCard} and {@link CharacterCard}. The tribe also keeps
- * track of the number of characters of each {@link CharacterType} and
- * manages shamanic attributes.
- *
- * Duplicate cards are automatically ignored thanks to the use of {@link HashSet}.
- */
 public class Tribe {
 
     private final List<InstantEffectBuilding> instantEffectBuildings;
     private final List<ScoringBuilding> scoringBuildings;
     private final List<SustenanceBuilding> sustenanceBuildings;
 
-    private final Set<CharacterCard> characterCards;
-    private final Map<CharacterType, Integer> count;
+    private final List<Artist> artists;
+    private final List<Binder> binders;
+    private final List<Builder> builders;
+    private final List<Hunter> hunters;
+    private final List<Inventor> inventors;
+    private final List<Shaman> shamans;
+    private Map<String, List<? extends Card>> allCardsMap;
 
     private final ShamanicAttributes shamanicAttr;
     private boolean extraCardFromUpper;
     private boolean extraFoodFromBonus;
 
     /**
-     * Creates an empty tribe with no cards and zero shamanic stars.
+     * Creates an empty tribe with no cards
      */
     public Tribe() {
         instantEffectBuildings = new ArrayList<>();
         scoringBuildings = new ArrayList<>();
         sustenanceBuildings = new ArrayList<>();
 
-        characterCards = new HashSet<>();
-        count = new EnumMap<>(CharacterType.class);
+        artists = new ArrayList<>();
+        binders = new ArrayList<>();
+        builders = new ArrayList<>();
+        hunters = new ArrayList<>();
+        inventors = new ArrayList<>();
+        shamans = new ArrayList<>();
 
-        for (CharacterType type : CharacterType.values()) {
-            count.put(type, 0);
-        }
+        initializeMap();
 
         shamanicAttr = new ShamanicAttributes();
         extraCardFromUpper = false;
         extraFoodFromBonus = false;
     }
 
-    /**
-     * Adds a {@link CharacterCard} to the tribe.
-     * If the card is new, the internal counters and shamanic stars are updated.
-     *
-     * @param card the character card to add (must not be null)
-     * @throws IllegalArgumentException if card is null
-     */
-    public void addCard(CharacterCard card) {
-        if (card == null)
-            throw new IllegalArgumentException("CharacterCard cannot be null");
+    public void initializeMap() {
+        allCardsMap = new HashMap<>();
 
-        // Update only if the card is actually added (no duplicates)
-        if (characterCards.add(card)) {
-            count.put(card.getType(), count.get(card.getType()) + 1);
-            shamanicAttr.addStars(card.getShamanStars());
-        }
-    }
-
-    /**
-     * Returns the number of character cards of a specific type.
-     *
-     * @param characterType the type to count (must not be null)
-     * @return number of cards of that type
-     * @throws IllegalArgumentException if characterType is null
-     */
-    public int numberOf(CharacterType characterType) {
-        if (characterType == null)
-            throw new IllegalArgumentException("CharacterType cannot be null");
-
-        return count.get(characterType);
+        allCardsMap.put("ARTIST", artists);
+        allCardsMap.put("BINDER", binders);
+        allCardsMap.put("BUILDER", builders);
+        allCardsMap.put("HUNTERS", hunters);
+        allCardsMap.put("INVENTORS", inventors);
+        allCardsMap.put("SHAMANS", shamans);
     }
 
     /**
      * @return total number of character cards in the tribe
      */
     public int numberOfCharacterCards() {
-        int sum = 0;
-        for (CharacterType type : CharacterType.values()) {
-            sum += numberOf(type);
-        }
-        return sum;
+        return allCardsMap.values().stream().mapToInt(List::size).sum();
+    }
+
+    //region Getter
+    /**
+     * Returns the number of Artist cards currently in the list.
+     * @return The total count of Artist cards.
+     */
+    public int getArtistsCount() {
+        return artists.size();
     }
 
     /**
-     * Computes the total prestige points of all character cards of a given type.
-     *
-     * @param type the character type to consider (must not be null)
-     * @return total prestige points for that type
-     * @throws IllegalArgumentException if type is null
+     * Returns the number of Binder cards currently in the list.
+     * @return The total count of Binder cards.
      */
-    public int getTotalPrestigePointsByType(CharacterType type) {
-        if (type == null)
-            throw new IllegalArgumentException("CharacterType cannot be null");
+    public int getBindersCount() {
+        return binders.size();
+    }
 
-        int total = 0;
+    /**
+     * Returns the number of Builder cards currently in the list.
+     * @return The total count of Builder cards.
+     */
+    public int getBuildersCount() {
+        return builders.size();
+    }
 
-        for (CharacterCard c : characterCards) {
-            if (c.getType() == type)
-                total += c.getPrestigePoints();
-        }
+    /**
+     * Returns the number of Hunter cards currently in the list.
+     * @return The total count of Hunter cards.
+     */
+    public int getHuntersCount() {
+        return hunters.size();
+    }
 
-        return total;
+    /**
+     * Returns the number of Inventor cards currently in the list.
+     * @return The total count of Inventor cards.
+     */
+    public int getInventorsCount() {
+        return inventors.size();
+    }
+
+    /**
+     * Returns the number of Shaman cards currently in the list.
+     * @return The total count of Shaman cards.
+     */
+    public int getShamansCount() {
+        return shamans.size();
     }
 
     /**
@@ -117,12 +119,113 @@ public class Tribe {
     public ShamanicAttributes getShamanicAttr() {
         return shamanicAttr;
     }
+    //endregion
+
+    //region Card Adder
+    public void addCard(InstantEffectBuilding card) {
+        if (card == null)
+            throw new IllegalArgumentException("BuildingCard cannot be null");
+
+        instantEffectBuildings.add(card);
+        shamanicAttr.setParamByBuilding(card);
+        extraCardFromUpper = extraCardFromUpper || card.isExtraCardFromUpper();
+        extraFoodFromBonus = extraFoodFromBonus || card.isExtraFoodFromBonus();
+    }
 
     /**
-     * @return total shamanic stars accumulated by the tribe
+     * Adds an Artist card to the corresponding list.
+     * @param card The Artist card to be added. Must not be null.
+     * @throws IllegalArgumentException if the card is null.
      */
-    public int getShamanicStars() {
-        return shamanicAttr.getStars();
+    public void addCard(Artist card) {
+        if (card == null)
+            throw new IllegalArgumentException("Artist card cannot be null");
+
+        this.artists.add(card);
+    }
+
+    /**
+     * Adds a Binder card to the corresponding list.
+     * @param card The Binder card to be added. Must not be null.
+     * @throws IllegalArgumentException if the card is null.
+     */
+    public void addCard(Binder card) {
+        if (card == null)
+            throw new IllegalArgumentException("Binder card cannot be null");
+
+        this.binders.add(card);
+    }
+
+    /**
+     * Adds a Builder card to the corresponding list.
+     * @param card The Builder card to be added. Must not be null.
+     * @throws IllegalArgumentException if the card is null.
+     */
+    public void addCard(Builder card) {
+        if (card == null)
+            throw new IllegalArgumentException("Builder card cannot be null");
+
+        this.builders.add(card);
+    }
+
+    /**
+     * Adds a Hunter card to the corresponding list.
+     * @param card The Hunter card to be added. Must not be null.
+     * @throws IllegalArgumentException if the card is null.
+     */
+    public void addCard(Hunter card) {
+        if (card == null)
+            throw new IllegalArgumentException("Hunter card cannot be null");
+
+        this.hunters.add(card);
+    }
+
+    /**
+     * Adds an Inventor card to the corresponding list.
+     * @param card The Inventor card to be added. Must not be null.
+     * @throws IllegalArgumentException if the card is null.
+     */
+    public void addCard(Inventor card) {
+        if (card == null)
+            throw new IllegalArgumentException("Inventor card cannot be null");
+
+        this.inventors.add(card);
+    }
+
+    /**
+     * Adds a Shaman card to the corresponding list.
+     * @param card The Shaman card to be added. Must not be null.
+     * @throws IllegalArgumentException if the card is null.
+     */
+    public void addCard(Shaman card) {
+        if (card == null)
+            throw new IllegalArgumentException("Shaman card cannot be null");
+
+        this.shamans.add(card);
+    }
+
+    public void addCard(ScoringBuilding card) {
+        if (card == null)
+            throw new IllegalArgumentException("BuildingCard cannot be null");
+
+        scoringBuildings.add(card);
+    }
+
+    public void addCard(SustenanceBuilding card) {
+        if (card == null)
+            throw new IllegalArgumentException("BuildingCard cannot be null");
+
+        sustenanceBuildings.add(card);
+    }
+    //endregion
+
+    public int getTotalScoringBuildingsPoints() {
+        int i = 0;
+
+        for (ScoringBuilding sb: scoringBuildings)
+            i += sb.getTotalPoints(this);
+
+        return i;
     }
 
     /**
@@ -141,39 +244,6 @@ public class Tribe {
         return 0;
     }
 
-    public void addCard(InstantEffectBuilding card) {
-        if (card == null)
-            throw new IllegalArgumentException("BuildingCard cannot be null");
-
-        instantEffectBuildings.add(card);
-        shamanicAttr.setParamByBuilding(card);
-        extraCardFromUpper = extraCardFromUpper || card.isExtraCardFromUpper();
-        extraFoodFromBonus = extraFoodFromBonus || card.isExtraFoodFromBonus();
-    }
-
-    public void addCard(ScoringBuilding card) {
-        if (card == null)
-            throw new IllegalArgumentException("BuildingCard cannot be null");
-
-        scoringBuildings.add(card);
-    }
-
-    public int getTotalScoringBuildingsPoints() {
-        int i = 0;
-
-        for (ScoringBuilding sb: scoringBuildings)
-            i += sb.getTotalPoints(this);
-
-        return i;
-    }
-
-    public void addCard(SustenanceBuilding card) {
-        if (card == null)
-            throw new IllegalArgumentException("BuildingCard cannot be null");
-
-        sustenanceBuildings.add(card);
-    }
-
     public int totalSustenanceDiscount() {
         int i = 0;
 
@@ -181,5 +251,9 @@ public class Tribe {
             i += sb.getDiscount(this);
 
         return i;
+    }
+
+    public int getTotalBuildersPoints() {
+        return builders.stream().mapToInt(Builder::getPrestigePoints).sum();
     }
 }

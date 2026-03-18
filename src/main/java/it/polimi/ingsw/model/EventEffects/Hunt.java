@@ -15,7 +15,7 @@ public class Hunt implements EventEffect {
 
     public void resolve(List<Player> players){
         for (Player p: players) {
-            int numberOfHunters = p.getTribe().numberOf(CharacterType.HUNTER);
+            int numberOfHunters = p.getTribe().getHuntersCount();
 
             p.changeFoodAmount(numberOfHunters);
             p.changePrestigePoints(numberOfHunters * pointsPerCard);

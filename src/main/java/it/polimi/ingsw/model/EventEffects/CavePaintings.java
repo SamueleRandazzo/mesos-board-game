@@ -19,7 +19,7 @@ public class CavePaintings implements EventEffect {
 
     public void resolve(List<Player> players) {
         for(Player p: players) {
-            int numberOfArtists = p.getTribe().numberOf(CharacterType.ARTIST);
+            int numberOfArtists = p.getTribe().getArtistsCount();
 
             if(numberOfArtists < penaltyThreshold)
                 p.changePrestigePoints(penaltyPoints);

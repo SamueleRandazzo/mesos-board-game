@@ -5,7 +5,7 @@ public abstract class Card {
     private final int minPlayer;
     private final boolean isObtainable;
 
-    Card(int era, int minPlayer, boolean isObtainable) {
+    protected Card(int era, int minPlayer, boolean isObtainable) {
         this.era = era;
         this.minPlayer = minPlayer;
         this.isObtainable = isObtainable;
