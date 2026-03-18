@@ -11,6 +11,8 @@ public class Tribe {
     private final List<InstantEffectBuilding> instantEffectBuildings;
     private final List<ScoringBuilding> scoringBuildings;
     private final List<SustenanceBuilding> sustenanceBuildings;
+    private final List<CavePaintingBuilding> cavePaintingBuildings;
+    private final List<HuntBuilding> huntBuildings;
 
     private final List<Artist> artists;
     private final List<Binder> binders;
@@ -31,6 +33,8 @@ public class Tribe {
         instantEffectBuildings = new ArrayList<>();
         scoringBuildings = new ArrayList<>();
         sustenanceBuildings = new ArrayList<>();
+        cavePaintingBuildings = new ArrayList<>();
+        huntBuildings = new ArrayList<>();
 
         artists = new ArrayList<>();
         binders = new ArrayList<>();
@@ -217,8 +221,25 @@ public class Tribe {
 
         sustenanceBuildings.add(card);
     }
+
+    public void addCard(CavePaintingBuilding card) {
+        if (card == null)
+            throw new IllegalArgumentException("BuildingCard cannot be null");
+
+        cavePaintingBuildings.add(card);
+    }
+
+    public void addCard(HuntBuilding card) {
+        if (card == null)
+            throw new IllegalArgumentException("BuildingCard cannot be null");
+
+        huntBuildings.add(card);
+    }
     //endregion
 
+    /**
+     * @return total extra points by scoring buildings
+     */
     public int getTotalScoringBuildingsPoints() {
         int i = 0;
 
@@ -244,6 +265,9 @@ public class Tribe {
         return 0;
     }
 
+    /**
+     * @return total food discount by sustenance buildings
+     */
     public int totalSustenanceDiscount() {
         int i = 0;
 
@@ -253,7 +277,22 @@ public class Tribe {
         return i;
     }
 
+    /**
+     * @return total points of builder cards
+     */
     public int getTotalBuildersPoints() {
         return builders.stream().mapToInt(Builder::getPrestigePoints).sum();
+    }
+
+    public int totalFoodByCavePaintingBuildings() {
+        return cavePaintingBuildings.stream().mapToInt(x -> x.getBonusFood(this)).sum();
+    }
+
+    public int totalFoodByHuntBuildings() {
+        return huntBuildings.stream().mapToInt(x -> x.getBonusFood(this)).sum();
+    }
+
+    public int totalPointsByHuntBuildings() {
+        return huntBuildings.stream().mapToInt(x -> x.getExtraPoints(this)).sum();
     }
 }
