@@ -1,6 +1,8 @@
 package it.polimi.ingsw.model.Cards;
 
 import java.util.*;
+
+import it.polimi.ingsw.model.BuildingCards.*;
 import it.polimi.ingsw.model.Enum.CharacterType;
 import it.polimi.ingsw.model.Utility.*;
 
@@ -14,16 +16,25 @@ import it.polimi.ingsw.model.Utility.*;
  */
 public class Tribe {
 
-    private final Set<BuildingCard> buildingCards;
+    private final List<InstantEffectBuilding> instantEffectBuildings;
+    private final List<ScoringBuilding> scoringBuildings;
+    private final List<SustenanceBuilding> sustenanceBuildings;
+
     private final Set<CharacterCard> characterCards;
     private final Map<CharacterType, Integer> count;
-    private ShamanicAttributes shamanicAttr;
+
+    private final ShamanicAttributes shamanicAttr;
+    private boolean extraCardFromUpper;
+    private boolean extraFoodFromBonus;
 
     /**
      * Creates an empty tribe with no cards and zero shamanic stars.
      */
     public Tribe() {
-        buildingCards = new HashSet<>();
+        instantEffectBuildings = new ArrayList<>();
+        scoringBuildings = new ArrayList<>();
+        sustenanceBuildings = new ArrayList<>();
+
         characterCards = new HashSet<>();
         count = new EnumMap<>(CharacterType.class);
 
@@ -32,6 +43,8 @@ public class Tribe {
         }
 
         shamanicAttr = new ShamanicAttributes();
+        extraCardFromUpper = false;
+        extraFoodFromBonus = false;
     }
 
     /**
@@ -48,22 +61,8 @@ public class Tribe {
         // Update only if the card is actually added (no duplicates)
         if (characterCards.add(card)) {
             count.put(card.getType(), count.get(card.getType()) + 1);
-            shamanicAttr.addStarsFromCards(card.getShamanStars());
+            shamanicAttr.addStars(card.getShamanStars());
         }
-    }
-
-    /**
-     * Adds a {@link BuildingCard} to the tribe.
-     * Duplicate cards are ignored automatically.
-     *
-     * @param card the building card to add (must not be null)
-     * @throws IllegalArgumentException if card is null
-     */
-    public void addCard(BuildingCard card) {
-        if (card == null)
-            throw new IllegalArgumentException("BuildingCard cannot be null");
-
-        buildingCards.add(card);
     }
 
     /**
@@ -140,5 +139,47 @@ public class Tribe {
 
         // TODO: implement logic
         return 0;
+    }
+
+    public void addCard(InstantEffectBuilding card) {
+        if (card == null)
+            throw new IllegalArgumentException("BuildingCard cannot be null");
+
+        instantEffectBuildings.add(card);
+        shamanicAttr.setParamByBuilding(card);
+        extraCardFromUpper = extraCardFromUpper || card.isExtraCardFromUpper();
+        extraFoodFromBonus = extraFoodFromBonus || card.isExtraFoodFromBonus();
+    }
+
+    public void addCard(ScoringBuilding card) {
+        if (card == null)
+            throw new IllegalArgumentException("BuildingCard cannot be null");
+
+        scoringBuildings.add(card);
+    }
+
+    public int getTotalScoringBuildingsPoints() {
+        int i = 0;
+
+        for (ScoringBuilding sb: scoringBuildings)
+            i += sb.getTotalPoints(this);
+
+        return i;
+    }
+
+    public void addCard(SustenanceBuilding card) {
+        if (card == null)
+            throw new IllegalArgumentException("BuildingCard cannot be null");
+
+        sustenanceBuildings.add(card);
+    }
+
+    public int totalSustenanceDiscount() {
+        int i = 0;
+
+        for (SustenanceBuilding sb: sustenanceBuildings)
+            i += sb.getDiscount(this);
+
+        return i;
     }
 }

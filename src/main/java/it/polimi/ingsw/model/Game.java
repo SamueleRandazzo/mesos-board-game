@@ -361,8 +361,8 @@ public class Game {
      * TODO: implement once Tribe exposes the required query methods.
      */
     private void computeFinalScores() {
-        for (Player player : players) {
-            // TODO: player.getTribe().computeEndGamePoints() or similar
+        for (Player p : players) {
+            p.changePrestigePoints(p.getTribe().getTotalScoringBuildingsPoints());
         }
     }
 
