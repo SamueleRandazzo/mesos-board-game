@@ -4,9 +4,11 @@ import java.util.*;
 
 import it.polimi.ingsw.model.BuildingCards.*;
 import it.polimi.ingsw.model.CharacterCards.*;
+import it.polimi.ingsw.model.Player;
 import it.polimi.ingsw.model.Utility.*;
 
 public class Tribe {
+    private final Player owner;
 
     private final List<InstantEffectBuilding> instantEffectBuildings;
     private final List<ScoringBuilding> scoringBuildings;
@@ -29,7 +31,12 @@ public class Tribe {
     /**
      * Creates an empty tribe with no cards
      */
-    public Tribe() {
+    public Tribe(Player p) {
+        if (p == null)
+            throw new IllegalArgumentException("Tribe must have an owner");
+
+        this.owner = p;
+
         instantEffectBuildings = new ArrayList<>();
         scoringBuildings = new ArrayList<>();
         sustenanceBuildings = new ArrayList<>();
@@ -126,16 +133,6 @@ public class Tribe {
     //endregion
 
     //region Card Adder
-    public void addCard(InstantEffectBuilding card) {
-        if (card == null)
-            throw new IllegalArgumentException("BuildingCard cannot be null");
-
-        instantEffectBuildings.add(card);
-        shamanicAttr.setParamByBuilding(card);
-        extraCardFromUpper = extraCardFromUpper || card.isExtraCardFromUpper();
-        extraFoodFromBonus = extraFoodFromBonus || card.isExtraFoodFromBonus();
-    }
-
     /**
      * Adds an Artist card to the corresponding list.
      * @param card The Artist card to be added. Must not be null.
@@ -182,6 +179,10 @@ public class Tribe {
             throw new IllegalArgumentException("Hunter card cannot be null");
 
         this.hunters.add(card);
+
+        if (card.hasFoodIcon()) {
+            owner.changeFoodAmount(hunters.size());
+        }
     }
 
     /**
@@ -197,7 +198,7 @@ public class Tribe {
     }
 
     /**
-     * Adds a Shaman card to the corresponding list.
+     * Adds a Shaman card to the corresponding list and update tribe shaman stars.
      * @param card The Shaman card to be added. Must not be null.
      * @throws IllegalArgumentException if the card is null.
      */
@@ -206,6 +207,17 @@ public class Tribe {
             throw new IllegalArgumentException("Shaman card cannot be null");
 
         this.shamans.add(card);
+        shamanicAttr.addStars(card.getShamanStars());
+    }
+
+    public void addCard(InstantEffectBuilding card) {
+        if (card == null)
+            throw new IllegalArgumentException("BuildingCard cannot be null");
+
+        instantEffectBuildings.add(card);
+        shamanicAttr.setParamByBuilding(card);
+        extraCardFromUpper = extraCardFromUpper || card.isExtraCardFromUpper();
+        extraFoodFromBonus = extraFoodFromBonus || card.isExtraFoodFromBonus();
     }
 
     public void addCard(ScoringBuilding card) {
@@ -280,19 +292,39 @@ public class Tribe {
     /**
      * @return total points of builder cards
      */
-    public int getTotalBuildersPoints() {
+    public int totalBuildersPoints() {
         return builders.stream().mapToInt(Builder::getPrestigePoints).sum();
     }
 
+    /**
+     * @return total food discount of builder cards
+     */
+    public int totalBuildersFoodDiscount() {
+        return builders.stream().mapToInt(Builder::getFoodDiscount).sum();
+    }
+
+    /**
+     * @return total points from cave paintings buildings
+     */
     public int totalFoodByCavePaintingBuildings() {
         return cavePaintingBuildings.stream().mapToInt(x -> x.getBonusFood(this)).sum();
     }
 
+    /**
+     * @return total food from hunt paintings buildings
+     */
     public int totalFoodByHuntBuildings() {
         return huntBuildings.stream().mapToInt(x -> x.getBonusFood(this)).sum();
     }
 
+    /**
+     * @return total points from hunt paintings buildings
+     */
     public int totalPointsByHuntBuildings() {
         return huntBuildings.stream().mapToInt(x -> x.getExtraPoints(this)).sum();
+    }
+
+    public int totalDifferentInventorIcon() {
+        return Math.toIntExact(inventors.stream().map(Inventor::getInventionIcon).distinct().count());
     }
 }

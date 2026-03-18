@@ -18,7 +18,7 @@ public class Player
         this.prestigePoints = 0;
         this.foodAmount = 0;
         this.color = color;
-        tribe = new Tribe();
+        tribe = new Tribe(this);
     }
 
     public Tribe getTribe(){

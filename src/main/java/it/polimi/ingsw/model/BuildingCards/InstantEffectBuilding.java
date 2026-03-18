@@ -9,9 +9,9 @@ public class InstantEffectBuilding extends BuildingCard {
     private final boolean extraCardFromUpper;
     private final boolean extraFoodFromBonus;
 
-    InstantEffectBuilding(int era, int minPlayer, boolean isObtainable, int foodCost, int prestigePoints, boolean isFinalBuilding,
+    InstantEffectBuilding(int era, int minPlayer, boolean isObtainable, int foodCost, int prestigePoints,
                           int extraStars, boolean preventLoss, boolean doubleOnWinning, boolean extraCardFromUpper, boolean extraFoodFromBonus) {
-        super(era, minPlayer, isObtainable, foodCost, prestigePoints, isFinalBuilding);
+        super(era, minPlayer, isObtainable, foodCost, prestigePoints);
         this.extraStars = extraStars;
         this.preventLoss = preventLoss;
         this.doubleOnWinning = doubleOnWinning;

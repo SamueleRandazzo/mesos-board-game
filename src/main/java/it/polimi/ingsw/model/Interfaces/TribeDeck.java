@@ -9,4 +9,5 @@ package it.polimi.ingsw.model.Interfaces;
  *  - EventCard
  */
 public interface TribeDeck {
+    public int getEra();
 }

@@ -8,9 +8,9 @@ public class SustenanceBuilding extends BuildingCard {
     private final int foodDiscountPerCard;
     private final CharacterTypeCount discountType;
 
-    public SustenanceBuilding(int era, int minPlayer, boolean isObtainable, int foodCost, int prestigePoints, boolean isFinalBuilding,
+    public SustenanceBuilding(int era, int minPlayer, boolean isObtainable, int foodCost, int prestigePoints,
                               int foodDiscountPerCard, CharacterTypeCount discountType) {
-        super(era, minPlayer, isObtainable, foodCost, prestigePoints, isFinalBuilding);
+        super(era, minPlayer, isObtainable, foodCost, prestigePoints);
         this.foodDiscountPerCard = foodDiscountPerCard;
         this.discountType = discountType;
     }
