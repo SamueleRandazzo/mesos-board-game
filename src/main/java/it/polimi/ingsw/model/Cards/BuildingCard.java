@@ -10,15 +10,15 @@ import java.util.List;
 public class BuildingCard extends Card {
     private final int foodCost;
     private final int prestigePoints;
-    private List<BuildingEffect> effectList;
+    private final BuildingEffect buildingEffect;
     private final boolean isFinalBuilding;
 
-    BuildingCard(int era, int minPlayer, boolean isObtainable, int foodCost, int prestigePoints, boolean isFinalBuilding, List<BuildingEffect> effectList) {
+    BuildingCard(int era, int minPlayer, boolean isObtainable, int foodCost, int prestigePoints, boolean isFinalBuilding, BuildingEffect buildingEffect) {
         super(era, minPlayer, isObtainable);
         this.foodCost = foodCost;
         this.prestigePoints = prestigePoints;
         this.isFinalBuilding = isFinalBuilding;
-        this.effectList = new ArrayList<>(effectList);
+        this.buildingEffect = buildingEffect;
     }
 
     /** Return building food cost */
@@ -36,15 +36,8 @@ public class BuildingCard extends Card {
         return isFinalBuilding;
     }
 
-    /** Add effect */
-    public void addEffect(BuildingEffect effect) {
-        this.effectList.add(effect);
-    }
-
     /** Activate all effect */
-    public void activateAllEffect(Player p, List<BuildingType> l) {
-        for (BuildingEffect e : this.effectList) {
-            e.applyEffect(p, l);
-        }
+    public void activateAllEffect(Player p, BuildingType l) {
+        buildingEffect.applyEffect(p, l);
     }
 }

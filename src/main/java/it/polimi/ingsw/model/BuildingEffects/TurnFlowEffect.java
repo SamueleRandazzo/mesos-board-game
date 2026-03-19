@@ -27,8 +27,8 @@ public class TurnFlowEffect implements BuildingEffect {
     }
 
     /** Apply building effect */
-    public void applyEffect(Player p, List<BuildingType> l) {
-        if (!l.contains(BuildingType.TURN_FLOW))
+    public void applyEffect(Player p, BuildingType l) {
+        if (l != BuildingType.TURN_FLOW)
             return;
     }
 }

@@ -5,6 +5,7 @@ import it.polimi.ingsw.model.Enum.*;
 import it.polimi.ingsw.model.*;
 import java.util.List;
 
+
 public interface BuildingEffect {
-    public void applyEffect(Player p, List<BuildingType> typeList);
+    public void applyEffect(Player p, BuildingType typeList);
 }
