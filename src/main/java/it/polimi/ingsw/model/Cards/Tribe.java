@@ -253,12 +253,7 @@ public class Tribe {
      * @return total extra points by scoring buildings
      */
     public int getTotalScoringBuildingsPoints() {
-        int i = 0;
-
-        for (ScoringBuilding sb: scoringBuildings)
-            i += sb.getTotalPoints(this);
-
-        return i;
+        return scoringBuildings.stream().mapToInt(x -> x.getTotalPoints(this)).sum();
     }
 
     /**
@@ -281,12 +276,7 @@ public class Tribe {
      * @return total food discount by sustenance buildings
      */
     public int totalSustenanceDiscount() {
-        int i = 0;
-
-        for (SustenanceBuilding sb: sustenanceBuildings)
-            i += sb.getDiscount(this);
-
-        return i;
+        return sustenanceBuildings.stream().mapToInt(x -> x.getDiscount(this)).sum();
     }
 
     /**
