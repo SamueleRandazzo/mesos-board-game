@@ -18,7 +18,7 @@ public class TurnOrderFactory {
             4, List.of(2, 1, 0, -1),
             5, List.of(3, 1, 0, 0, -1)
     );
-    /* creates the TurnOrderTile, the param is the number of player of the game and returns
+    /** creates the TurnOrderTile, the param is the number of player of the game and returns
        a configuration TurnOrderTile
      */
     public static TurnOrderTile createTrack(int numOfPlayers){

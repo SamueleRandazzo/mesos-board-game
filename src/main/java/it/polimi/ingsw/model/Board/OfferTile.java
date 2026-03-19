@@ -12,7 +12,7 @@ public class OfferTile {
     private final int bottomRowDraws;
     private Totem placedTotem;
 
-    /* Constructor for OfferTile */
+    /** Constructor for OfferTile */
     public OfferTile(int foodBonus, TileId tileId, int topRowDraws, int bottomRowDraws){
         this.foodBonus = foodBonus;
         this.tileId = tileId;
@@ -21,38 +21,38 @@ public class OfferTile {
         this.placedTotem = null;
     }
 
-    /* returns the eventual food bonus of the tile*/
+    /** returns the eventual food bonus of the tile*/
     public int getFoodBonus(){
         return this.foodBonus;
     }
 
-    /* returns the number of cards that the player can draw from the top row.*/
+    /** returns the number of cards that the player can draw from the top row.*/
     public int getTopRowDraws(){
         return this.topRowDraws;
     }
-    /* returns the number of cards that the player can draw from the bottom row.*/
+    /** returns the number of cards that the player can draw from the bottom row.*/
     public int getBottomRowDraws(){
         return this.bottomRowDraws;
     }
 
-    /*returns the id of the Tile which is a letter*/
+    /** returns the id of the Tile which is a letter*/
     public TileId getTileId(){
         return this.tileId;
     }
-    /* checks if the tile is available (a tile is available if no totem placed on it)
+    /** checks if the tile is available (a tile is available if no totem placed on it)
        return true if available, false otherwise.
      */
     public boolean isAvailable(){
         return placedTotem == null;
     }
 
-    /* places a totem on this tile, param "totem" is the totem to place*/
+    /** places a totem on this tile, param "totem" is the totem to place*/
     public void placeTotem(Totem totem){
         this.placedTotem = totem;
 
     }
 
-    /*remove the totem from this tile at the end of the phase*/
+    /** remove the totem from this tile at the end of the phase*/
     public void removeTotem(){
 
         this.placedTotem = null;

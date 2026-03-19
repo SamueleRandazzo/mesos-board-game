@@ -10,13 +10,13 @@ public class TurnOrderTile {
 
     private final List<TurnOrderSlot> slots;
 
-    /* Constructor: create the tile with the exact number and type of slot*/
+    /** Constructor: create the tile with the exact number and type of slot*/
     public TurnOrderTile(List<TurnOrderSlot> slots){
         this.slots = new ArrayList<>(slots);
     }
 
-    /*place the param in the first free slot, return the food modifier of the slot, throws an IllegalStateException if all
-    * slots are already occupied*/
+    /** place the param in the first free slot, return the food modifier of the slot, throws an IllegalStateException if all
+    * slots are already occupied */
     public int placeTotem(Totem totem){
 
         for(TurnOrderSlot slot : slots){
@@ -32,8 +32,8 @@ public class TurnOrderTile {
         throw new IllegalStateException("Cannot place totem: the Turn Order Track is full.");
     }
 
-    /*Calculates the turn order for next round
-      return the list of totem in the order they will play
+    /** Calculates the turn order for next round
+        return the list of totem in the order they will play
      */
     public List<Totem> getNextRoundOrder(){
 
