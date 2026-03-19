@@ -1,31 +1,32 @@
-package it.polimi.ingsw.model.EventCardsPackage;
-import it.polimi.ingsw.model.Cards.EventCard;
+package it.polimi.ingsw.model.EventEffects;
+
+import it.polimi.ingsw.model.Interfaces.EventEffect;
 import it.polimi.ingsw.model.Player;
-import it.polimi.ingsw.model.Game;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ShamanicRitual extends EventCard {
+public class ShamanicRitual implements EventEffect {
     private final int victoryPrestigePoints;
     private final int defeatPrestigePoints;
-    public ShamanicRitual(int era, int minPlayer, boolean isObtainable, boolean isFinal, int victoryPrestigePoints, int defeatPrestigePoints) {
-        super(era, minPlayer, isObtainable, isFinal);
+
+    public ShamanicRitual(int victoryPrestigePoints, int defeatPrestigePoints) {
         this.victoryPrestigePoints = victoryPrestigePoints;
         this.defeatPrestigePoints = defeatPrestigePoints;
     }
 
-    @Override
-    protected void eventHandler(Player player){
+    public void resolve(List<Player> players) {
         int maxStars = Integer.MIN_VALUE;
         int minStars = Integer.MAX_VALUE;
-        Map<Player, Integer> shamanicStarsForPlayer = new HashMap<>();
+
         List<Player> maxPlayers = new ArrayList<>();
         List<Player> minPlayers = new ArrayList<>();
 
-        // TODO
-        //for(Player pl: Game.game().getPlayers()) shamanicStarsForPlayer.put(pl, pl.getTribe().getShamanicStars());
+        Map<Player, Integer> shamanicStarsForPlayer = new HashMap<>();
+        for (Player p: players) {
+            shamanicStarsForPlayer.put(p, p.getTribe().getShamanicAttr().getStars());
+        }
 
         for (int stars : shamanicStarsForPlayer.values()) {
             if (stars > maxStars) maxStars = stars;
@@ -37,7 +38,10 @@ public class ShamanicRitual extends EventCard {
             if (entry.getValue() == minStars) minPlayers.add(entry.getKey());
         }
 
-        for (Player pl : maxPlayers) pl.changePrestigePoints(victoryPrestigePoints);
-        for (Player pl : minPlayers) pl.changePrestigePoints(defeatPrestigePoints);
+        for (Player pl : maxPlayers)
+            pl.changePrestigePoints(pl.getTribe().getShamanicAttr().isDoubleOnWinning() ? victoryPrestigePoints * 2 : victoryPrestigePoints);
+
+        for (Player pl : minPlayers)
+            pl.changePrestigePoints(pl.getTribe().getShamanicAttr().isPreventLoss() ? 0 : defeatPrestigePoints);
     }
 }

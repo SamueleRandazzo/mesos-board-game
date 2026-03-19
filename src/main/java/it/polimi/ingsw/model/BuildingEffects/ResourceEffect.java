@@ -7,7 +7,7 @@ import it.polimi.ingsw.model.Player;
 import java.util.List;
 
 public class ResourceEffect implements BuildingEffect {
-    public void applyEffect(Player p, List<BuildingType> typeList) {
+    public void applyEffect(Player p, BuildingType l) {
 
     }
 }
