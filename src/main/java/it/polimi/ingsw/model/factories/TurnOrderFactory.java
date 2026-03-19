@@ -30,7 +30,7 @@ public class TurnOrderFactory {
         }
 
         List<TurnOrderSlot> slots = new ArrayList<>();
-        for(int mod : modifiers){ //scorre la lista di modifiers e mod è l' intero della lista ad ogni iterazione
+        for(int mod : modifiers){ //scorre la lista di modifiers e mod è l' intero della lista ad ogni iterazione,ad ogni iterazione crea uno slot con fooodModifier uguale a quello passato
 
             slots.add(new TurnOrderSlot((mod)));
         }
