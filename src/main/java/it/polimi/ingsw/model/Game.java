@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  * concurrent games (e.g. on a server) without Singleton constraints.
  * <p>
  * Responsibilities:
- *  - Initialising and holding all model objects (Board, Players, OfferTrack)
+ *  - Initializing and holding all model objects (Board, Players, OfferTrack)
  *  - Managing the current era and detecting era transitions
  *  - Driving the 10-round game loop (place totems → resolve actions → end-of-round)
  *  - Resolving events found in the lower row at end of round
@@ -293,16 +293,15 @@ public class Game {
      * Checks whether the cards just revealed in the upper row belong to a new era.
      * If so, triggers the era transition on Board (rulebook p. 7).
      */
+
     private void checkEraTransition() {
         List<TribeDeck> topRow = board.getTopRow();
 
         for (TribeDeck card : topRow) {
-            if (card instanceof Card) {
-                int cardEra = ((Card) card).getEra();
-                if (cardEra > currentEra) {
-                    advanceEra(cardEra);
-                    break; // One transition per round is enough
-                }
+            int cardEra = card.getEra();
+            if (cardEra > currentEra) {
+                advanceEra(cardEra);
+                break; // One transition per round is enough
             }
         }
     }
@@ -361,8 +360,11 @@ public class Game {
      * TODO: implement once Tribe exposes the required query methods.
      */
     private void computeFinalScores() {
-        for (Player player : players) {
-            // TODO: player.getTribe().computeEndGamePoints() or similar
+        for (Player p : players) {
+            p.changePrestigePoints(p.getTribe().getTotalScoringBuildingsPoints());
+            p.changePrestigePoints((p.getTribe().getArtistsCount() / 2) * 10);
+            p.changePrestigePoints(p.getTribe().getInventorsCount() * p.getTribe().totalDifferentInventorIcon());
+            p.changePrestigePoints(p.getTribe().totalBuildersPoints());
         }
     }
 
@@ -395,10 +397,7 @@ public class Game {
                 .collect(Collectors.toList());
     }
 
-    // -------------------------------------------------------------------------
-    // Getters
-    // -------------------------------------------------------------------------
-
+    //region Getters
     /**
      * Returns the list of players in this game.
      *
@@ -452,6 +451,7 @@ public class Game {
     public OfferTrack getOfferTrack() {
         return offerTrack;
     }
+    //endregion
 
     //create the TurnOrderTile using the TurnOrderFactory
     public boolean createTurnOrderTile(int numPlayers){

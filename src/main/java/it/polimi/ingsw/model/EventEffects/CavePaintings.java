@@ -1,6 +1,5 @@
 package it.polimi.ingsw.model.EventEffects;
 
-import it.polimi.ingsw.model.Enum.CharacterType;
 import it.polimi.ingsw.model.Interfaces.EventEffect;
 import it.polimi.ingsw.model.Player;
 
@@ -19,7 +18,9 @@ public class CavePaintings implements EventEffect {
 
     public void resolve(List<Player> players) {
         for(Player p: players) {
-            int numberOfArtists = p.getTribe().numberOf(CharacterType.ARTIST);
+            p.changeFoodAmount(p.getTribe().totalFoodByCavePaintingBuildings());
+
+            int numberOfArtists = p.getTribe().getArtistsCount();
 
             if(numberOfArtists < penaltyThreshold)
                 p.changePrestigePoints(penaltyPoints);

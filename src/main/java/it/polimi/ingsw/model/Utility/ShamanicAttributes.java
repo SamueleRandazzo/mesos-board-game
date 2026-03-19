@@ -1,14 +1,14 @@
 package it.polimi.ingsw.model.Utility;
 
+import it.polimi.ingsw.model.BuildingCards.InstantEffectBuilding;
+
 public class ShamanicAttributes {
     private int stars;
-    private int starsFromCards;
     private boolean preventLoss;
     private boolean doubleOnWinning;
 
     public ShamanicAttributes() {
         stars = 0;
-        starsFromCards = 0;
         preventLoss = false;
         doubleOnWinning = false;
     }
@@ -29,11 +29,6 @@ public class ShamanicAttributes {
         this.stars += stars;
     }
 
-    public void addStarsFromCards(int s) {
-        this.stars += s;
-        this.starsFromCards += s;
-    }
-
     public void setPreventLoss(boolean preventLoss) {
         this.preventLoss = preventLoss;
     }
@@ -42,9 +37,9 @@ public class ShamanicAttributes {
         this.doubleOnWinning = doubleOnWinning;
     }
 
-    public void reset() {
-        this.doubleOnWinning = false;
-        this.preventLoss = false;
-        this.stars = this.starsFromCards;
+    public void setParamByBuilding(InstantEffectBuilding card) {
+        addStars(card.getExtraStars());
+        setPreventLoss(this.preventLoss || card.isPreventLoss());
+        setDoubleOnWinning(this.doubleOnWinning || card.isDoubleOnWinning());
     }
 }
