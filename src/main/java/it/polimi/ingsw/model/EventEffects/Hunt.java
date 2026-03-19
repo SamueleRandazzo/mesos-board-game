@@ -1,6 +1,5 @@
 package it.polimi.ingsw.model.EventEffects;
 
-import it.polimi.ingsw.model.Enum.CharacterType;
 import it.polimi.ingsw.model.Interfaces.EventEffect;
 import it.polimi.ingsw.model.Player;
 
@@ -15,7 +14,10 @@ public class Hunt implements EventEffect {
 
     public void resolve(List<Player> players){
         for (Player p: players) {
-            int numberOfHunters = p.getTribe().numberOf(CharacterType.HUNTER);
+            p.changeFoodAmount(p.getTribe().totalFoodByHuntBuildings());
+            p.changePrestigePoints(p.getTribe().totalPointsByHuntBuildings());
+
+            int numberOfHunters = p.getTribe().getHuntersCount();
 
             p.changeFoodAmount(numberOfHunters);
             p.changePrestigePoints(numberOfHunters * pointsPerCard);
