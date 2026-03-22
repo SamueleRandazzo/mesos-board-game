@@ -17,7 +17,7 @@ public class Tribe {
     private final List<HuntBuilding> huntBuildings;
 
     private final List<Artist> artists;
-    private final List<Binder> binders;
+    private final List<Gatherer> gatherers;
     private final List<Builder> builders;
     private final List<Hunter> hunters;
     private final List<Inventor> inventors;
@@ -44,7 +44,7 @@ public class Tribe {
         huntBuildings = new ArrayList<>();
 
         artists = new ArrayList<>();
-        binders = new ArrayList<>();
+        gatherers = new ArrayList<>();
         builders = new ArrayList<>();
         hunters = new ArrayList<>();
         inventors = new ArrayList<>();
@@ -61,7 +61,7 @@ public class Tribe {
         allCardsMap = new HashMap<>();
 
         allCardsMap.put("ARTIST", artists);
-        allCardsMap.put("BINDER", binders);
+        allCardsMap.put("GATHERER", gatherers);
         allCardsMap.put("BUILDER", builders);
         allCardsMap.put("HUNTERS", hunters);
         allCardsMap.put("INVENTORS", inventors);
@@ -88,8 +88,8 @@ public class Tribe {
      * Returns the number of Binder cards currently in the list.
      * @return The total count of Binder cards.
      */
-    public int getBindersCount() {
-        return binders.size();
+    public int getGatherersCount() {
+        return gatherers.size();
     }
 
     /**
@@ -150,11 +150,11 @@ public class Tribe {
      * @param card The Binder card to be added. Must not be null.
      * @throws IllegalArgumentException if the card is null.
      */
-    public void addCard(Binder card) {
+    public void addCard(Gatherer card) {
         if (card == null)
             throw new IllegalArgumentException("Binder card cannot be null");
 
-        this.binders.add(card);
+        this.gatherers.add(card);
     }
 
     /**

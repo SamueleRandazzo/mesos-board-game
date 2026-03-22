@@ -12,7 +12,7 @@ public class Sustenance implements EventEffect {
 
     public void resolve(List<Player> players){
         for (Player p: players) {
-            int toFeed = p.getTribe().numberOfCharacterCards() - p.getTribe().getBindersCount() * 3 - p.getTribe().totalSustenanceDiscount();
+            int toFeed = p.getTribe().numberOfCharacterCards() - p.getTribe().getGatherersCount() * 3 - p.getTribe().totalSustenanceDiscount();
 
             if (toFeed > 0) {
                 p.changeFoodAmount(-toFeed);
