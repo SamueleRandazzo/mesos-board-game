@@ -85,8 +85,8 @@ public class Tribe {
     }
 
     /**
-     * Returns the number of Binder cards currently in the list.
-     * @return The total count of Binder cards.
+     * Returns the number of Gatherer cards currently in the list.
+     * @return The total count of Gatherer cards.
      */
     public int getGatherersCount() {
         return gatherers.size();
@@ -146,13 +146,13 @@ public class Tribe {
     }
 
     /**
-     * Adds a Binder card to the corresponding list.
-     * @param card The Binder card to be added. Must not be null.
+     * Adds a Gatherer card to the corresponding list.
+     * @param card The Gatherer card to be added. Must not be null.
      * @throws IllegalArgumentException if the card is null.
      */
     public void addCard(Gatherer card) {
         if (card == null)
-            throw new IllegalArgumentException("Binder card cannot be null");
+            throw new IllegalArgumentException("Gatherer card cannot be null");
 
         this.gatherers.add(card);
     }
