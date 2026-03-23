@@ -368,8 +368,7 @@ public class Game {
             throw new IllegalStateException("Tile già occupata!");
         }
 
-        // Fondamentale: il model deve cambiare stato!
-        //chosen.occupy(player);
+        chosen.placeTotem(player);
 
         // Se il regolamento dice che dopo il piazzamento il turno passa al prossimo:
         advanceTurn();

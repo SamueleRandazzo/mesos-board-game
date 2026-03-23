@@ -2,7 +2,7 @@ package it.polimi.ingsw.model.Board;
 
 
 import it.polimi.ingsw.model.Enum.TileId;
-import it.polimi.ingsw.model.Totem;
+import it.polimi.ingsw.model.Player;
 
 public class OfferTile {
 
@@ -10,7 +10,7 @@ public class OfferTile {
     private final TileId tileId;
     private final int topRowDraws;
     private final int bottomRowDraws;
-    private Totem placedTotem;
+    private Player placedPlayer;
 
     /** Constructor for OfferTile */
     public OfferTile(int foodBonus, TileId tileId, int topRowDraws, int bottomRowDraws){
@@ -18,7 +18,7 @@ public class OfferTile {
         this.tileId = tileId;
         this.topRowDraws = topRowDraws;
         this.bottomRowDraws = bottomRowDraws;
-        this.placedTotem = null;
+        this.placedPlayer = null;
     }
 
     /** returns the eventual food bonus of the tile*/
@@ -43,18 +43,18 @@ public class OfferTile {
        return true if available, false otherwise.
      */
     public boolean isAvailable(){
-        return placedTotem == null;
+        return placedPlayer == null;
     }
 
     /** places a totem on this tile, param "totem" is the totem to place*/
-    public void placeTotem(Totem totem){
-        this.placedTotem = totem;
+    public void placeTotem(Player player){
+        this.placedPlayer = player;
 
     }
 
     /** remove the totem from this tile at the end of the phase*/
     public void removeTotem(){
 
-        this.placedTotem = null;
+        this.placedPlayer = null;
     }
 }
