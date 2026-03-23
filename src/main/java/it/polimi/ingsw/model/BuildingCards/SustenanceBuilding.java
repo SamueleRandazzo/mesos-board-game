@@ -18,4 +18,9 @@ public class SustenanceBuilding extends BuildingCard {
     public int getDiscount(Tribe t) {
         return foodDiscountPerCard * discountType.cardNumber(t);
     }
+
+    @Override
+    public void addToTribe(Tribe tribe) {
+        tribe.addCard(this);
+    }
 }

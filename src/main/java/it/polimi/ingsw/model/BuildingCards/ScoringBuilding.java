@@ -38,4 +38,9 @@ public class ScoringBuilding extends BuildingCard {
 
         return i;
     }
+
+    @Override
+    public void addToTribe(Tribe tribe) {
+        tribe.addCard(this);
+    }
 }

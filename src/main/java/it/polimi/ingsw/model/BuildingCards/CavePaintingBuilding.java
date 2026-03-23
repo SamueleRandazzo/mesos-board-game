@@ -19,4 +19,9 @@ public class CavePaintingBuilding extends BuildingCard {
     public int getBonusFood(Tribe t) {
         return extraFood * typeCount.cardNumber(t);
     }
+
+    @Override
+    public void addToTribe(Tribe tribe) {
+        tribe.addCard(this);
+    }
 }

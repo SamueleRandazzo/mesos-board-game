@@ -1,6 +1,8 @@
 package it.polimi.ingsw.model.Cards;
 
-public abstract class BuildingCard extends Card {
+import it.polimi.ingsw.model.Interfaces.PlayerTribe;
+
+public abstract class BuildingCard extends Card implements PlayerTribe {
     private final int foodCost;
     private final int prestigePoints;
 
