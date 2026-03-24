@@ -22,15 +22,12 @@ class CavePaintingsTest {
     private Player player;
     private List<Player> players;
 
-    // Test constants
-    private final int THRESHOLD = 2;
-    private final int BONUS_PER_ARTIST = 2;
     private final int PENALTY = 3;
 
     @BeforeEach
     void setUp() {
         // Threshold: 2, Bonus: 2 PP per artist, Penalty: 3 PP
-        cavePaintings = new CavePaintings(THRESHOLD, BONUS_PER_ARTIST, PENALTY);
+        cavePaintings = new CavePaintings(2, 2, PENALTY);
 
         // Initializing player with a color as per Player.java constructor
         player = new Player(Color.RED);
