@@ -2,6 +2,8 @@ package it.polimi.ingsw.model;
 
 import it.polimi.ingsw.model.Board.Board;
 import it.polimi.ingsw.model.Board.OfferTrack;
+import it.polimi.ingsw.model.Board.TurnOrderSlot;
+import it.polimi.ingsw.model.Board.TurnOrderTile;
 import it.polimi.ingsw.model.Cards.BuildingCard;
 import it.polimi.ingsw.model.Cards.Card;
 import it.polimi.ingsw.model.Enum.Color;
@@ -47,15 +49,16 @@ class GameAdvancedTest {
     private static Game newGameWithPlayersAndBuildings(List<Player> players,
                                                        List<BuildingCard> era1,
                                                        List<BuildingCard> era2,
-                                                       List<BuildingCard> era3) {
+                                                       List<BuildingCard> era3,
+                                                       TurnOrderTile t) {
         return new Game(
                 players,
                 emptyTribeDeckList(),
                 era1,
                 era2,
                 era3,
-                newOfferTrack()
-        );
+                newOfferTrack(),
+                t);
     }
 
     private static void setPrivateField(Object target, String fieldName, Object value) {
@@ -86,6 +89,10 @@ class GameAdvancedTest {
 
     @Test
     void checkEraTransition_shouldNotAdvanceEraWhenTopRowHasOnlyCurrentEraCards() {
+        // TODO Fill tos param and t param
+        List<TurnOrderSlot> tos = new ArrayList<>();
+        TurnOrderTile t = new TurnOrderTile(tos);
+
         List<Player> players = List.of(
                 newPlayer(Color.RED, 0, 0),
                 newPlayer(Color.BLUE, 0, 0)
@@ -95,7 +102,8 @@ class GameAdvancedTest {
                 players,
                 emptyBuildingList(),
                 buildingPlaceholders(3),
-                buildingPlaceholders(4)
+                buildingPlaceholders(4),
+                t
         );
 
         Board board = game.getBoard();
@@ -110,6 +118,10 @@ class GameAdvancedTest {
 
     @Test
     void checkEraTransition_shouldAdvanceEraAndLoadNewBuildingsWhenHigherEraCardAppears() {
+        // TODO Fill tos param and t param
+        List<TurnOrderSlot> tos = new ArrayList<>();
+        TurnOrderTile t = new TurnOrderTile(tos);
+
         List<Player> players = List.of(
                 newPlayer(Color.RED, 0, 0),
                 newPlayer(Color.BLUE, 0, 0)
@@ -119,7 +131,8 @@ class GameAdvancedTest {
                 players,
                 emptyBuildingList(),
                 buildingPlaceholders(3),
-                buildingPlaceholders(4)
+                buildingPlaceholders(4),
+                t
         );
 
         Board board = game.getBoard();
