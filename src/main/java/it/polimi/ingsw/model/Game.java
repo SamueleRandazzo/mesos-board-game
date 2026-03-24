@@ -53,6 +53,9 @@ public class Game {
     /** Number of players in this game. Drives board row sizes and turn order. */
     private final int numPlayers;
 
+    /** The player whose turn it currently is. */
+    private Player currentPlayer;
+
     /** The game board (rows, decks). Owned exclusively by this Game instance. */
     private final Board board;
 
@@ -120,10 +123,11 @@ public class Game {
             );
         }
 
-        this.players      = new ArrayList<>(players);
-        this.offerTrack   = offerTrack;
-        this.currentEra   = FIRST_ERA;
-        this.currentRound = 1;
+        this.players       = new ArrayList<>(players);
+        this.offerTrack    = offerTrack;
+        this.currentEra    = FIRST_ERA;
+        this.currentRound  = 1;
+        this.currentPlayer = this.players.get(0);
 
         // TurnOrderTile is created here via factory — no need for a separate createTurnOrderTile() call
         this.turnOrderTile = TurnOrderFactory.createTrack(this.numPlayers);
@@ -161,11 +165,8 @@ public class Game {
             playRound();
         }
 
-        // End of game: resolve all remaining visible events (rulebook p. 7)
-        resolveRemainingEvents();
-
-        // Add end-of-game prestige points (builders, inventors, artists, buildings)
-        computeFinalScores();
+        // End of game: resolve all remaining visible events and compute final scores
+        endGame();
     }
 
     /**
@@ -351,12 +352,24 @@ public class Game {
     // -------------------------------------------------------------------------
 
     /**
-     * At the end of round 10, resolves all Event cards still visible
-     * on the board — both upper and lower rows (rulebook p. 7).
-     * Sustenance is resolved last as usual.
+     * Ends the game by resolving all remaining visible events on the board
+     * (both upper and lower rows, rulebook p. 7) and computing final scores.
+     * <p>
+     * Called automatically by startGame() at the end of round 10, but can
+     * also be called explicitly if needed.
      * <p>
      * TODO: replace instanceof with card.isEvent() and event.isSustenance()
      *       once TribeDeck and EventEffect expose those methods.
+     */
+    public void endGame() {
+        resolveRemainingEvents();
+        computeFinalScores();
+    }
+
+    /**
+     * Resolves all Event cards still visible on the board at game end —
+     * both upper and lower rows (rulebook p. 7).
+     * Sustenance is resolved last as usual.
      */
     private void resolveRemainingEvents() {
         List<EventCard> events = new ArrayList<>();
@@ -500,6 +513,15 @@ public class Game {
      */
     public TurnOrderTile getTurnOrderTile() {
         return turnOrderTile;
+    }
+
+    /**
+     * Returns the player whose turn it currently is.
+     *
+     * @return the current player
+     */
+    public Player getCurrentPlayer() {
+        return currentPlayer;
     }
     //endregion
 }
