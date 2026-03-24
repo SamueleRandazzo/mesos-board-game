@@ -2,12 +2,12 @@ package it.polimi.ingsw.model;
 
 import it.polimi.ingsw.model.Board.Board;
 import it.polimi.ingsw.model.Board.OfferTrack;
-import it.polimi.ingsw.model.Board.TurnOrderSlot;
 import it.polimi.ingsw.model.Board.TurnOrderTile;
 import it.polimi.ingsw.model.Cards.BuildingCard;
 import it.polimi.ingsw.model.Cards.Card;
 import it.polimi.ingsw.model.Enum.Color;
 import it.polimi.ingsw.model.Interfaces.TribeDeck;
+import it.polimi.ingsw.model.factories.TurnOrderFactory;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -46,11 +46,14 @@ class GameAdvancedTest {
         return new OfferTrack(new ArrayList<>());
     }
 
+    private static TurnOrderTile newTurnOrderTile(int numPlayers) {
+        return TurnOrderFactory.createTrack(numPlayers);
+    }
+
     private static Game newGameWithPlayersAndBuildings(List<Player> players,
                                                        List<BuildingCard> era1,
                                                        List<BuildingCard> era2,
-                                                       List<BuildingCard> era3,
-                                                       TurnOrderTile t) {
+                                                       List<BuildingCard> era3) {
         return new Game(
                 players,
                 emptyTribeDeckList(),
@@ -58,7 +61,8 @@ class GameAdvancedTest {
                 era2,
                 era3,
                 newOfferTrack(),
-                t);
+                newTurnOrderTile(players.size())
+        );
     }
 
     private static void setPrivateField(Object target, String fieldName, Object value) {
@@ -81,6 +85,9 @@ class GameAdvancedTest {
         }
     }
 
+    /**
+     * Fake tribe card usata solo per controllare l'era nei test.
+     */
     private static class FakeTribeCard extends Card implements TribeDeck {
         protected FakeTribeCard(int era) {
             super(era, 2, true);
@@ -89,10 +96,6 @@ class GameAdvancedTest {
 
     @Test
     void checkEraTransition_shouldNotAdvanceEraWhenTopRowHasOnlyCurrentEraCards() {
-        // TODO Fill tos param and t param
-        List<TurnOrderSlot> tos = new ArrayList<>();
-        TurnOrderTile t = new TurnOrderTile(tos);
-
         List<Player> players = List.of(
                 newPlayer(Color.RED, 0, 0),
                 newPlayer(Color.BLUE, 0, 0)
@@ -102,8 +105,7 @@ class GameAdvancedTest {
                 players,
                 emptyBuildingList(),
                 buildingPlaceholders(3),
-                buildingPlaceholders(4),
-                t
+                buildingPlaceholders(4)
         );
 
         Board board = game.getBoard();
@@ -118,10 +120,6 @@ class GameAdvancedTest {
 
     @Test
     void checkEraTransition_shouldAdvanceEraAndLoadNewBuildingsWhenHigherEraCardAppears() {
-        // TODO Fill tos param and t param
-        List<TurnOrderSlot> tos = new ArrayList<>();
-        TurnOrderTile t = new TurnOrderTile(tos);
-
         List<Player> players = List.of(
                 newPlayer(Color.RED, 0, 0),
                 newPlayer(Color.BLUE, 0, 0)
@@ -130,9 +128,8 @@ class GameAdvancedTest {
         Game game = newGameWithPlayersAndBuildings(
                 players,
                 emptyBuildingList(),
-                buildingPlaceholders(3),
-                buildingPlaceholders(4),
-                t
+                buildingPlaceholders(3), // edifici era II
+                buildingPlaceholders(4)  // edifici era III
         );
 
         Board board = game.getBoard();
