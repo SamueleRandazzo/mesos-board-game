@@ -1,7 +1,6 @@
 package it.polimi.ingsw.model.Cards;
 
 import java.util.*;
-
 import it.polimi.ingsw.model.BuildingCards.*;
 import it.polimi.ingsw.model.CharacterCards.*;
 import it.polimi.ingsw.model.Player;
@@ -150,7 +149,7 @@ public class Tribe {
 
         this.artists.add(card);
 
-        this.checkSet6Bonus();
+        this.checkSetBonus();
     }
 
     /**
@@ -164,7 +163,7 @@ public class Tribe {
 
         this.gatherers.add(card);
 
-        this.checkSet6Bonus();
+        this.checkSetBonus();
     }
 
     /**
@@ -178,7 +177,7 @@ public class Tribe {
 
         this.builders.add(card);
 
-        this.checkSet6Bonus();
+        this.checkSetBonus();
     }
 
     /**
@@ -196,7 +195,7 @@ public class Tribe {
             owner.changeFoodAmount(hunters.size());
         }
 
-        this.checkSet6Bonus();
+        this.checkSetBonus();
     }
 
     /**
@@ -222,7 +221,7 @@ public class Tribe {
             }
         }
 
-        this.checkSet6Bonus();
+        this.checkSetBonus();
     }
 
     /**
@@ -282,8 +281,8 @@ public class Tribe {
 
         cardAddedBuildings.add(card);
 
-        if (card.isBonusOnSet6Characters()) {
-            card.setInitialSetCount(this.getSetNumOfDifferentCard(card.getSetDim()));
+        if (card.isBonusOnSetCharacters()) {
+            card.setInitialSetCount(this.getSetCountOfDifferentCard(card.getSetDim()));
         }
     }
     //endregion
@@ -303,7 +302,7 @@ public class Tribe {
      * @return number of complete sets
      * @throws IllegalArgumentException if setDim <= 0
      */
-    public int getSetNumOfDifferentCard(int setDim) {
+    public int getSetCountOfDifferentCard(int setDim) {
         if (setDim <= 0)
             throw new IllegalArgumentException("setDim must be greater than 0");
 
@@ -357,15 +356,33 @@ public class Tribe {
         return huntBuildings.stream().mapToInt(x -> x.getExtraPoints(this)).sum();
     }
 
+    /**
+     * @return total number of different inventor icon
+     */
     public int totalDifferentInventorIcon() {
         return Math.toIntExact(inventors.stream().map(Inventor::getInventionIcon).distinct().count());
     }
 
-    private void checkSet6Bonus() {
+    /**
+     * Processes food rewards for completing new sets of unique character cards.
+     * <p>
+     * Checks if the current number of completed sets exceeds the sum of sets
+     * owned at purchase and those already rewarded. If a new set is detected,
+     * it grants the food bonus and increments the reward counter to prevent
+     * multiple payouts for the same set.
+     * </p>
+     *
+     * @see CardAddedBuilding#getInitialSetCount()
+     * @see CardAddedBuilding#getRewardedSetCount()
+     */
+    private void checkSetBonus() {
         for (CardAddedBuilding building : cardAddedBuildings) {
-            if (building.isBonusOnSet6Characters()
-                    && getSetNumOfDifferentCard(building.getSetDim()) > building.getInitialSetCount()) {
-                this.owner.changeFoodAmount(building.getFoodBonus());
+            if (building.isBonusOnSetCharacters()) {
+                int setCountRequired = building.getInitialSetCount() + building.getRewardedSetCount();
+                if (getSetCountOfDifferentCard(building.getSetDim()) > setCountRequired) {
+                    this.owner.changeFoodAmount(building.getFoodBonus());
+                    building.incrementRewardedSetCount();
+                }
             }
         }
     }

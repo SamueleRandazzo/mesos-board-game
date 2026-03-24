@@ -2,23 +2,24 @@ package it.polimi.ingsw.model.BuildingCards;
 
 import it.polimi.ingsw.model.Cards.BuildingCard;
 import it.polimi.ingsw.model.Cards.Tribe;
-import java.util.*;
 
 public class CardAddedBuilding extends BuildingCard {
     private final int foodBonus;
     private final boolean bonusOnDuplicateInventor;
-    private final boolean bonusOnSet6Characters;
+    private final boolean bonusOnSetCharacters;
     private int initialSetCount;
+    private int rewardedSetCount;
     private int setDim;
 
     public CardAddedBuilding(int era, int minPlayer, boolean isObtainable, int foodCost, int prestigePoints,
-                             boolean bonusOnDuplicateInventor, boolean bonusOnSet6Characters, int foodBonus, int setDim) {
+                             boolean bonusOnDuplicateInventor, boolean bonusOnSetCharacters, int foodBonus, int setDim) {
         super(era, minPlayer, isObtainable, foodCost, prestigePoints);
         this.bonusOnDuplicateInventor = bonusOnDuplicateInventor;
-        this.bonusOnSet6Characters = bonusOnSet6Characters;
+        this.bonusOnSetCharacters = bonusOnSetCharacters;
         this.foodBonus = foodBonus;
         this.setDim = setDim;
         initialSetCount = 0;
+        rewardedSetCount = 0;
     }
 
     @Override
@@ -30,8 +31,8 @@ public class CardAddedBuilding extends BuildingCard {
         return bonusOnDuplicateInventor;
     }
 
-    public boolean isBonusOnSet6Characters() {
-        return bonusOnSet6Characters;
+    public boolean isBonusOnSetCharacters() {
+        return bonusOnSetCharacters;
     }
 
     public int getFoodBonus() {
@@ -46,7 +47,15 @@ public class CardAddedBuilding extends BuildingCard {
         return setDim;
     }
 
+    public int getRewardedSetCount() {
+        return rewardedSetCount;
+    }
+
     public void setInitialSetCount(int n) {
         this.initialSetCount = n;
+    }
+
+    public void incrementRewardedSetCount() {
+        rewardedSetCount++;
     }
 }
