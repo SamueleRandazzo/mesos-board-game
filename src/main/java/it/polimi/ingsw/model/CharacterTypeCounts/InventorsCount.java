@@ -6,6 +6,6 @@ import it.polimi.ingsw.model.Interfaces.CharacterTypeCount;
 public class InventorsCount implements CharacterTypeCount {
     @Override
     public int cardNumber(Tribe t) {
-        return t.getHuntersCount();
+        return t.getInventorsCount();
     }
 }
