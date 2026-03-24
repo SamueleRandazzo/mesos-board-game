@@ -6,6 +6,8 @@ import it.polimi.ingsw.model.Player;
 import java.util.List;
 
 /**
+ * Represents the Cave Paintings event effect in the game.
+ *
  * <p>For each player:
  * <ul>
  *     <li>They gain Food equal to the total provided by their Cave Painting buildings.</li>
