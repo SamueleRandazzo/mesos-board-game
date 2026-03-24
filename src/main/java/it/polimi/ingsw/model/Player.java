@@ -12,8 +12,8 @@ public class Player
     private final Color color;
     private Tribe tribe;
 
-    public Player(Color color){ //perhaps a different implementation is needed
-        this.nickname = "";
+    public Player(Color color, String nickname){ //perhaps a different implementation is needed
+        this.nickname = nickname;
         this.password = "";
         this.prestigePoints = 0;
         this.foodAmount = 0;
