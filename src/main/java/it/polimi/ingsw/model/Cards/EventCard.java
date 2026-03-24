@@ -21,4 +21,15 @@ public class EventCard extends Card {
     public boolean isFinal(){
         return this.isFinal;
     }
+
+    /**
+     * Returns the EventEffect associated with this card.
+     * Used by Game to identify the type of event (e.g. Sustenance)
+     * without relying on subclasses.
+     *
+     * @return the EventEffect of this card
+     */
+    public EventEffect getEventEffect() {
+        return eventEffect;
+    }
 }

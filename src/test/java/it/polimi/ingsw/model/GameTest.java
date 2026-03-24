@@ -1,11 +1,10 @@
 package it.polimi.ingsw.model;
 
-import it.polimi.ingsw.model.Board.OfferTrack;
 import it.polimi.ingsw.model.Board.OfferTile;
-import it.polimi.ingsw.model.Board.TurnOrderTile;
+import it.polimi.ingsw.model.Board.OfferTrack;
 import it.polimi.ingsw.model.Cards.BuildingCard;
-import it.polimi.ingsw.model.Interfaces.TribeDeck;
 import it.polimi.ingsw.model.Enum.Color;
+import it.polimi.ingsw.model.Interfaces.TribeDeck;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -15,21 +14,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class GameTest {
 
-    /**
-     * Utility: creates a list of null placeholders.
-     * Useful when the tested method only needs the list size / structure.
-     */
-    private static <T> List<T> placeholders(int n) {
-        List<T> list = new ArrayList<>();
-        for (int i = 0; i < n; i++) {
-            list.add(null);
-        }
-        return list;
+    private static List<TribeDeck> emptyTribeDeckList() {
+        return new ArrayList<>();
     }
 
-    /**
-     * Utility: creates a valid player.
-     */
+    private static List<BuildingCard> emptyBuildingList() {
+        return new ArrayList<>();
+    }
+
     private static Player newPlayer(Color color, int prestige, int food) {
         Player p = new Player(color);
         p.setPrestigePoints(prestige);
@@ -37,27 +29,18 @@ class GameTest {
         return p;
     }
 
-    /**
-     * Utility: creates a minimal OfferTrack.
-     * Empty is fine for the tests below because we are not exercising round logic yet.
-     */
     private static OfferTrack newOfferTrack() {
         return new OfferTrack(new ArrayList<OfferTile>());
     }
 
-    /**
-     * Utility: creates a valid Game instance with the provided players.
-     * TurnOrderTile is passed as null because current tested methods do not use it.
-     */
     private static Game newGameWithPlayers(List<Player> players) {
         return new Game(
                 players,
-                placeholders(0),   // tribeDeck
-                placeholders(0),   // era1Buildings
-                placeholders(0),   // era2Buildings
-                placeholders(0),   // era3Buildings
-                newOfferTrack(),
-                null               // turnOrderTile
+                emptyTribeDeckList(),
+                emptyBuildingList(),
+                emptyBuildingList(),
+                emptyBuildingList(),
+                newOfferTrack()
         );
     }
 
@@ -126,12 +109,11 @@ class GameTest {
         assertThrows(NullPointerException.class, () ->
                 new Game(
                         null,
-                        placeholders(0),
-                        placeholders(0),
-                        placeholders(0),
-                        placeholders(0),
-                        newOfferTrack(),
-                        null
+                        emptyTribeDeckList(),
+                        emptyBuildingList(),
+                        emptyBuildingList(),
+                        emptyBuildingList(),
+                        newOfferTrack()
                 )
         );
     }
@@ -147,11 +129,10 @@ class GameTest {
                 new Game(
                         players,
                         null,
-                        placeholders(0),
-                        placeholders(0),
-                        placeholders(0),
-                        newOfferTrack(),
-                        null
+                        emptyBuildingList(),
+                        emptyBuildingList(),
+                        emptyBuildingList(),
+                        newOfferTrack()
                 )
         );
     }
@@ -166,12 +147,49 @@ class GameTest {
         assertThrows(NullPointerException.class, () ->
                 new Game(
                         players,
-                        placeholders(0),
+                        emptyTribeDeckList(),
                         null,
-                        placeholders(0),
-                        placeholders(0),
-                        newOfferTrack(),
-                        null
+                        emptyBuildingList(),
+                        emptyBuildingList(),
+                        newOfferTrack()
+                )
+        );
+    }
+
+    @Test
+    void constructor_shouldThrowExceptionWhenEra2BuildingsIsNull() {
+        List<Player> players = List.of(
+                newPlayer(Color.RED, 0, 0),
+                newPlayer(Color.BLUE, 0, 0)
+        );
+
+        assertThrows(NullPointerException.class, () ->
+                new Game(
+                        players,
+                        emptyTribeDeckList(),
+                        emptyBuildingList(),
+                        null,
+                        emptyBuildingList(),
+                        newOfferTrack()
+                )
+        );
+    }
+
+    @Test
+    void constructor_shouldThrowExceptionWhenEra3BuildingsIsNull() {
+        List<Player> players = List.of(
+                newPlayer(Color.RED, 0, 0),
+                newPlayer(Color.BLUE, 0, 0)
+        );
+
+        assertThrows(NullPointerException.class, () ->
+                new Game(
+                        players,
+                        emptyTribeDeckList(),
+                        emptyBuildingList(),
+                        emptyBuildingList(),
+                        null,
+                        newOfferTrack()
                 )
         );
     }
@@ -186,11 +204,10 @@ class GameTest {
         assertThrows(NullPointerException.class, () ->
                 new Game(
                         players,
-                        placeholders(0),
-                        placeholders(0),
-                        placeholders(0),
-                        placeholders(0),
-                        null,
+                        emptyTribeDeckList(),
+                        emptyBuildingList(),
+                        emptyBuildingList(),
+                        emptyBuildingList(),
                         null
                 )
         );

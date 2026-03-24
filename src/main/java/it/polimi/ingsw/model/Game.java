@@ -4,6 +4,7 @@ import it.polimi.ingsw.model.Cards.*;
 import it.polimi.ingsw.model.Interfaces.*;
 import it.polimi.ingsw.model.Board.*;
 import it.polimi.ingsw.model.factories.TurnOrderFactory;
+import it.polimi.ingsw.model.EventEffects.Sustenance;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,8 +59,8 @@ public class Game {
     /** The offer track (tiles where players place their totems). */
     private final OfferTrack offerTrack;
 
-    /** The TurnOrderTrack*/
-    private TurnOrderTile TurnOrderTile;
+    /** The turn order tile, created via TurnOrderFactory at game start. */
+    private final TurnOrderTile turnOrderTile;
 
     /**
      * Current era (1, 2 or 3).
@@ -89,12 +90,12 @@ public class Game {
      * the decks according to the setup rules (rulebook p. 2-3) before passing
      * them in.
      *
-     * @param players         players in initial (randomised) turn order; size must be 2-5
-     * @param tribeDeck       full ordered tribe deck (Era I on top, Final Events at bottom)
-     * @param era1Buildings   building cards selected for Era I
-     * @param era2Buildings   building cards selected for Era II
-     * @param era3Buildings   building cards selected for Era III
-     * @param offerTrack      the offer track initialised for the correct player count
+     * @param players        players in initial (randomised) turn order; size must be 2-5
+     * @param tribeDeck      full ordered tribe deck (Era I on top, Final Events at bottom)
+     * @param era1Buildings  building cards selected for Era I
+     * @param era2Buildings  building cards selected for Era II
+     * @param era3Buildings  building cards selected for Era III
+     * @param offerTrack     the offer track initialised for the correct player count
      * @throws IllegalArgumentException if player count is outside 2-5
      * @throws NullPointerException     if any argument is null
      */
@@ -103,8 +104,7 @@ public class Game {
                 List<BuildingCard> era1Buildings,
                 List<BuildingCard> era2Buildings,
                 List<BuildingCard> era3Buildings,
-                OfferTrack offerTrack, TurnOrderTile turnOrderTile) {
-                TurnOrderTile = turnOrderTile;
+                OfferTrack offerTrack) {
 
         if (players == null)       throw new NullPointerException("players cannot be null.");
         if (tribeDeck == null)     throw new NullPointerException("tribeDeck cannot be null.");
@@ -124,6 +124,9 @@ public class Game {
         this.offerTrack   = offerTrack;
         this.currentEra   = FIRST_ERA;
         this.currentRound = 1;
+
+        // TurnOrderTile is created here via factory — no need for a separate createTurnOrderTile() call
+        this.turnOrderTile = TurnOrderFactory.createTrack(this.numPlayers);
 
         // Store Era II and III building decks for later use
         this.eraBuildingDecks = new ArrayList<>();
@@ -203,8 +206,8 @@ public class Game {
      * as indicated by that slot (rulebook p. 4).
      * <p>
      * TODO: actual player input / AI decision needed here.
-     * TODO: occupy() method name to be confirmed with OfferTile owner.
-     * TODO: getColor() method to be added to Player.
+     * TODO: placeTotem() requires a Totem object — pending decision on whether
+     *       Totem class is kept or replaced by Color directly on Player.
      */
     private void placeTotems() {
         for (Player player : players) {
@@ -213,7 +216,7 @@ public class Game {
                 // TODO: ask the player (or controller) which tile to choose.
                 // Placeholder: first available tile.
                 OfferTile chosen = available.get(0);
-                // TODO: chosen.occupy(player.getColor());
+                // TODO: chosen.placeTotem(player.getTotem());
             }
         }
     }
@@ -267,12 +270,16 @@ public class Game {
      * If two events of the same type appear, they are resolved in era order.
      * <p>
      * Non-event cards (Character, Building) are ignored here.
+     * <p>
+     * TODO: replace instanceof EventCard with card.isEvent() once TribeDeck exposes that method.
+     * TODO: replace instanceof Sustenance with event.isSustenance() once EventEffect exposes that method.
      */
     private void resolveEventsInLowerRow() {
         List<TribeDeck> bottomRow = board.getBottomRow();
 
         List<EventCard> events = new ArrayList<>();
         for (TribeDeck card : bottomRow) {
+            // TODO: replace with card.isEvent()
             if (card instanceof EventCard) {
                 events.add((EventCard) card);
             }
@@ -280,12 +287,28 @@ public class Game {
 
         if (events.isEmpty()) return;
 
-        // Sort: non-sustenance events first (by era), sustenance last.
-        // TODO: identify Sustenance by subclass once EventCard subclasses are available.
-        events.sort(Comparator.comparingInt(EventCard::getEra));
+        // TODO: replace with event.isSustenance() once EventEffect exposes that method
+        List<EventCard> normalEvents = new ArrayList<>();
+        List<EventCard> sustenanceEvents = new ArrayList<>();
 
         for (EventCard event : events) {
-            event.raiseEvent(getPlayers()); // NOTE: raiseEvent() still uses Game.game() singleton — to fix later.
+            if (event.getEventEffect() instanceof Sustenance) {
+                sustenanceEvents.add(event);
+            } else {
+                normalEvents.add(event);
+            }
+        }
+
+        // Resolve normal events in era order
+        normalEvents.sort(Comparator.comparingInt(EventCard::getEra));
+        for (EventCard event : normalEvents) {
+            event.raiseEvent(players);
+        }
+
+        // Resolve Sustenance last, in era order if multiple
+        sustenanceEvents.sort(Comparator.comparingInt(EventCard::getEra));
+        for (EventCard event : sustenanceEvents) {
+            event.raiseEvent(players);
         }
     }
 
@@ -293,7 +316,6 @@ public class Game {
      * Checks whether the cards just revealed in the upper row belong to a new era.
      * If so, triggers the era transition on Board (rulebook p. 7).
      */
-
     private void checkEraTransition() {
         List<TribeDeck> topRow = board.getTopRow();
 
@@ -332,21 +354,42 @@ public class Game {
      * At the end of round 10, resolves all Event cards still visible
      * on the board — both upper and lower rows (rulebook p. 7).
      * Sustenance is resolved last as usual.
+     * <p>
+     * TODO: replace instanceof with card.isEvent() and event.isSustenance()
+     *       once TribeDeck and EventEffect expose those methods.
      */
     private void resolveRemainingEvents() {
         List<EventCard> events = new ArrayList<>();
 
         for (TribeDeck card : board.getBottomRow()) {
+            // TODO: replace with card.isEvent()
             if (card instanceof EventCard) events.add((EventCard) card);
         }
         for (TribeDeck card : board.getTopRow()) {
+            // TODO: replace with card.isEvent()
             if (card instanceof EventCard) events.add((EventCard) card);
         }
 
-        events.sort(Comparator.comparingInt(EventCard::getEra));
+        // TODO: replace with event.isSustenance() once EventEffect exposes that method
+        List<EventCard> normalEvents = new ArrayList<>();
+        List<EventCard> sustenanceEvents = new ArrayList<>();
 
         for (EventCard event : events) {
-            event.raiseEvent(getPlayers()); // NOTE: to fix after EventCard Singleton dependency is removed.
+            if (event.getEventEffect() instanceof Sustenance) {
+                sustenanceEvents.add(event);
+            } else {
+                normalEvents.add(event);
+            }
+        }
+
+        normalEvents.sort(Comparator.comparingInt(EventCard::getEra));
+        for (EventCard event : normalEvents) {
+            event.raiseEvent(players);
+        }
+
+        sustenanceEvents.sort(Comparator.comparingInt(EventCard::getEra));
+        for (EventCard event : sustenanceEvents) {
+            event.raiseEvent(players);
         }
     }
 
@@ -356,8 +399,6 @@ public class Game {
      *  - Inventor PP (numInventors x numDistinctInventionIcons)
      *  - 10 PP per every 2 Artist cards
      *  - Building card PP (printed + end-game effects)
-     * <p>
-     * TODO: implement once Tribe exposes the required query methods.
      */
     private void computeFinalScores() {
         for (Player p : players) {
@@ -451,14 +492,14 @@ public class Game {
     public OfferTrack getOfferTrack() {
         return offerTrack;
     }
-    //endregion
 
-    //create the TurnOrderTile using the TurnOrderFactory
-    public boolean createTurnOrderTile(int numPlayers){
-
-        this.TurnOrderTile = TurnOrderFactory.createTrack(numPlayers);
-
-        return true;
-        //l' eccezione sul numero di players è già gestita
+    /**
+     * Returns the turn order tile for this game.
+     *
+     * @return the TurnOrderTile
+     */
+    public TurnOrderTile getTurnOrderTile() {
+        return turnOrderTile;
     }
+    //endregion
 }
