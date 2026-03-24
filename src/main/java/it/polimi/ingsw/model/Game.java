@@ -88,8 +88,7 @@ public class Game {
                 List<BuildingCard> era1Buildings,
                 List<BuildingCard> era2Buildings,
                 List<BuildingCard> era3Buildings,
-                OfferTrack offerTrack, TurnOrderTile turnOrderTile) {
-                TurnOrderTile = turnOrderTile;
+                OfferTrack offerTrack) {
 
         if (players == null)       throw new NullPointerException("players cannot be null.");
         if (tribeDeck == null)     throw new NullPointerException("tribeDeck cannot be null.");
@@ -105,23 +104,23 @@ public class Game {
             );
         }
 
-        this.players      = new ArrayList<>(players);
-        this.offerTrack   = offerTrack;
-        this.currentEra   = FIRST_ERA;
+        this.players = new ArrayList<>(players);
+        this.offerTrack = offerTrack;
+        this.currentEra = FIRST_ERA;
         this.currentRound = 1;
+        this.currentPlayerIndex = 0;
 
-        // Store Era II and III building decks for later use
+        this.TurnOrderTile = TurnOrderFactory.createTrack(this.numPlayers);
+
         this.eraBuildingDecks = new ArrayList<>();
         this.eraBuildingDecks.add(new ArrayList<>(era2Buildings));
         this.eraBuildingDecks.add(new ArrayList<>(era3Buildings));
 
-        // Board is created with Era I buildings
         this.board = new Board(tribeDeck, era1Buildings);
     }
 
     public void initializeGame() {
         setupInitialRows();
-        createTurnOrderTile(numPlayers);
         this.currentRound = 1;
         this.currentPlayerIndex = 0;
     }
@@ -346,16 +345,11 @@ public class Game {
     public Player getCurrentActivePlayer() {
         return players.get(currentPlayerIndex);
     }
-    //endregion
 
-    //create the TurnOrderTile using the TurnOrderFactory
-    public boolean createTurnOrderTile(int numPlayers){
-
-        this.TurnOrderTile = TurnOrderFactory.createTrack(numPlayers);
-
-        return true;
-        //l' eccezione sul numero di players è già gestita
+    public TurnOrderTile getTurnOrderTile() {
+        return TurnOrderTile;
     }
+    //endregion
 
     public void advanceTurn() {
         this.currentPlayerIndex = (currentPlayerIndex + 1) % numPlayers;

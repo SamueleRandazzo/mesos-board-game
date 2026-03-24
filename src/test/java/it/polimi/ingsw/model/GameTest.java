@@ -2,11 +2,9 @@ package it.polimi.ingsw.model;
 
 import it.polimi.ingsw.model.Board.OfferTile;
 import it.polimi.ingsw.model.Board.OfferTrack;
-import it.polimi.ingsw.model.Board.TurnOrderTile;
 import it.polimi.ingsw.model.Cards.BuildingCard;
 import it.polimi.ingsw.model.Enum.Color;
 import it.polimi.ingsw.model.Interfaces.TribeDeck;
-import it.polimi.ingsw.model.factories.TurnOrderFactory;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -25,7 +23,7 @@ class GameTest {
     }
 
     private static Player newPlayer(Color color, int prestige, int food) {
-        Player p = new Player(color);
+        Player p = new Player(color, "test"); // nickname dummy
         p.setPrestigePoints(prestige);
         p.setFoodAmount(food);
         return p;
@@ -35,10 +33,6 @@ class GameTest {
         return new OfferTrack(new ArrayList<OfferTile>());
     }
 
-    private static TurnOrderTile newTurnOrderTile(int numPlayers) {
-        return TurnOrderFactory.createTrack(numPlayers);
-    }
-
     private static Game newGameWithPlayers(List<Player> players) {
         return new Game(
                 players,
@@ -46,8 +40,7 @@ class GameTest {
                 emptyBuildingList(),
                 emptyBuildingList(),
                 emptyBuildingList(),
-                newOfferTrack(),
-                newTurnOrderTile(players.size())
+                newOfferTrack()
         );
     }
 
@@ -116,8 +109,7 @@ class GameTest {
                         emptyBuildingList(),
                         emptyBuildingList(),
                         emptyBuildingList(),
-                        newOfferTrack(),
-                        null
+                        newOfferTrack()
                 )
         );
     }
@@ -136,8 +128,7 @@ class GameTest {
                         emptyBuildingList(),
                         emptyBuildingList(),
                         emptyBuildingList(),
-                        newOfferTrack(),
-                        newTurnOrderTile(players.size())
+                        newOfferTrack()
                 )
         );
     }
@@ -156,8 +147,7 @@ class GameTest {
                         null,
                         emptyBuildingList(),
                         emptyBuildingList(),
-                        newOfferTrack(),
-                        newTurnOrderTile(players.size())
+                        newOfferTrack()
                 )
         );
     }
@@ -176,8 +166,7 @@ class GameTest {
                         emptyBuildingList(),
                         null,
                         emptyBuildingList(),
-                        newOfferTrack(),
-                        newTurnOrderTile(players.size())
+                        newOfferTrack()
                 )
         );
     }
@@ -196,8 +185,7 @@ class GameTest {
                         emptyBuildingList(),
                         emptyBuildingList(),
                         null,
-                        newOfferTrack(),
-                        newTurnOrderTile(players.size())
+                        newOfferTrack()
                 )
         );
     }
@@ -216,8 +204,7 @@ class GameTest {
                         emptyBuildingList(),
                         emptyBuildingList(),
                         emptyBuildingList(),
-                        null,
-                        newTurnOrderTile(players.size())
+                        null
                 )
         );
     }

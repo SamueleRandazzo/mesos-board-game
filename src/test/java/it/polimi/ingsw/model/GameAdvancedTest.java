@@ -2,12 +2,10 @@ package it.polimi.ingsw.model;
 
 import it.polimi.ingsw.model.Board.Board;
 import it.polimi.ingsw.model.Board.OfferTrack;
-import it.polimi.ingsw.model.Board.TurnOrderTile;
 import it.polimi.ingsw.model.Cards.BuildingCard;
 import it.polimi.ingsw.model.Cards.Card;
 import it.polimi.ingsw.model.Enum.Color;
 import it.polimi.ingsw.model.Interfaces.TribeDeck;
-import it.polimi.ingsw.model.factories.TurnOrderFactory;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -36,7 +34,7 @@ class GameAdvancedTest {
     }
 
     private static Player newPlayer(Color color, int prestige, int food) {
-        Player p = new Player(color);
+        Player p = new Player(color, "player-" + color);
         p.setPrestigePoints(prestige);
         p.setFoodAmount(food);
         return p;
@@ -44,10 +42,6 @@ class GameAdvancedTest {
 
     private static OfferTrack newOfferTrack() {
         return new OfferTrack(new ArrayList<>());
-    }
-
-    private static TurnOrderTile newTurnOrderTile(int numPlayers) {
-        return TurnOrderFactory.createTrack(numPlayers);
     }
 
     private static Game newGameWithPlayersAndBuildings(List<Player> players,
@@ -60,8 +54,7 @@ class GameAdvancedTest {
                 era1,
                 era2,
                 era3,
-                newOfferTrack(),
-                newTurnOrderTile(players.size())
+                newOfferTrack()
         );
     }
 
@@ -85,9 +78,6 @@ class GameAdvancedTest {
         }
     }
 
-    /**
-     * Fake tribe card usata solo per controllare l'era nei test.
-     */
     private static class FakeTribeCard extends Card implements TribeDeck {
         protected FakeTribeCard(int era) {
             super(era, 2, true);
@@ -128,8 +118,8 @@ class GameAdvancedTest {
         Game game = newGameWithPlayersAndBuildings(
                 players,
                 emptyBuildingList(),
-                buildingPlaceholders(3), // edifici era II
-                buildingPlaceholders(4)  // edifici era III
+                buildingPlaceholders(3),
+                buildingPlaceholders(4)
         );
 
         Board board = game.getBoard();
