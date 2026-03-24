@@ -1,6 +1,6 @@
 package it.polimi.ingsw.model.Board;
 
-import it.polimi.ingsw.model.Totem;
+import it.polimi.ingsw.model.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,13 +17,13 @@ public class TurnOrderTile {
 
     /** place the param in the first free slot, return the food modifier of the slot, throws an IllegalStateException if all
     * slots are already occupied */
-    public int placeTotem(Totem totem){
+    public int placeTotem(Player player){
 
         for(TurnOrderSlot slot : slots){
 
             if(!slot.isOccupied()){
 
-                slot.occupy(totem);
+                slot.occupy(player);
                 return slot.getFoodModifier();
             }
         }
@@ -35,11 +35,11 @@ public class TurnOrderTile {
     /** Calculates the turn order for next round
         return the list of totem in the order they will play
      */
-    public List<Totem> getNextRoundOrder(){
+    public List<Player> getNextRoundOrder(){
 
         return slots.stream()
                 .filter(TurnOrderSlot::isOccupied)
-                .map(slot -> slot.getOccupyingTotem()
+                .map(slot -> slot.getOccupyingPlayer()
                         .orElseThrow(() -> new IllegalStateException("Slot was occupied but totem is missing")))
                 .collect(Collectors.toList());
     }

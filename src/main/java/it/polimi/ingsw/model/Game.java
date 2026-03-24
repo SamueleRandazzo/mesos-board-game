@@ -4,7 +4,6 @@ import it.polimi.ingsw.model.Cards.*;
 import it.polimi.ingsw.model.Interfaces.*;
 import it.polimi.ingsw.model.Board.*;
 import it.polimi.ingsw.model.factories.TurnOrderFactory;
-import it.polimi.ingsw.model.EventEffects.Sustenance;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,47 +32,31 @@ import java.util.stream.Collectors;
  */
 public class Game {
 
-    // -------------------------------------------------------------------------
-    // Constants
-    // -------------------------------------------------------------------------
-
+    //region Constants
     /** Total number of rounds in a game of Mesos. */
     private static final int TOTAL_ROUNDS = 10;
-
     /** First era number. */
     private static final int FIRST_ERA = 1;
+    //endregion
 
-    // -------------------------------------------------------------------------
-    // Attributes
-    // -------------------------------------------------------------------------
-
+    //region Attributes
     /** All players in this game, in initial turn order. */
     private final List<Player> players;
-
     /** Number of players in this game. Drives board row sizes and turn order. */
     private final int numPlayers;
-
-    /** The player whose turn it currently is. */
-    private Player currentPlayer;
-
     /** The game board (rows, decks). Owned exclusively by this Game instance. */
     private final Board board;
-
     /** The offer track (tiles where players place their totems). */
     private final OfferTrack offerTrack;
-
-    /** The turn order tile, created via TurnOrderFactory at game start. */
-    private final TurnOrderTile turnOrderTile;
-
+    /** The TurnOrderTrack*/
+    private TurnOrderTile TurnOrderTile;
     /**
      * Current era (1, 2 or 3).
      * Starts at 1; advances when a card of the next era is revealed during fillRows().
      */
     private int currentEra;
-
     /** Round counter. Starts at 1, ends at TOTAL_ROUNDS. */
     private int currentRound;
-
     /**
      * Building decks for eras 2 and 3, indexed as:
      *  eraBuildingDecks.get(0) = Era 2 buildings
@@ -81,10 +64,8 @@ public class Game {
      * Kept here so Game can hand them to Board when a new era begins.
      */
     private final List<List<BuildingCard>> eraBuildingDecks;
-
-    // -------------------------------------------------------------------------
-    // Constructor
-    // -------------------------------------------------------------------------
+    private int currentPlayerIndex = 0;
+    //endregion
 
     /**
      * Creates and fully initialises a new Game instance.
@@ -93,12 +74,12 @@ public class Game {
      * the decks according to the setup rules (rulebook p. 2-3) before passing
      * them in.
      *
-     * @param players        players in initial (randomised) turn order; size must be 2-5
-     * @param tribeDeck      full ordered tribe deck (Era I on top, Final Events at bottom)
-     * @param era1Buildings  building cards selected for Era I
-     * @param era2Buildings  building cards selected for Era II
-     * @param era3Buildings  building cards selected for Era III
-     * @param offerTrack     the offer track initialised for the correct player count
+     * @param players         players in initial (randomised) turn order; size must be 2-5
+     * @param tribeDeck       full ordered tribe deck (Era I on top, Final Events at bottom)
+     * @param era1Buildings   building cards selected for Era I
+     * @param era2Buildings   building cards selected for Era II
+     * @param era3Buildings   building cards selected for Era III
+     * @param offerTrack      the offer track initialised for the correct player count
      * @throws IllegalArgumentException if player count is outside 2-5
      * @throws NullPointerException     if any argument is null
      */
@@ -107,7 +88,8 @@ public class Game {
                 List<BuildingCard> era1Buildings,
                 List<BuildingCard> era2Buildings,
                 List<BuildingCard> era3Buildings,
-                OfferTrack offerTrack) {
+                OfferTrack offerTrack, TurnOrderTile turnOrderTile) {
+                TurnOrderTile = turnOrderTile;
 
         if (players == null)       throw new NullPointerException("players cannot be null.");
         if (tribeDeck == null)     throw new NullPointerException("tribeDeck cannot be null.");
@@ -123,14 +105,10 @@ public class Game {
             );
         }
 
-        this.players       = new ArrayList<>(players);
-        this.offerTrack    = offerTrack;
-        this.currentEra    = FIRST_ERA;
-        this.currentRound  = 1;
-        this.currentPlayer = this.players.get(0);
-
-        // TurnOrderTile is created here via factory — no need for a separate createTurnOrderTile() call
-        this.turnOrderTile = TurnOrderFactory.createTrack(this.numPlayers);
+        this.players      = new ArrayList<>(players);
+        this.offerTrack   = offerTrack;
+        this.currentEra   = FIRST_ERA;
+        this.currentRound = 1;
 
         // Store Era II and III building decks for later use
         this.eraBuildingDecks = new ArrayList<>();
@@ -141,32 +119,11 @@ public class Game {
         this.board = new Board(tribeDeck, era1Buildings);
     }
 
-    // -------------------------------------------------------------------------
-    // Game loop
-    // -------------------------------------------------------------------------
-
-    /**
-     * Runs the full game from start to finish.
-     * <p>
-     * Flow per round (rulebook p. 4-6):
-     *  1. Players place their totems on the offer track (in turn-order-tile order).
-     *  2. Players resolve their offer tile actions (left to right on the track).
-     *  3. End-of-round: resolve events, rotate rows, refill upper row,
-     *     check for era transition.
-     * <p>
-     * After round 10: resolve all remaining visible events, compute final
-     * scores, declare the winner.
-     */
-    public void startGame() {
-        // Initial board setup: fill lower row (numPlayers + 1), then upper row (numPlayers + 4)
+    public void initializeGame() {
         setupInitialRows();
-
-        for (currentRound = 1; currentRound <= TOTAL_ROUNDS; currentRound++) {
-            playRound();
-        }
-
-        // End of game: resolve all remaining visible events and compute final scores
-        endGame();
+        createTurnOrderTile(numPlayers);
+        this.currentRound = 1;
+        this.currentPlayerIndex = 0;
     }
 
     /**
@@ -176,77 +133,11 @@ public class Game {
      * Event cards drawn for the lower row are redirected to the upper row
      * as required by the rules.
      */
-    private void setupInitialRows() {
+    public void setupInitialRows() {
         // TODO: implement initial lower-row setup with event-card redirection.
         // For now, delegate standard fill to Board.
         board.fillRows(numPlayers);
     }
-
-    /**
-     * Executes a single round:
-     *  1. Players place totems in turn-order-tile order.
-     *  2. Players resolve actions left to right on the offer track.
-     *  3. End-of-round board update + event resolution.
-     */
-    private void playRound() {
-        placeTotems();
-        resolveActions();
-        endOfRound();
-    }
-
-    // -------------------------------------------------------------------------
-    // Totem placement
-    // -------------------------------------------------------------------------
-
-    /**
-     * Phase 1: each player places their totem on a free offer tile,
-     * following the order defined by the turn-order tile (top to bottom).
-     * <p>
-     * After placing, the player returns their totem to the turn-order tile
-     * in the first available slot (top to bottom), gaining or paying food
-     * as indicated by that slot (rulebook p. 4).
-     * <p>
-     * TODO: actual player input / AI decision needed here.
-     * TODO: placeTotem() requires a Totem object — pending decision on whether
-     *       Totem class is kept or replaced by Color directly on Player.
-     */
-    private void placeTotems() {
-        for (Player player : players) {
-            List<OfferTile> available = offerTrack.getAvailableOffers();
-            if (!available.isEmpty()) {
-                // TODO: ask the player (or controller) which tile to choose.
-                // Placeholder: first available tile.
-                OfferTile chosen = available.get(0);
-                // TODO: chosen.placeTotem(player.getTotem());
-            }
-        }
-    }
-
-    // -------------------------------------------------------------------------
-    // Action resolution
-    // -------------------------------------------------------------------------
-
-    /**
-     * Phase 2: players resolve their offer tile actions in left-to-right order
-     * on the offer track (rulebook p. 4).
-     * <p>
-     * Each tile tells the player how many cards to take and from which row.
-     * Board provides the pick operations; this method orchestrates who acts when.
-     * <p>
-     * TODO: card selection requires player input / controller integration.
-     */
-    private void resolveActions() {
-        for (OfferTile tile : offerTrack.getTiles()) {
-            if (!tile.isAvailable()) {
-                // TODO: resolve the action defined by this tile for the occupying player.
-                // e.g. tile.resolveAction(board, getPlayerByColor(tile.getOccupyingTotem()))
-            }
-        }
-    }
-
-    // -------------------------------------------------------------------------
-    // End of round
-    // -------------------------------------------------------------------------
 
     /**
      * End-of-round sequence (rulebook p. 6):
@@ -254,7 +145,7 @@ public class Game {
      *  2. Discard lower tribe row, move upper tribe row down, refill upper row.
      *  3. Check whether a new era has started and handle the transition.
      */
-    private void endOfRound() {
+    public void endOfRound() {
         // Step 1 — resolve events in the lower row
         resolveEventsInLowerRow();
 
@@ -271,16 +162,12 @@ public class Game {
      * If two events of the same type appear, they are resolved in era order.
      * <p>
      * Non-event cards (Character, Building) are ignored here.
-     * <p>
-     * TODO: replace instanceof EventCard with card.isEvent() once TribeDeck exposes that method.
-     * TODO: replace instanceof Sustenance with event.isSustenance() once EventEffect exposes that method.
      */
     private void resolveEventsInLowerRow() {
         List<TribeDeck> bottomRow = board.getBottomRow();
 
         List<EventCard> events = new ArrayList<>();
         for (TribeDeck card : bottomRow) {
-            // TODO: replace with card.isEvent()
             if (card instanceof EventCard) {
                 events.add((EventCard) card);
             }
@@ -288,28 +175,12 @@ public class Game {
 
         if (events.isEmpty()) return;
 
-        // TODO: replace with event.isSustenance() once EventEffect exposes that method
-        List<EventCard> normalEvents = new ArrayList<>();
-        List<EventCard> sustenanceEvents = new ArrayList<>();
+        // Sort: non-sustenance events first (by era), sustenance last.
+        // TODO: identify Sustenance by subclass once EventCard subclasses are available.
+        events.sort(Comparator.comparingInt(EventCard::getEra));
 
         for (EventCard event : events) {
-            if (event.getEventEffect() instanceof Sustenance) {
-                sustenanceEvents.add(event);
-            } else {
-                normalEvents.add(event);
-            }
-        }
-
-        // Resolve normal events in era order
-        normalEvents.sort(Comparator.comparingInt(EventCard::getEra));
-        for (EventCard event : normalEvents) {
-            event.raiseEvent(players);
-        }
-
-        // Resolve Sustenance last, in era order if multiple
-        sustenanceEvents.sort(Comparator.comparingInt(EventCard::getEra));
-        for (EventCard event : sustenanceEvents) {
-            event.raiseEvent(players);
+            event.raiseEvent(getPlayers()); // NOTE: raiseEvent() still uses Game.game() singleton — to fix later.
         }
     }
 
@@ -317,6 +188,7 @@ public class Game {
      * Checks whether the cards just revealed in the upper row belong to a new era.
      * If so, triggers the era transition on Board (rulebook p. 7).
      */
+
     private void checkEraTransition() {
         List<TribeDeck> topRow = board.getTopRow();
 
@@ -347,62 +219,25 @@ public class Game {
         board.updateEra();
     }
 
-    // -------------------------------------------------------------------------
-    // End of game
-    // -------------------------------------------------------------------------
-
     /**
-     * Ends the game by resolving all remaining visible events on the board
-     * (both upper and lower rows, rulebook p. 7) and computing final scores.
-     * <p>
-     * Called automatically by startGame() at the end of round 10, but can
-     * also be called explicitly if needed.
-     * <p>
-     * TODO: replace instanceof with card.isEvent() and event.isSustenance()
-     *       once TribeDeck and EventEffect expose those methods.
-     */
-    public void endGame() {
-        resolveRemainingEvents();
-        computeFinalScores();
-    }
-
-    /**
-     * Resolves all Event cards still visible on the board at game end —
-     * both upper and lower rows (rulebook p. 7).
+     * At the end of round 10, resolves all Event cards still visible
+     * on the board — both upper and lower rows (rulebook p. 7).
      * Sustenance is resolved last as usual.
      */
     private void resolveRemainingEvents() {
         List<EventCard> events = new ArrayList<>();
 
         for (TribeDeck card : board.getBottomRow()) {
-            // TODO: replace with card.isEvent()
             if (card instanceof EventCard) events.add((EventCard) card);
         }
         for (TribeDeck card : board.getTopRow()) {
-            // TODO: replace with card.isEvent()
             if (card instanceof EventCard) events.add((EventCard) card);
         }
 
-        // TODO: replace with event.isSustenance() once EventEffect exposes that method
-        List<EventCard> normalEvents = new ArrayList<>();
-        List<EventCard> sustenanceEvents = new ArrayList<>();
+        events.sort(Comparator.comparingInt(EventCard::getEra));
 
         for (EventCard event : events) {
-            if (event.getEventEffect() instanceof Sustenance) {
-                sustenanceEvents.add(event);
-            } else {
-                normalEvents.add(event);
-            }
-        }
-
-        normalEvents.sort(Comparator.comparingInt(EventCard::getEra));
-        for (EventCard event : normalEvents) {
-            event.raiseEvent(players);
-        }
-
-        sustenanceEvents.sort(Comparator.comparingInt(EventCard::getEra));
-        for (EventCard event : sustenanceEvents) {
-            event.raiseEvent(players);
+            event.raiseEvent(getPlayers()); // NOTE: to fix after EventCard Singleton dependency is removed.
         }
     }
 
@@ -412,6 +247,8 @@ public class Game {
      *  - Inventor PP (numInventors x numDistinctInventionIcons)
      *  - 10 PP per every 2 Artist cards
      *  - Building card PP (printed + end-game effects)
+     * <p>
+     * TODO: implement once Tribe exposes the required query methods.
      */
     private void computeFinalScores() {
         for (Player p : players) {
@@ -506,22 +343,56 @@ public class Game {
         return offerTrack;
     }
 
-    /**
-     * Returns the turn order tile for this game.
-     *
-     * @return the TurnOrderTile
-     */
-    public TurnOrderTile getTurnOrderTile() {
-        return turnOrderTile;
-    }
-
-    /**
-     * Returns the player whose turn it currently is.
-     *
-     * @return the current player
-     */
-    public Player getCurrentPlayer() {
-        return currentPlayer;
+    public Player getCurrentActivePlayer() {
+        return players.get(currentPlayerIndex);
     }
     //endregion
+
+    //create the TurnOrderTile using the TurnOrderFactory
+    public boolean createTurnOrderTile(int numPlayers){
+
+        this.TurnOrderTile = TurnOrderFactory.createTrack(numPlayers);
+
+        return true;
+        //l' eccezione sul numero di players è già gestita
+    }
+
+    public void advanceTurn() {
+        this.currentPlayerIndex = (currentPlayerIndex + 1) % numPlayers;
+    }
+
+    public void placePlayerTotem(Player player, int tileIndex) {
+        OfferTile chosen = offerTrack.getTiles().get(tileIndex);
+
+        if (!chosen.isAvailable()) {
+            throw new IllegalStateException("Tile già occupata!");
+        }
+
+        chosen.placeTotem(player);
+
+        // Se il regolamento dice che dopo il piazzamento il turno passa al prossimo:
+        advanceTurn();
+    }
+
+    public List<OfferTile> getTilesToResolve() {
+        return offerTrack.getTiles();
+    }
+
+    public void nextRound() {
+        endOfRound(); // Esegue pulizia board ed eventi
+        this.currentRound++;
+        this.currentPlayerIndex = 0; // Reset per il nuovo round
+
+        if (this.currentRound > TOTAL_ROUNDS) {
+            resolveRemainingEvents();
+            computeFinalScores();
+        }
+    }
+
+    public void resolvePlayerPick(Player player, List<PlayerTribe> selectedCards) {
+        for (PlayerTribe card : selectedCards) {
+            //board.removeCard(card); // da creare
+            card.addToTribe(player.getTribe());
+        }
+    }
 }

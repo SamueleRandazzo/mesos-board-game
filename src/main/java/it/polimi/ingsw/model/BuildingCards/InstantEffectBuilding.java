@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model.BuildingCards;
 
 import it.polimi.ingsw.model.Cards.BuildingCard;
+import it.polimi.ingsw.model.Cards.Tribe;
 
 public class InstantEffectBuilding extends BuildingCard {
     private final int extraStars;
@@ -37,5 +38,10 @@ public class InstantEffectBuilding extends BuildingCard {
 
     public boolean isExtraFoodFromBonus() {
         return extraFoodFromBonus;
+    }
+
+    @Override
+    public void addToTribe(Tribe tribe) {
+        tribe.addCard(this);
     }
 }

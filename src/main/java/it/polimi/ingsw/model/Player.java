@@ -9,7 +9,7 @@ public class Player
     private String password;
     private int prestigePoints;
     private int foodAmount;
-    private Color color;
+    private final Color color;
     private Tribe tribe;
 
     public Player(Color color){ //perhaps a different implementation is needed

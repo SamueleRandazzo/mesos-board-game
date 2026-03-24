@@ -1,7 +1,6 @@
 package it.polimi.ingsw.model.Cards;
 
 import java.util.*;
-
 import it.polimi.ingsw.model.BuildingCards.*;
 import it.polimi.ingsw.model.CharacterCards.*;
 import it.polimi.ingsw.model.Player;
@@ -15,6 +14,7 @@ public class Tribe {
     private final List<SustenanceBuilding> sustenanceBuildings;
     private final List<CavePaintingBuilding> cavePaintingBuildings;
     private final List<HuntBuilding> huntBuildings;
+    private final List<CardAddedBuilding> cardAddedBuildings;
 
     private final List<Artist> artists;
     private final List<Gatherer> gatherers;
@@ -22,7 +22,7 @@ public class Tribe {
     private final List<Hunter> hunters;
     private final List<Inventor> inventors;
     private final List<Shaman> shamans;
-    private Map<String, List<? extends Card>> allCardsMap;
+    private Map<String, List<? extends Card>> allCharacterCardsMap;
 
     private final ShamanicAttributes shamanicAttr;
     private boolean extraCardFromUpper;
@@ -42,6 +42,7 @@ public class Tribe {
         sustenanceBuildings = new ArrayList<>();
         cavePaintingBuildings = new ArrayList<>();
         huntBuildings = new ArrayList<>();
+        cardAddedBuildings = new ArrayList<>();
 
         artists = new ArrayList<>();
         gatherers = new ArrayList<>();
@@ -58,21 +59,21 @@ public class Tribe {
     }
 
     public void initializeMap() {
-        allCardsMap = new HashMap<>();
+        allCharacterCardsMap = new HashMap<>();
 
-        allCardsMap.put("ARTIST", artists);
-        allCardsMap.put("GATHERER", gatherers);
-        allCardsMap.put("BUILDER", builders);
-        allCardsMap.put("HUNTERS", hunters);
-        allCardsMap.put("INVENTORS", inventors);
-        allCardsMap.put("SHAMANS", shamans);
+        allCharacterCardsMap.put("ARTIST", artists);
+        allCharacterCardsMap.put("GATHERER", gatherers);
+        allCharacterCardsMap.put("BUILDER", builders);
+        allCharacterCardsMap.put("HUNTERS", hunters);
+        allCharacterCardsMap.put("INVENTORS", inventors);
+        allCharacterCardsMap.put("SHAMANS", shamans);
     }
 
     /**
      * @return total number of character cards in the tribe
      */
     public int numberOfCharacterCards() {
-        return allCardsMap.values().stream().mapToInt(List::size).sum();
+        return allCharacterCardsMap.values().stream().mapToInt(List::size).sum();
     }
 
     //region Getter
@@ -130,6 +131,10 @@ public class Tribe {
     public ShamanicAttributes getShamanicAttr() {
         return shamanicAttr;
     }
+
+    public Map<String, List<? extends Card>> getAllCharacterCardsMap() {
+        return Collections.unmodifiableMap(this.allCharacterCardsMap);
+    }
     //endregion
 
     //region Card Adder
@@ -143,6 +148,8 @@ public class Tribe {
             throw new IllegalArgumentException("Artist card cannot be null");
 
         this.artists.add(card);
+
+        this.checkSetBonus();
     }
 
     /**
@@ -155,6 +162,8 @@ public class Tribe {
             throw new IllegalArgumentException("Gatherer card cannot be null");
 
         this.gatherers.add(card);
+
+        this.checkSetBonus();
     }
 
     /**
@@ -167,6 +176,8 @@ public class Tribe {
             throw new IllegalArgumentException("Builder card cannot be null");
 
         this.builders.add(card);
+
+        this.checkSetBonus();
     }
 
     /**
@@ -183,6 +194,8 @@ public class Tribe {
         if (card.hasFoodIcon()) {
             owner.changeFoodAmount(hunters.size());
         }
+
+        this.checkSetBonus();
     }
 
     /**
@@ -195,6 +208,20 @@ public class Tribe {
             throw new IllegalArgumentException("Inventor card cannot be null");
 
         this.inventors.add(card);
+
+        for (CardAddedBuilding building : cardAddedBuildings) {
+            if (building.isBonusOnDuplicateInventor()) {
+                long count = inventors.stream()
+                        .filter(i -> i.getInventionIcon().equals(card.getInventionIcon()))
+                        .count();
+
+                if (count % 2 == 0) {
+                    this.owner.changeFoodAmount(building.getFoodBonus());
+                }
+            }
+        }
+
+        this.checkSetBonus();
     }
 
     /**
@@ -247,6 +274,17 @@ public class Tribe {
 
         huntBuildings.add(card);
     }
+
+    public void addCard(CardAddedBuilding card) {
+        if (card == null)
+            throw new IllegalArgumentException("BuildingCard cannot be null");
+
+        cardAddedBuildings.add(card);
+
+        if (card.isBonusOnSetCharacters()) {
+            card.setInitialSetCount(this.getSetCountOfDifferentCard(card.getSetDim()));
+        }
+    }
     //endregion
 
     /**
@@ -257,19 +295,23 @@ public class Tribe {
     }
 
     /**
-     * TODO: Computes how many complete sets of different cards of size {@code setDim}
+     * Computes how many complete sets of different cards of size {@code setDim}
      * the tribe possesses.
      *
      * @param setDim size of the set (must be > 0)
      * @return number of complete sets
      * @throws IllegalArgumentException if setDim <= 0
      */
-    public int getSetNumOfDifferentCard(int setDim) {
+    public int getSetCountOfDifferentCard(int setDim) {
         if (setDim <= 0)
             throw new IllegalArgumentException("setDim must be greater than 0");
 
-        // TODO: implement logic
-        return 0;
+        return allCharacterCardsMap.values().stream()
+                .map(List::size)
+                .sorted(Comparator.reverseOrder())
+                .skip(setDim - 1)
+                .findFirst()
+                .orElse(0);
     }
 
     /**
@@ -314,7 +356,34 @@ public class Tribe {
         return huntBuildings.stream().mapToInt(x -> x.getExtraPoints(this)).sum();
     }
 
+    /**
+     * @return total number of different inventor icon
+     */
     public int totalDifferentInventorIcon() {
         return Math.toIntExact(inventors.stream().map(Inventor::getInventionIcon).distinct().count());
+    }
+
+    /**
+     * Processes food rewards for completing new sets of unique character cards.
+     * <p>
+     * Checks if the current number of completed sets exceeds the sum of sets
+     * owned at purchase and those already rewarded. If a new set is detected,
+     * it grants the food bonus and increments the reward counter to prevent
+     * multiple payouts for the same set.
+     * </p>
+     *
+     * @see CardAddedBuilding#getInitialSetCount()
+     * @see CardAddedBuilding#getRewardedSetCount()
+     */
+    private void checkSetBonus() {
+        for (CardAddedBuilding building : cardAddedBuildings) {
+            if (building.isBonusOnSetCharacters()) {
+                int setCountRequired = building.getInitialSetCount() + building.getRewardedSetCount();
+                if (getSetCountOfDifferentCard(building.getSetDim()) > setCountRequired) {
+                    this.owner.changeFoodAmount(building.getFoodBonus());
+                    building.incrementRewardedSetCount();
+                }
+            }
+        }
     }
 }

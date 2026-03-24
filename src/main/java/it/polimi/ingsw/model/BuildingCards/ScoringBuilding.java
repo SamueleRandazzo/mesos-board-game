@@ -30,12 +30,17 @@ public class ScoringBuilding extends BuildingCard {
 
         i += multiplier * t.totalBuildersPoints();
 
-        i += t.getSetNumOfDifferentCard(setDim) * pointsPerUnit;
+        i += t.getSetCountOfDifferentCard(setDim) * pointsPerUnit;
 
         if (countType != null) {
             i += pointsPerUnit * countType.cardNumber(t);
         }
 
         return i;
+    }
+
+    @Override
+    public void addToTribe(Tribe tribe) {
+        tribe.addCard(this);
     }
 }

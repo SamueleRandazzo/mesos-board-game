@@ -1,14 +1,14 @@
 package it.polimi.ingsw.model.Board;
 
 
-import it.polimi.ingsw.model.Totem;
+import it.polimi.ingsw.model.Player;
 
 import java.util.Optional;
 
 public class TurnOrderSlot {
 
     private final int foodModifier;
-    private Totem occupyingTotem;
+    private Player occupyingPlayer;
 
     /** Constructor: create the single TurnOrderSlot with the bonus/malus of food.
      */
@@ -24,14 +24,16 @@ public class TurnOrderSlot {
 
     /** returns true if this slot is occupied, otherwise returns false*/
     public boolean isOccupied(){
-        return occupyingTotem != null;
+        return occupyingPlayer != null;
     }
 
-    /** returns the totem that occupied this slot*/
-    public Optional<Totem> getOccupyingTotem() {
+    /**
+     * returns the player that occupied this slot
+     */
+    public Optional<Player> getOccupyingPlayer() {
 
-        if(this.occupyingTotem != null){
-            return Optional.of(this.occupyingTotem);
+        if(this.occupyingPlayer != null){
+            return Optional.of(this.occupyingPlayer);
         }
 
         else{
@@ -40,15 +42,15 @@ public class TurnOrderSlot {
     }
 
     /** make this slot occupied, returns an IllegalStateException if this slot was already occupied*/
-    public void occupy(Totem totem){
-        if (totem == null) {
+    public void occupy(Player player){
+        if (player == null) {
             throw new IllegalArgumentException("Cannot occupy a slot with a null totem.");
         }
         if(this.isOccupied()){
             throw new IllegalStateException("Slot already occupied");
         }
 
-        this.occupyingTotem = totem;
+        this.occupyingPlayer = player;
 
     }
 }

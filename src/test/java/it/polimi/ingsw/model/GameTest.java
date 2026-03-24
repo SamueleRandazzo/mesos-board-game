@@ -2,6 +2,8 @@ package it.polimi.ingsw.model;
 
 import it.polimi.ingsw.model.Board.OfferTile;
 import it.polimi.ingsw.model.Board.OfferTrack;
+import it.polimi.ingsw.model.Board.TurnOrderSlot;
+import it.polimi.ingsw.model.Board.TurnOrderTile;
 import it.polimi.ingsw.model.Cards.BuildingCard;
 import it.polimi.ingsw.model.Enum.Color;
 import it.polimi.ingsw.model.Interfaces.TribeDeck;
@@ -33,14 +35,15 @@ class GameTest {
         return new OfferTrack(new ArrayList<OfferTile>());
     }
 
-    private static Game newGameWithPlayers(List<Player> players) {
+    private static Game newGameWithPlayers(List<Player> players, TurnOrderTile t) {
         return new Game(
                 players,
                 emptyTribeDeckList(),
                 emptyBuildingList(),
                 emptyBuildingList(),
                 emptyBuildingList(),
-                newOfferTrack()
+                newOfferTrack(),
+                t
         );
     }
 
@@ -50,12 +53,16 @@ class GameTest {
 
     @Test
     void constructor_shouldCreateGameWithMinimumValidPlayers() {
+        // TODO Fill tos param and t param
+        List<TurnOrderSlot> tos = new ArrayList<>();
+        TurnOrderTile t = new TurnOrderTile(tos);
+
         List<Player> players = List.of(
                 newPlayer(Color.RED, 0, 0),
                 newPlayer(Color.BLUE, 0, 0)
         );
 
-        Game game = newGameWithPlayers(players);
+        Game game = newGameWithPlayers(players, t);
 
         assertNotNull(game);
         assertEquals(2, game.getNumPlayers());
@@ -67,6 +74,10 @@ class GameTest {
 
     @Test
     void constructor_shouldCreateGameWithMaximumValidPlayers() {
+        // TODO Fill tos param and t param
+        List<TurnOrderSlot> tos = new ArrayList<>();
+        TurnOrderTile t = new TurnOrderTile(tos);
+
         List<Player> players = List.of(
                 newPlayer(Color.RED, 0, 0),
                 newPlayer(Color.BLUE, 0, 0),
@@ -75,7 +86,7 @@ class GameTest {
                 newPlayer(Color.BLACK, 0, 0)
         );
 
-        Game game = newGameWithPlayers(players);
+        Game game = newGameWithPlayers(players, t);
 
         assertNotNull(game);
         assertEquals(5, game.getNumPlayers());
@@ -83,15 +94,23 @@ class GameTest {
 
     @Test
     void constructor_shouldThrowExceptionWhenPlayersAreTooFew() {
+        // TODO Fill tos param and t param
+        List<TurnOrderSlot> tos = new ArrayList<>();
+        TurnOrderTile t = new TurnOrderTile(tos);
+
         List<Player> players = List.of(
                 newPlayer(Color.RED, 0, 0)
         );
 
-        assertThrows(IllegalArgumentException.class, () -> newGameWithPlayers(players));
+        assertThrows(IllegalArgumentException.class, () -> newGameWithPlayers(players, t));
     }
 
     @Test
     void constructor_shouldThrowExceptionWhenPlayersAreTooMany() {
+        // TODO Fill tos param and t param
+        List<TurnOrderSlot> tos = new ArrayList<>();
+        TurnOrderTile t = new TurnOrderTile(tos);
+
         List<Player> players = List.of(
                 newPlayer(Color.RED, 0, 0),
                 newPlayer(Color.BLUE, 0, 0),
@@ -101,11 +120,15 @@ class GameTest {
                 newPlayer(Color.RED, 0, 0)
         );
 
-        assertThrows(IllegalArgumentException.class, () -> newGameWithPlayers(players));
+        assertThrows(IllegalArgumentException.class, () -> newGameWithPlayers(players, t));
     }
 
     @Test
     void constructor_shouldThrowExceptionWhenPlayersIsNull() {
+        // TODO Fill tos param and t param
+        List<TurnOrderSlot> tos = new ArrayList<>();
+        TurnOrderTile t = new TurnOrderTile(tos);
+
         assertThrows(NullPointerException.class, () ->
                 new Game(
                         null,
@@ -113,13 +136,18 @@ class GameTest {
                         emptyBuildingList(),
                         emptyBuildingList(),
                         emptyBuildingList(),
-                        newOfferTrack()
+                        newOfferTrack(),
+                        t
                 )
         );
     }
 
     @Test
     void constructor_shouldThrowExceptionWhenTribeDeckIsNull() {
+        // TODO Fill tos param and t param
+        List<TurnOrderSlot> tos = new ArrayList<>();
+        TurnOrderTile t = new TurnOrderTile(tos);
+
         List<Player> players = List.of(
                 newPlayer(Color.RED, 0, 0),
                 newPlayer(Color.BLUE, 0, 0)
@@ -132,13 +160,18 @@ class GameTest {
                         emptyBuildingList(),
                         emptyBuildingList(),
                         emptyBuildingList(),
-                        newOfferTrack()
+                        newOfferTrack(),
+                        t
                 )
         );
     }
 
     @Test
     void constructor_shouldThrowExceptionWhenEra1BuildingsIsNull() {
+        // TODO Fill tos param and t param
+        List<TurnOrderSlot> tos = new ArrayList<>();
+        TurnOrderTile t = new TurnOrderTile(tos);
+
         List<Player> players = List.of(
                 newPlayer(Color.RED, 0, 0),
                 newPlayer(Color.BLUE, 0, 0)
@@ -151,13 +184,18 @@ class GameTest {
                         null,
                         emptyBuildingList(),
                         emptyBuildingList(),
-                        newOfferTrack()
+                        newOfferTrack(),
+                        t
                 )
         );
     }
 
     @Test
     void constructor_shouldThrowExceptionWhenEra2BuildingsIsNull() {
+        // TODO Fill tos param and t param
+        List<TurnOrderSlot> tos = new ArrayList<>();
+        TurnOrderTile t = new TurnOrderTile(tos);
+
         List<Player> players = List.of(
                 newPlayer(Color.RED, 0, 0),
                 newPlayer(Color.BLUE, 0, 0)
@@ -170,13 +208,18 @@ class GameTest {
                         emptyBuildingList(),
                         null,
                         emptyBuildingList(),
-                        newOfferTrack()
+                        newOfferTrack(),
+                        t
                 )
         );
     }
 
     @Test
     void constructor_shouldThrowExceptionWhenEra3BuildingsIsNull() {
+        // TODO Fill tos param and t param
+        List<TurnOrderSlot> tos = new ArrayList<>();
+        TurnOrderTile t = new TurnOrderTile(tos);
+
         List<Player> players = List.of(
                 newPlayer(Color.RED, 0, 0),
                 newPlayer(Color.BLUE, 0, 0)
@@ -189,13 +232,18 @@ class GameTest {
                         emptyBuildingList(),
                         emptyBuildingList(),
                         null,
-                        newOfferTrack()
+                        newOfferTrack(),
+                        t
                 )
         );
     }
 
     @Test
     void constructor_shouldThrowExceptionWhenOfferTrackIsNull() {
+        // TODO Fill tos param and t param
+        List<TurnOrderSlot> tos = new ArrayList<>();
+        TurnOrderTile t = new TurnOrderTile(tos);
+
         List<Player> players = List.of(
                 newPlayer(Color.RED, 0, 0),
                 newPlayer(Color.BLUE, 0, 0)
@@ -208,7 +256,8 @@ class GameTest {
                         emptyBuildingList(),
                         emptyBuildingList(),
                         emptyBuildingList(),
-                        null
+                        null,
+                        t
                 )
         );
     }
@@ -219,12 +268,16 @@ class GameTest {
 
     @Test
     void getPlayers_shouldReturnUnmodifiableList() {
+        // TODO Fill tos param and t param
+        List<TurnOrderSlot> tos = new ArrayList<>();
+        TurnOrderTile t = new TurnOrderTile(tos);
+
         List<Player> players = List.of(
                 newPlayer(Color.RED, 0, 0),
                 newPlayer(Color.BLUE, 0, 0)
         );
 
-        Game game = newGameWithPlayers(players);
+        Game game = newGameWithPlayers(players, t);
 
         assertThrows(UnsupportedOperationException.class, () ->
                 game.getPlayers().add(newPlayer(Color.YELLOW, 0, 0))
@@ -233,12 +286,16 @@ class GameTest {
 
     @Test
     void getters_shouldReturnExpectedInitialValues() {
+        // TODO Fill tos param and t param
+        List<TurnOrderSlot> tos = new ArrayList<>();
+        TurnOrderTile t = new TurnOrderTile(tos);
+
         List<Player> players = List.of(
                 newPlayer(Color.RED, 0, 0),
                 newPlayer(Color.BLUE, 0, 0)
         );
 
-        Game game = newGameWithPlayers(players);
+        Game game = newGameWithPlayers(players, t);
 
         assertEquals(2, game.getNumPlayers());
         assertEquals(1, game.getCurrentEra());
@@ -253,10 +310,14 @@ class GameTest {
 
     @Test
     void getWinner_shouldReturnSingleWinnerWhenOnePlayerHasMorePrestige() {
+        // TODO Fill tos param and t param
+        List<TurnOrderSlot> tos = new ArrayList<>();
+        TurnOrderTile t = new TurnOrderTile(tos);
+
         Player p1 = newPlayer(Color.RED, 20, 1);
         Player p2 = newPlayer(Color.BLUE, 10, 99);
 
-        Game game = newGameWithPlayers(List.of(p1, p2));
+        Game game = newGameWithPlayers(List.of(p1, p2), t);
 
         List<Player> winners = game.getWinner();
 
@@ -266,10 +327,14 @@ class GameTest {
 
     @Test
     void getWinner_shouldUseFoodAsTieBreakerWhenPrestigeIsEqual() {
+        // TODO Fill tos param and t param
+        List<TurnOrderSlot> tos = new ArrayList<>();
+        TurnOrderTile t = new TurnOrderTile(tos);
+
         Player p1 = newPlayer(Color.RED, 20, 3);
         Player p2 = newPlayer(Color.BLUE, 20, 7);
 
-        Game game = newGameWithPlayers(List.of(p1, p2));
+        Game game = newGameWithPlayers(List.of(p1, p2), t);
 
         List<Player> winners = game.getWinner();
 
@@ -279,10 +344,14 @@ class GameTest {
 
     @Test
     void getWinner_shouldReturnSharedVictoryWhenPrestigeAndFoodAreEqual() {
+        // TODO Fill tos param and t param
+        List<TurnOrderSlot> tos = new ArrayList<>();
+        TurnOrderTile t = new TurnOrderTile(tos);
+
         Player p1 = newPlayer(Color.RED, 20, 5);
         Player p2 = newPlayer(Color.BLUE, 20, 5);
 
-        Game game = newGameWithPlayers(List.of(p1, p2));
+        Game game = newGameWithPlayers(List.of(p1, p2), t);
 
         List<Player> winners = game.getWinner();
 
@@ -293,12 +362,16 @@ class GameTest {
 
     @Test
     void getWinner_shouldWorkWithMoreThanTwoPlayers() {
+        // TODO Fill tos param and t param
+        List<TurnOrderSlot> tos = new ArrayList<>();
+        TurnOrderTile t = new TurnOrderTile(tos);
+
         Player p1 = newPlayer(Color.RED, 10, 1);
         Player p2 = newPlayer(Color.BLUE, 15, 2);
         Player p3 = newPlayer(Color.YELLOW, 15, 4);
         Player p4 = newPlayer(Color.WHITE, 8, 10);
 
-        Game game = newGameWithPlayers(List.of(p1, p2, p3, p4));
+        Game game = newGameWithPlayers(List.of(p1, p2, p3, p4), t);
 
         List<Player> winners = game.getWinner();
 
