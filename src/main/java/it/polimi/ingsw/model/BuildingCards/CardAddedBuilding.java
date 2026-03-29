@@ -2,6 +2,7 @@ package it.polimi.ingsw.model.BuildingCards;
 
 import it.polimi.ingsw.model.Cards.BuildingCard;
 import it.polimi.ingsw.model.Cards.Tribe;
+import it.polimi.ingsw.model.Player;
 
 public class CardAddedBuilding extends BuildingCard {
     private final int foodBonus;
@@ -20,11 +21,6 @@ public class CardAddedBuilding extends BuildingCard {
         this.setDim = setDim;
         initialSetCount = 0;
         rewardedSetCount = 0;
-    }
-
-    @Override
-    public void addToTribe(Tribe tribe) {
-        tribe.addCard(this);
     }
 
     public boolean isBonusOnDuplicateInventor() {
@@ -57,5 +53,9 @@ public class CardAddedBuilding extends BuildingCard {
 
     public void incrementRewardedSetCount() {
         rewardedSetCount++;
+    }
+
+    public void applyTo(Player p) {
+        p.getTribe().addCard(this);
     }
 }

@@ -88,7 +88,8 @@ public class Game {
                 List<BuildingCard> era1Buildings,
                 List<BuildingCard> era2Buildings,
                 List<BuildingCard> era3Buildings,
-                OfferTrack offerTrack) {
+                OfferTrack offerTrack)
+    {
 
         if (players == null)       throw new NullPointerException("players cannot be null.");
         if (tribeDeck == null)     throw new NullPointerException("tribeDeck cannot be null.");
@@ -110,17 +111,18 @@ public class Game {
         this.currentRound = 1;
         this.currentPlayerIndex = 0;
 
-        this.TurnOrderTile = TurnOrderFactory.createTrack(this.numPlayers);
-
+        // Store Era II and III building decks for later use
         this.eraBuildingDecks = new ArrayList<>();
         this.eraBuildingDecks.add(new ArrayList<>(era2Buildings));
         this.eraBuildingDecks.add(new ArrayList<>(era3Buildings));
 
+        // Board is created with Era I buildings
         this.board = new Board(tribeDeck, era1Buildings);
     }
 
     public void initializeGame() {
         setupInitialRows();
+        createTurnOrderTile(numPlayers);
         this.currentRound = 1;
         this.currentPlayerIndex = 0;
     }
@@ -345,24 +347,29 @@ public class Game {
     public Player getCurrentActivePlayer() {
         return players.get(currentPlayerIndex);
     }
-
-    public TurnOrderTile getTurnOrderTile() {
-        return TurnOrderTile;
-    }
     //endregion
+
+    //create the TurnOrderTile using the TurnOrderFactory
+    public boolean createTurnOrderTile(int numPlayers){
+
+        this.TurnOrderTile = TurnOrderFactory.createTrack(numPlayers);
+
+        return true;
+        //l' eccezione sul numero di players è già gestita
+    }
 
     public void advanceTurn() {
         this.currentPlayerIndex = (currentPlayerIndex + 1) % numPlayers;
     }
 
-    public void placePlayerTotem(Player player, int tileIndex) {
+    public void placePlayerTotem(int tileIndex) {
         OfferTile chosen = offerTrack.getTiles().get(tileIndex);
 
         if (!chosen.isAvailable()) {
             throw new IllegalStateException("Tile già occupata!");
         }
 
-        chosen.placeTotem(player);
+        chosen.placeTotem(getCurrentActivePlayer());
 
         // Se il regolamento dice che dopo il piazzamento il turno passa al prossimo:
         advanceTurn();
@@ -383,10 +390,23 @@ public class Game {
         }
     }
 
-    public void resolvePlayerPick(Player player, List<PlayerTribe> selectedCards) {
-        for (PlayerTribe card : selectedCards) {
-            //board.removeCard(card); // da creare
-            card.addToTribe(player.getTribe());
-        }
+    public void resolveUpperCardPlayerPick(int pos) {
+        TribeDeck c = this.board.takeCardFromTopRow(pos);
+        c.applyTo(this.getCurrentActivePlayer());
+    }
+
+    public void resolveLowerCardPlayerPick(int pos) {
+        TribeDeck c = this.board.takeCardFromBottomRow(pos);
+        c.applyTo(this.getCurrentActivePlayer());
+    }
+
+    public void resolveUpperBuildingPlayerPick(int pos) {
+        BuildingCard c = this.board.takeCardFromUpperBuildingRow(pos);
+        c.applyTo(this.getCurrentActivePlayer());
+    }
+
+    public void resolveLowerBuildingPlayerPick(int pos) {
+        BuildingCard c = this.board.takeCardFromLowerBuildingRow(pos);
+        c.applyTo(this.getCurrentActivePlayer());
     }
 }

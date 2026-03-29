@@ -82,6 +82,9 @@ class GameAdvancedTest {
         protected FakeTribeCard(int era) {
             super(era, 2, true);
         }
+
+        public void applyTo(Player player) {
+        }
     }
 
     @Test

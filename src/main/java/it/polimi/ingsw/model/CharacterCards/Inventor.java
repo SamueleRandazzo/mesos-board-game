@@ -1,11 +1,10 @@
 package it.polimi.ingsw.model.CharacterCards;
 import it.polimi.ingsw.model.Cards.Card;
-import it.polimi.ingsw.model.Cards.Tribe;
 import it.polimi.ingsw.model.Enum.InventionIcon;
-import it.polimi.ingsw.model.Interfaces.PlayerTribe;
 import it.polimi.ingsw.model.Interfaces.TribeDeck;
+import it.polimi.ingsw.model.Player;
 
-public class Inventor extends Card implements TribeDeck, PlayerTribe {
+public class Inventor extends Card implements TribeDeck {
     private final InventionIcon inventionIcon;
 
     public Inventor(int era, int minPlayer, boolean isObtainable, InventionIcon inventionIcon){
@@ -17,8 +16,7 @@ public class Inventor extends Card implements TribeDeck, PlayerTribe {
         return this.inventionIcon;
     }
 
-    @Override
-    public void addToTribe(Tribe tribe) {
-        tribe.addCard(this);
+    public void applyTo(Player p) {
+        p.getTribe().addCard(this);
     }
 }

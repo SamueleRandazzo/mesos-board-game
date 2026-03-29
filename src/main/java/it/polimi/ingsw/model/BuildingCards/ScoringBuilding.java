@@ -3,6 +3,7 @@ package it.polimi.ingsw.model.BuildingCards;
 import it.polimi.ingsw.model.Cards.BuildingCard;
 import it.polimi.ingsw.model.Cards.Tribe;
 import it.polimi.ingsw.model.Interfaces.CharacterTypeCount;
+import it.polimi.ingsw.model.Player;
 import org.jetbrains.annotations.Nullable;
 
 public class ScoringBuilding extends BuildingCard {
@@ -39,8 +40,7 @@ public class ScoringBuilding extends BuildingCard {
         return i;
     }
 
-    @Override
-    public void addToTribe(Tribe tribe) {
-        tribe.addCard(this);
+    public void applyTo(Player p) {
+        p.getTribe().addCard(this);
     }
 }

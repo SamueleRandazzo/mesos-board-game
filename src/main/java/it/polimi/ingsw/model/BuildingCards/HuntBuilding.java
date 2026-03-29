@@ -26,8 +26,7 @@ public class HuntBuilding extends BuildingCard {
         return extraPoints * typeCount.cardNumber(t);
     }
 
-    @Override
-    public void addToTribe(Tribe tribe) {
-        tribe.addCard(this);
+    public void applyTo(Player p) {
+        p.getTribe().addCard(this);
     }
 }

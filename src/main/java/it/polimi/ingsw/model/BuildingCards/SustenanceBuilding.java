@@ -3,6 +3,7 @@ package it.polimi.ingsw.model.BuildingCards;
 import it.polimi.ingsw.model.Cards.BuildingCard;
 import it.polimi.ingsw.model.Cards.Tribe;
 import it.polimi.ingsw.model.Interfaces.CharacterTypeCount;
+import it.polimi.ingsw.model.Player;
 
 public class SustenanceBuilding extends BuildingCard {
     private final int foodDiscountPerCard;
@@ -19,8 +20,7 @@ public class SustenanceBuilding extends BuildingCard {
         return foodDiscountPerCard * discountType.cardNumber(t);
     }
 
-    @Override
-    public void addToTribe(Tribe tribe) {
-        tribe.addCard(this);
+    public void applyTo(Player p) {
+        p.getTribe().addCard(this);
     }
 }

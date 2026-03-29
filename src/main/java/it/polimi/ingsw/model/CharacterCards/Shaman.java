@@ -1,11 +1,10 @@
 package it.polimi.ingsw.model.CharacterCards;
 
 import it.polimi.ingsw.model.Cards.Card;
-import it.polimi.ingsw.model.Cards.Tribe;
-import it.polimi.ingsw.model.Interfaces.PlayerTribe;
 import it.polimi.ingsw.model.Interfaces.TribeDeck;
+import it.polimi.ingsw.model.Player;
 
-public class Shaman extends Card implements TribeDeck, PlayerTribe {
+public class Shaman extends Card implements TribeDeck {
     private final int shamanStars;
 
     public Shaman(int era, int minPlayer, boolean isObtainable, int shamanStars){
@@ -17,8 +16,7 @@ public class Shaman extends Card implements TribeDeck, PlayerTribe {
         return this.shamanStars;
     }
 
-    @Override
-    public void addToTribe(Tribe tribe) {
-        tribe.addCard(this);
+    public void applyTo(Player p) {
+        p.getTribe().addCard(this);
     }
 }

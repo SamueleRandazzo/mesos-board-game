@@ -1,5 +1,7 @@
 package it.polimi.ingsw.model.Cards;
 
+import it.polimi.ingsw.model.Player;
+
 public abstract class Card {
     private final int era;
     private final int minPlayer;
@@ -25,4 +27,6 @@ public abstract class Card {
     public boolean getIsObtainable() {
         return this.isObtainable;
     }
+
+    public abstract void applyTo(Player player);
 }

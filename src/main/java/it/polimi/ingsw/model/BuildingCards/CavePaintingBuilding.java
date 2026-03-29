@@ -20,8 +20,7 @@ public class CavePaintingBuilding extends BuildingCard {
         return extraFood * typeCount.cardNumber(t);
     }
 
-    @Override
-    public void addToTribe(Tribe tribe) {
-        tribe.addCard(this);
+    public void applyTo(Player p) {
+        p.getTribe().addCard(this);
     }
 }

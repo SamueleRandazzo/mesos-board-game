@@ -2,14 +2,16 @@ package it.polimi.ingsw.model.Cards;
 
 import it.polimi.ingsw.model.Interfaces.EventEffect;
 import it.polimi.ingsw.model.*;
+import it.polimi.ingsw.model.Interfaces.TribeDeck;
+
 import java.util.List;
 
-public class EventCard extends Card {
+public class EventCard extends Card implements TribeDeck {
     private final boolean isFinal;
     private final EventEffect eventEffect;
 
-    public EventCard(int era, int minPlayer, boolean isObtainable, boolean isFinal, EventEffect eventEffect) {
-        super(era, minPlayer, isObtainable);
+    public EventCard(int era, int minPlayer, boolean isFinal, EventEffect eventEffect) {
+        super(era, minPlayer, false);
         this.isFinal = isFinal;
         this.eventEffect = eventEffect;
     }
@@ -31,5 +33,9 @@ public class EventCard extends Card {
      */
     public EventEffect getEventEffect() {
         return eventEffect;
+    }
+
+    public void applyTo(Player player) {
+        throw new IllegalArgumentException("You can't obtain event card");
     }
 }

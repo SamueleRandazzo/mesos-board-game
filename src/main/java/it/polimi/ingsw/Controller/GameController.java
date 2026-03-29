@@ -9,18 +9,49 @@ public class GameController {
         this.game = game;
     }
 
-    // TODO
-    public void addPlayer(String nickname) {
+    public void handleTileSelection(int tileIndex) {
         try {
-
+            game.placePlayerTotem(tileIndex);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void startGame() {
+    public void handleUpperCardSelection(int pos) {
         try {
-            game.initializeGame();
+            game.resolveUpperCardPlayerPick(pos);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void handleLowerCardSelection(int pos) {
+        try {
+            game.resolveLowerCardPlayerPick(pos);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void handleUpperBuildingSelection(int pos) {
+        try {
+            game.resolveUpperBuildingPlayerPick(pos);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void handleLowerBuildingSelection(int pos) {
+        try {
+            game.resolveLowerBuildingPlayerPick(pos);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void handleEndTurnRequest() {
+        try {
+            game.advanceTurn();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
