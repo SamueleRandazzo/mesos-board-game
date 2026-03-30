@@ -30,7 +30,7 @@ class HuntTest {
     @DisplayName("Should grant 0 rewards if players have no hunters or hunt buildings")
     void testResolveNoHunters() {
         // Create player locally to ensure no leftover cards from other tests
-        Player player = new Player(Color.YELLOW);
+        Player player = new Player(Color.YELLOW, "player-yellow");
         List<Player> players = List.of(player);
 
         huntEvent.resolve(players);
@@ -108,7 +108,7 @@ class HuntTest {
     @DisplayName("Should throw IllegalArgumentException if a player in the list is null")
     void testResolveListWithNullElement() {
         List<Player> listWithNull = new ArrayList<>();
-        listWithNull.add(new Player(Color.BLACK));
+        listWithNull.add(new Player(Color.BLACK, "player-black"));
         listWithNull.add(null);
 
         assertThrows(IllegalArgumentException.class, () -> huntEvent.resolve(listWithNull));
