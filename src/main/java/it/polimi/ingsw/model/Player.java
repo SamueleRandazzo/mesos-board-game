@@ -9,7 +9,7 @@ public class Player
     private String password;
     private int prestigePoints;
     private int foodAmount;
-    private final Color color;
+    public final Color color;
     private Tribe tribe;
 
     public Player(Color color, String nickname){ //perhaps a different implementation is needed
@@ -48,4 +48,7 @@ public class Player
     public void changeFoodAmount(int variation){
         foodAmount += variation;
     }
+
+    public Color getColor(){return this.color; }
+
 }
