@@ -23,7 +23,7 @@ public class TotemPlacementState extends GameState {
 
         if (chosenTile.isAvailable()) { //return true if the chosenTile is available
 
-            chosenTile.placeTotem(player);
+            context.executeTotemPlacement(player, tileIndex);
             context.advanceTurn();
 
         } else {
