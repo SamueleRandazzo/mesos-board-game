@@ -57,4 +57,13 @@ public class OfferTile {
 
         this.placedPlayer = null;
     }
+
+    /**
+     * Returns the player who placed their totem on this tile.
+     * @return the Player instance, or null if the tile is unoccupied.
+     */
+    public Player getPlacedPlayer(){
+        return this.placedPlayer;
+    }
+
 }

@@ -4,7 +4,10 @@ import it.polimi.ingsw.model.Cards.*;
 import it.polimi.ingsw.model.Interfaces.*;
 import it.polimi.ingsw.model.Board.*;
 import it.polimi.ingsw.model.factories.TurnOrderFactory;
+import it.polimi.ingsw.model.states.EndGameState;
 import it.polimi.ingsw.model.states.GameState;
+import it.polimi.ingsw.model.states.SetupGameState;
+import it.polimi.ingsw.model.states.TotemPlacementState;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -127,6 +130,8 @@ public class Game {
 
         // Board is created with Era I buildings
         this.board = new Board(tribeDeck, era1Buildings);
+
+        this.currentState = new SetupGameState();
     }
 
     public void initializeGame() {
@@ -134,6 +139,8 @@ public class Game {
         createTurnOrderTile(numPlayers);
         this.currentRound = 1;
         this.currentPlayerIndex = 0;
+
+        this.setState(new TotemPlacementState());
     }
 
     /**
@@ -371,7 +378,7 @@ public class Game {
         this.turnOrderTile = TurnOrderFactory.createTrack(numPlayers);
 
         return true;
-        //l' eccezione sul numero di players è già gestita
+        //the exception about player's number is already managed
     }
 
     public void advanceTurn() {
@@ -390,13 +397,15 @@ public class Game {
     }
 
     public void nextRound() {
-        endOfRound(); // Esegue pulizia board ed eventi
+        endOfRound(); // clean boards and events
         this.currentRound++;
-        this.currentPlayerIndex = 0; // Reset per il nuovo round
+        this.currentPlayerIndex = 0; // Reset for the next round
 
         if (this.currentRound > TOTAL_ROUNDS) {
             resolveRemainingEvents();
             computeFinalScores();
+
+            this.setState(new EndGameState());
         }
     }
 
@@ -469,6 +478,11 @@ public class Game {
     public void setTurnOrder(List<Player> newOrder){
         this.roundTurnOrder = new ArrayList<>(newOrder);
         this.currentPlayerIndex = 0;
+    }
+
+    public TurnOrderTile getTurnOrderTile(){
+
+        return this.turnOrderTile;
     }
 
 

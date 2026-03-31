@@ -4,6 +4,9 @@ import it.polimi.ingsw.model.Board.OfferTile;
 import it.polimi.ingsw.model.Game;
 import it.polimi.ingsw.model.Player;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class TotemPlacementState extends GameState {
 
     @Override
@@ -11,7 +14,7 @@ public class TotemPlacementState extends GameState {
 
         //check if it the player's turn
         if (!player.equals(context.getCurrentActivePlayer())) {
-            throw new IllegalStateException("It is not" + player.getColor() + "'s turn!");
+            throw new IllegalStateException("It is not " + player.getColor() + "'s turn!");
         }
 
         //check if tileIndex is valid
@@ -33,6 +36,16 @@ public class TotemPlacementState extends GameState {
 
         //if all the totem has been placed on the track moves to next state
         if (isPhaseOver(context)) {
+            //Extract the new turn order (left to the right on the Offer Track)
+            List<Player> newOrder = context.getOfferTrack().getTiles().stream()
+                            .filter(tile -> !tile.isAvailable())
+                            .map(OfferTile::getPlacedPlayer)
+                            .collect(Collectors.toList());
+
+            //set the new order for Phase 2
+            context.setTurnOrder(newOrder);
+
+            //Move to next state
             context.setState(new ActionResolutionState(context));
         }
 
