@@ -193,11 +193,5 @@ public class ActionResolutionState extends GameState {
             context.setState(new TotemPlacementState());
 
         }
-
-
-
     }
-
-
-
 }
