@@ -35,7 +35,6 @@ public abstract class GameState {
      */
     public void resolveUpperCardPick(Game context, Player player, int cardIndex) {
         throw new IllegalStateException("Action not allowed: You cannot pick an upper row card now.");
-
     }
 
     /**
@@ -48,7 +47,6 @@ public abstract class GameState {
      */
     public void resolveLowerCardPick(Game context, Player player, int cardIndex) {
         throw new IllegalStateException("Action not allowed: You cannot pick a lower row card now.");
-
     }
 
     /**
@@ -72,7 +70,6 @@ public abstract class GameState {
      */
     public void resolveUpperBuildingPick (Game context, Player player, int buildingIndex){
         throw new IllegalStateException("Action not allowed: You cannot pick an upper building card now.");
-
     }
 
     /**
@@ -85,7 +82,5 @@ public abstract class GameState {
      */
     public void resolveLowerBuildingPick (Game context, Player player, int BuildingIndex){
         throw new IllegalStateException("Action not allowed: You cannot pick a lower building card now.");
-
     }
 }
-

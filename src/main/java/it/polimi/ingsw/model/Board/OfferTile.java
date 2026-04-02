@@ -30,6 +30,7 @@ public class OfferTile {
     public int getTopRowDraws(){
         return this.topRowDraws;
     }
+
     /** returns the number of cards that the player can draw from the bottom row.*/
     public int getBottomRowDraws(){
         return this.bottomRowDraws;
@@ -39,6 +40,7 @@ public class OfferTile {
     public TileId getTileId(){
         return this.tileId;
     }
+
     /** checks if the tile is available (a tile is available if no totem placed on it)
        return true if available, false otherwise.
      */
@@ -50,11 +52,13 @@ public class OfferTile {
     public void placeTotem(Player player){
         this.placedPlayer = player;
 
+        if (this.foodBonus != 0) {
+            player.changeFoodAmount(this.foodBonus);
+        }
     }
 
     /** remove the totem from this tile at the end of the phase*/
     public void removeTotem(){
-
         this.placedPlayer = null;
     }
 

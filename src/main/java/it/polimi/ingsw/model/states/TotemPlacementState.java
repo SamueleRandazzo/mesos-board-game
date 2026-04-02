@@ -12,7 +12,7 @@ public class TotemPlacementState extends GameState {
     @Override
     public void placeTotem(Game context, Player player, int tileIndex) {
 
-        //check if it the player's turn
+        //check if it's the player's turn
         if (!player.equals(context.getCurrentActivePlayer())) {
             throw new IllegalStateException("It is not " + player.getColor() + "'s turn!");
         }
@@ -59,7 +59,5 @@ public class TotemPlacementState extends GameState {
                 .filter(tile -> !tile.isAvailable())
                 .count();
         return placedTotems == context.getNumPlayers();
-
     }
-
 }

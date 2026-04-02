@@ -31,7 +31,6 @@ public class ActionResolutionState extends GameState {
         if (this.currentActivePlayer ==  null || !this.currentActivePlayer.equals(activePlayer)) {
             this.currentActivePlayer = activePlayer;
 
-
             //find the OfferTile where the new player is
             OfferTile playerTile = findTileForPlayer(context, activePlayer);
 

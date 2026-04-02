@@ -382,7 +382,7 @@ public class Game {
     }
 
     public void advanceTurn() {
-        this.currentPlayerIndex ++;
+        this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.size();
     }
 
     /**
@@ -484,11 +484,4 @@ public class Game {
 
         return this.turnOrderTile;
     }
-
-
-
-
-
-
-
 }
