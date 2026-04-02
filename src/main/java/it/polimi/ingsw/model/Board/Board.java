@@ -20,6 +20,9 @@ import java.util.List;
  */
 public class Board {
 
+    private static final int UPPER_EXTRA_CARDS = 4;
+    private static final int LOWER_EXTRA_CARDS = 1;
+
     /** Tribe cards visible in the upper row (CharacterCard or EventCard). */
     private List<TribeDeck> upperTribeCards;
 
@@ -47,7 +50,7 @@ public class Board {
      * Called once by Game during game setup (preparazione).
      * <p>
      * After construction the rows are empty; Game must call
-     * {@link #fillRows(int)} and set up the initial lower row separately
+     * {@link #fillUpperRow(int)} and set up the initial lower row separately
      * following the setup rules (p. 2-3 of the rulebook).
      *
      * @param tribeDeck    the full, ordered tribe deck (Era I on top, Final Events at bottom)
@@ -195,17 +198,34 @@ public class Board {
      *
      * @param numPlayers number of players, used to compute the upper row target size
      */
-    public void fillRows(int numPlayers) {
-        int target       = numPlayers + 4;
-        int alreadyInRow = upperTribeCards.size();
-        int needed       = target - alreadyInRow;
+    public void fillUpperRow(int numPlayers) {
+        int needed = numPlayers + UPPER_EXTRA_CARDS - upperTribeCards.size();
 
         for (int i = 0; i < needed; i++) {
-            if (tribeDeck.isEmpty()) break;
+            if (tribeDeck.isEmpty())
+                break;
             upperTribeCards.add(tribeDeck.remove(0));
         }
     }
 
+    public void initializeLowerRow(int numPlayers) {
+        int needed = numPlayers + LOWER_EXTRA_CARDS;
+
+        int i = 0;
+        while (i < needed) {
+            if (tribeDeck.isEmpty())
+                break;
+
+            TribeDeck card = tribeDeck.remove(0);
+
+            if (card.isEvent()) {
+                upperTribeCards.add(card);
+            } else {
+                lowerTribeCards.add(card);
+                i++;
+            }
+        }
+    }
     // -------------------------------------------------------------------------
     // End-of-round cleanup
     // -------------------------------------------------------------------------
@@ -218,7 +238,7 @@ public class Board {
      *  2. Move all Character and Event cards from the upper tribe row
      *     down to the lower tribe row.
      *     Building cards in the upper row are NOT affected (they stay).
-     *  3. Refill the upper tribe row via {@link #fillRows(int)}.
+     *  3. Refill the upper tribe row via {@link #fillUpperRow(int)}.
      * <p>
      * Event resolution and era-change detection happen in Game, which calls
      * this method after all players have taken their turns.
@@ -229,7 +249,7 @@ public class Board {
         lowerTribeCards.clear();
         lowerTribeCards.addAll(upperTribeCards);
         upperTribeCards.clear();
-        fillRows(numPlayers);
+        fillUpperRow(numPlayers);
     }
 
     // -------------------------------------------------------------------------

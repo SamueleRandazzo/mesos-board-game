@@ -56,7 +56,7 @@ public class Game {
     private TurnOrderTile turnOrderTile;
     /**
      * Current era (1, 2 or 3).
-     * Starts at 1; advances when a card of the next era is revealed during fillRows().
+     * Starts at 1; advances when a card of the next era is revealed during fillUpperRow().
      */
     private int currentEra;
     /** Round counter. Starts at 1, ends at TOTAL_ROUNDS. */
@@ -120,7 +120,6 @@ public class Game {
         this.currentEra = FIRST_ERA;
         this.currentRound = 1;
         this.currentPlayerIndex = 0;
-        this.roundTurnOrder = new ArrayList<>(this.players);
         this.roundTurnOrder = new ArrayList<>(players);
 
         // Store Era II and III building decks for later use
@@ -151,9 +150,8 @@ public class Game {
      * as required by the rules.
      */
     public void setupInitialRows() {
-        // TODO: implement initial lower-row setup with event-card redirection.
-        // For now, delegate standard fill to Board.
-        board.fillRows(numPlayers);
+        board.initializeLowerRow(numPlayers);
+        board.fillUpperRow(numPlayers);
     }
 
     /**
@@ -313,6 +311,15 @@ public class Game {
      */
     public List<Player> getPlayers() {
         return Collections.unmodifiableList(players);
+    }
+
+    /**
+     * Returns the current player index
+     *
+     * @return current player index
+     */
+    public int getCurrentPlayerIndex() {
+        return this.currentPlayerIndex;
     }
 
     /**
@@ -483,5 +490,9 @@ public class Game {
     public TurnOrderTile getTurnOrderTile(){
 
         return this.turnOrderTile;
+    }
+
+    public void resolveEndTurn() {
+        this.currentState.endTurn(this, this.getCurrentActivePlayer());
     }
 }

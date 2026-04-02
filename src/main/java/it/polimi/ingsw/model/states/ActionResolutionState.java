@@ -151,7 +151,8 @@ public class ActionResolutionState extends GameState {
 
     }
 
-    public void placeTotemOnTurnOrder(Game context, Player player){
+    @Override
+    public void endTurn(Game context, Player player){
         if(upperPicksLeft > 0 || lowerPicksLeft > 0){
             throw new IllegalStateException("You must draw all your required tribe cards before ending your turn!");
 
@@ -177,12 +178,8 @@ public class ActionResolutionState extends GameState {
             }
         }
 
-        context.advanceTurn();
-
         //check if the Phase (and round) is over
-        //if advanceTurn() goes out of bounds, getCurrentActivePlayer() returns null
-        if(context.getCurrentActivePlayer() == null){
-
+        if(context.getCurrentPlayerIndex() == (context.getNumPlayers() - 1)) {
             List<Player> nextRoundOrder = context.getTurnOrderTile().getNextRoundOrder();
 
             context.setTurnOrder(nextRoundOrder);
@@ -190,7 +187,6 @@ public class ActionResolutionState extends GameState {
             context.nextRound();
 
             context.setState(new TotemPlacementState());
-
         }
     }
 }
