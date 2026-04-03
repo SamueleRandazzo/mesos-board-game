@@ -30,7 +30,7 @@ class CavePaintingsTest {
         cavePaintings = new CavePaintings(2, 2, PENALTY);
 
         // Initializing player with a color as per Player.java constructor
-        player = new Player(Color.RED);
+        player = new Player(Color.RED, "player-red");
         players = new ArrayList<>();
         players.add(player);
     }
@@ -104,7 +104,7 @@ class CavePaintingsTest {
     @Test
     @DisplayName("Should handle multiple players with different tribe compositions")
     void testMultiplePlayers() {
-        Player player2 = new Player(Color.BLUE);
+        Player player2 = new Player(Color.BLUE, "player-blue");
         // Player 2 has 2 artists (Bonus +4), Player 1 has 0 (Penalty -3)
         player2.getTribe().addCard(new Artist(1, 2, true));
         player2.getTribe().addCard(new Artist(1, 2, true));

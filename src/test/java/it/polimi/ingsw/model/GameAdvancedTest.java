@@ -4,7 +4,9 @@ import it.polimi.ingsw.model.Board.Board;
 import it.polimi.ingsw.model.Board.OfferTrack;
 import it.polimi.ingsw.model.Cards.BuildingCard;
 import it.polimi.ingsw.model.Cards.Card;
+import it.polimi.ingsw.model.Cards.EventCard;
 import it.polimi.ingsw.model.Enum.Color;
+import it.polimi.ingsw.model.Interfaces.EventEffect;
 import it.polimi.ingsw.model.Interfaces.TribeDeck;
 import org.junit.jupiter.api.Test;
 
@@ -14,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GameAdvancedTest {
 
@@ -78,12 +81,17 @@ class GameAdvancedTest {
         }
     }
 
+    /**
+     * Finta carta tribù usata solo per controllare l'era nei test.
+     */
     private static class FakeTribeCard extends Card implements TribeDeck {
         protected FakeTribeCard(int era) {
             super(era, 2, true);
         }
 
+        @Override
         public void applyTo(Player player) {
+            // niente: è solo una fake per i test
         }
     }
 
@@ -133,5 +141,51 @@ class GameAdvancedTest {
         assertEquals(2, game.getCurrentEra());
         assertEquals(3, board.getUpperBuildingCards().size());
         assertEquals(0, board.getLowerBuildingCards().size());
+    }
+
+    @Test
+    void eventCard_shouldBeCompatibleWithBoardRows() {
+        assertTrue(
+                TribeDeck.class.isAssignableFrom(EventCard.class),
+                "EventCard should implement TribeDeck so it can appear in Board rows typed as List<TribeDeck>."
+        );
+    }
+
+    @Test
+    void resolveRemainingEvents_shouldResolveOnlyEventsFromBothRows() {
+        List<Player> players = List.of(
+                newPlayer(Color.RED, 0, 0),
+                newPlayer(Color.BLUE, 0, 0)
+        );
+
+        Game game = newGameWithPlayersAndBuildings(
+                players,
+                emptyBuildingList(),
+                emptyBuildingList(),
+                emptyBuildingList()
+        );
+
+        Board board = game.getBoard();
+
+        final int[] counter = {0};
+        EventEffect effect = ps -> counter[0] += ps.size();
+
+        EventCard bottomEvent = new EventCard(1, 2, false, effect);
+        EventCard topEvent = new EventCard(1, 2, false, effect);
+
+        List<TribeDeck> bottomRow = new ArrayList<>();
+        bottomRow.add(bottomEvent);
+        bottomRow.add(new FakeTribeCard(1)); // non-evento, da ignorare
+
+        List<TribeDeck> topRow = new ArrayList<>();
+        topRow.add(topEvent);
+
+        setPrivateField(board, "lowerTribeCards", bottomRow);
+        setPrivateField(board, "upperTribeCards", topRow);
+
+        invokePrivateVoid(game, "resolveRemainingEvents");
+
+        // 2 eventi x 2 giocatori = 4 chiamate totali all'effect
+        assertEquals(4, counter[0]);
     }
 }

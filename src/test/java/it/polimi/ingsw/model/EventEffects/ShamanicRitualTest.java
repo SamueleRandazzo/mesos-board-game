@@ -28,9 +28,9 @@ class ShamanicRitualTest {
     @Test
     @DisplayName("Test basic resolution with one winner, one loser and one neutral player")
     void testResolve_StandardScenario() {
-        Player winner = new Player(Color.RED);
-        Player neutral = new Player(Color.BLUE);
-        Player loser = new Player(Color.YELLOW);
+        Player winner = new Player(Color.RED, "winner");
+        Player neutral = new Player(Color.BLUE, "neutral");
+        Player loser = new Player(Color.YELLOW, "loser");
 
         // Setting stars: Winner(10), Neutral(5), Loser(0)
         winner.getTribe().getShamanicAttr().addStars(10);
@@ -50,10 +50,10 @@ class ShamanicRitualTest {
     @Test
     @DisplayName("Test multiple winners and losers (Ties)")
     void testResolve_MultipleWinnersAndLosers() {
-        Player win1 = new Player(Color.RED);
-        Player win2 = new Player(Color.BLUE);
-        Player loss1 = new Player(Color.WHITE);
-        Player loss2 = new Player(Color.BLACK);
+        Player win1 = new Player(Color.RED, "win1");
+        Player win2 = new Player(Color.BLUE, "win2");
+        Player loss1 = new Player(Color.WHITE, "loss1");
+        Player loss2 = new Player(Color.BLACK, "loss2");
 
         win1.getTribe().getShamanicAttr().addStars(8);
         win2.getTribe().getShamanicAttr().addStars(8);
@@ -73,8 +73,8 @@ class ShamanicRitualTest {
     @Test
     @DisplayName("Test Double On Winning attribute")
     void testResolve_DoubleOnWinning() {
-        Player luckyWinner = new Player(Color.RED);
-        Player standardLoser = new Player(Color.BLUE);
+        Player luckyWinner = new Player(Color.RED, "luckyWinner");
+        Player standardLoser = new Player(Color.BLUE, "standardLoser");
 
         luckyWinner.getTribe().getShamanicAttr().addStars(10);
         luckyWinner.getTribe().getShamanicAttr().setDoubleOnWinning(true);
@@ -92,8 +92,8 @@ class ShamanicRitualTest {
     @Test
     @DisplayName("Test Prevent Loss attribute")
     void testResolve_PreventLoss() {
-        Player standardWinner = new Player(Color.RED);
-        Player protectedLoser = new Player(Color.BLUE);
+        Player standardWinner = new Player(Color.RED, "standardWinner");
+        Player protectedLoser = new Player(Color.BLUE, "protectedLoser");
 
         standardWinner.getTribe().getShamanicAttr().addStars(10);
 
@@ -110,8 +110,8 @@ class ShamanicRitualTest {
     @Test
     @DisplayName("Test edge case: All players have the same number of stars")
     void testResolve_AllTied() {
-        Player p1 = new Player(Color.RED);
-        Player p2 = new Player(Color.BLUE);
+        Player p1 = new Player(Color.RED, "p1");
+        Player p2 = new Player(Color.BLUE, "p2");
 
         // Both have 5 stars
         p1.getTribe().getShamanicAttr().addStars(5);
@@ -131,7 +131,7 @@ class ShamanicRitualTest {
     @Test
     @DisplayName("Test edge case: Single player in the game")
     void testResolve_SinglePlayer() {
-        Player p1 = new Player(Color.RED);
+        Player p1 = new Player(Color.RED, "singlePlayer");
         p1.getTribe().getShamanicAttr().addStars(5);
         players.add(p1);
 

@@ -111,4 +111,39 @@ class BoardTest {
 
         assertTrue(board.isTribeDeckEmpty());
     }
+
+    @Test
+    void fillRows_shouldStopIfDeckIsShorterThanTarget() {
+        Board board = new Board(placeholders(3), placeholders(0));
+
+        board.fillRows(3); // target would be 7, but deck has only 3 cards
+
+        assertEquals(3, board.getTopRow().size());
+        assertTrue(board.isTribeDeckEmpty());
+    }
+
+    @Test
+    void takeCardFromBottomRow_withInvalidIndex_shouldThrowException() {
+        Board board = new Board(placeholders(0), placeholders(0));
+
+        assertThrows(IndexOutOfBoundsException.class, () -> board.takeCardFromBottomRow(0));
+
+        setPrivateField(board, "lowerTribeCards", placeholders(2));
+
+        assertThrows(IndexOutOfBoundsException.class, () -> board.takeCardFromBottomRow(-1));
+        assertThrows(IndexOutOfBoundsException.class, () -> board.takeCardFromBottomRow(2));
+    }
+
+    @Test
+    void cleanUpAtRoundEnd_shouldHandleEmptyUpperRow() {
+        Board board = new Board(placeholders(0), placeholders(0));
+
+        setPrivateField(board, "lowerTribeCards", placeholders(3));
+        setPrivateField(board, "upperTribeCards", placeholders(0));
+
+        board.cleanUpAtRoundEnd(2);
+
+        assertEquals(0, board.getBottomRow().size());
+        assertEquals(0, board.getTopRow().size());
+    }
 }
