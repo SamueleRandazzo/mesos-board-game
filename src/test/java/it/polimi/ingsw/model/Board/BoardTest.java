@@ -1,7 +1,6 @@
 package it.polimi.ingsw.model.Board;
 
 import it.polimi.ingsw.model.Cards.BuildingCard;
-import it.polimi.ingsw.model.Interfaces.TribeDeck;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -45,7 +44,7 @@ class BoardTest {
     void fillRows_shouldFillUpperRowUpToNumPlayersPlusFour() {
         Board board = new Board(placeholders(10), placeholders(0));
 
-        board.fillRows(3);
+        board.fillUpperRow(3);
 
         assertEquals(7, board.getTopRow().size());
         assertEquals(3, ((List<?>) getPrivateField(board, "tribeDeck")).size());
@@ -54,7 +53,7 @@ class BoardTest {
     @Test
     void takeCardFromTopRow_shouldRemoveOneCard() {
         Board board = new Board(placeholders(10), placeholders(0));
-        board.fillRows(2); // 2 + 4 = 6
+        board.fillUpperRow(2); // 2 + 4 = 6
 
         int before = board.getTopRow().size();
         board.takeCardFromTopRow(0);
@@ -73,7 +72,7 @@ class BoardTest {
     void cleanUpAtRoundEnd_shouldMoveUpperToLowerAndRefillUpper() {
         Board board = new Board(placeholders(20), placeholders(0));
 
-        board.fillRows(2); // upper = 6
+        board.fillUpperRow(2); // upper = 6
         setPrivateField(board, "lowerTribeCards", placeholders(3)); // simulate old lower row
 
         board.cleanUpAtRoundEnd(2);

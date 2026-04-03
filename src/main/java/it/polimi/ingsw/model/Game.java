@@ -4,6 +4,10 @@ import it.polimi.ingsw.model.Cards.*;
 import it.polimi.ingsw.model.Interfaces.*;
 import it.polimi.ingsw.model.Board.*;
 import it.polimi.ingsw.model.factories.TurnOrderFactory;
+import it.polimi.ingsw.model.states.EndGameState;
+import it.polimi.ingsw.model.states.GameState;
+import it.polimi.ingsw.model.states.SetupGameState;
+import it.polimi.ingsw.model.states.TotemPlacementState;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,10 +53,10 @@ public class Game {
     /** The offer track (tiles where players place their totems). */
     private final OfferTrack offerTrack;
     /** The TurnOrderTrack*/
-    private TurnOrderTile TurnOrderTile;
+    private TurnOrderTile turnOrderTile;
     /**
      * Current era (1, 2 or 3).
-     * Starts at 1; advances when a card of the next era is revealed during fillRows().
+     * Starts at 1; advances when a card of the next era is revealed during fillUpperRow().
      */
     private int currentEra;
     /** Round counter. Starts at 1, ends at TOTAL_ROUNDS. */
@@ -65,6 +69,12 @@ public class Game {
      */
     private final List<List<BuildingCard>> eraBuildingDecks;
     private int currentPlayerIndex = 0;
+
+    private GameState currentState;
+
+    /**the sequence of players for the current phase.*/
+    private List<Player> roundTurnOrder;
+
     //endregion
 
     /**
@@ -110,6 +120,7 @@ public class Game {
         this.currentEra = FIRST_ERA;
         this.currentRound = 1;
         this.currentPlayerIndex = 0;
+        this.roundTurnOrder = new ArrayList<>(players);
 
         // Store Era II and III building decks for later use
         this.eraBuildingDecks = new ArrayList<>();
@@ -118,6 +129,8 @@ public class Game {
 
         // Board is created with Era I buildings
         this.board = new Board(tribeDeck, era1Buildings);
+
+        this.currentState = new SetupGameState();
     }
 
     public void initializeGame() {
@@ -125,6 +138,8 @@ public class Game {
         createTurnOrderTile(numPlayers);
         this.currentRound = 1;
         this.currentPlayerIndex = 0;
+
+        this.setState(new TotemPlacementState());
     }
 
     /**
@@ -135,9 +150,8 @@ public class Game {
      * as required by the rules.
      */
     public void setupInitialRows() {
-        // TODO: implement initial lower-row setup with event-card redirection.
-        // For now, delegate standard fill to Board.
-        board.fillRows(numPlayers);
+        board.initializeLowerRow(numPlayers);
+        board.fillUpperRow(numPlayers);
     }
 
     /**
@@ -300,6 +314,15 @@ public class Game {
     }
 
     /**
+     * Returns the current player index
+     *
+     * @return current player index
+     */
+    public int getCurrentPlayerIndex() {
+        return this.currentPlayerIndex;
+    }
+
+    /**
      * Returns the Board owned by this game instance.
      *
      * @return the Board
@@ -344,35 +367,36 @@ public class Game {
         return offerTrack;
     }
 
+    /**
+     * Returns the player whose turn it is currently.
+     */
     public Player getCurrentActivePlayer() {
-        return players.get(currentPlayerIndex);
+
+        if(roundTurnOrder == null || currentPlayerIndex >= roundTurnOrder.size()) {
+            return null;
+        }
+        return roundTurnOrder.get(currentPlayerIndex);
     }
     //endregion
 
     //create the TurnOrderTile using the TurnOrderFactory
     public boolean createTurnOrderTile(int numPlayers){
 
-        this.TurnOrderTile = TurnOrderFactory.createTrack(numPlayers);
+        this.turnOrderTile = TurnOrderFactory.createTrack(numPlayers);
 
         return true;
-        //l' eccezione sul numero di players è già gestita
+        //the exception about player's number is already managed
     }
 
     public void advanceTurn() {
-        this.currentPlayerIndex = (currentPlayerIndex + 1) % numPlayers;
+        this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.size();
     }
 
+    /**
+     * Entry point for totem placement. Delegates logic to the current state.
+     */
     public void placePlayerTotem(int tileIndex) {
-        OfferTile chosen = offerTrack.getTiles().get(tileIndex);
-
-        if (!chosen.isAvailable()) {
-            throw new IllegalStateException("Tile già occupata!");
-        }
-
-        chosen.placeTotem(getCurrentActivePlayer());
-
-        // Se il regolamento dice che dopo il piazzamento il turno passa al prossimo:
-        advanceTurn();
+        currentState.placeTotem(this, getCurrentActivePlayer(), tileIndex);
     }
 
     public List<OfferTile> getTilesToResolve() {
@@ -380,33 +404,95 @@ public class Game {
     }
 
     public void nextRound() {
-        endOfRound(); // Esegue pulizia board ed eventi
+        endOfRound(); // clean boards and events
         this.currentRound++;
-        this.currentPlayerIndex = 0; // Reset per il nuovo round
+        this.currentPlayerIndex = 0; // Reset for the next round
 
         if (this.currentRound > TOTAL_ROUNDS) {
             resolveRemainingEvents();
             computeFinalScores();
+
+            this.setState(new EndGameState());
         }
     }
 
     public void resolveUpperCardPlayerPick(int pos) {
-        TribeDeck c = this.board.takeCardFromTopRow(pos);
-        c.applyTo(this.getCurrentActivePlayer());
+        currentState.resolveUpperCardPick(this, getCurrentActivePlayer(), pos);
     }
 
     public void resolveLowerCardPlayerPick(int pos) {
-        TribeDeck c = this.board.takeCardFromBottomRow(pos);
-        c.applyTo(this.getCurrentActivePlayer());
+        currentState.resolveLowerCardPick(this, getCurrentActivePlayer(), pos);
     }
 
     public void resolveUpperBuildingPlayerPick(int pos) {
-        BuildingCard c = this.board.takeCardFromUpperBuildingRow(pos);
-        c.applyTo(this.getCurrentActivePlayer());
+        currentState.resolveUpperBuildingPick(this, getCurrentActivePlayer(), pos);
     }
 
     public void resolveLowerBuildingPlayerPick(int pos) {
+        currentState.resolveLowerBuildingPick(this, getCurrentActivePlayer(), pos);
+    }
+
+    public void setState(GameState newState){
+        this.currentState = newState;
+    }
+
+    /**
+     * Actually performs the totem placement on the board data.
+     * Called by TotemPlacementState after validation.
+     */
+    public void executeTotemPlacement(Player player, int tileIndex) {
+        OfferTile chosen = offerTrack.getTiles().get(tileIndex);
+        chosen.placeTotem(player);
+    }
+
+    /**
+     * Actually performs the upper card acquisition.
+     * Called by ActionResolutionState after validation.
+     */
+    public void executeUpperCardPick(Player player, int pos) {
+        TribeDeck c = this.board.takeCardFromTopRow(pos);
+        c.applyTo(player);
+    }
+
+    /**
+     * Actually performs the lower card acquisition.
+     */
+    public void executeLowerCardPick(Player player, int pos) {
+        TribeDeck c = this.board.takeCardFromBottomRow(pos);
+        c.applyTo(player);
+    }
+
+    /**
+     * Actually performs the upper building acquisition.
+     */
+    public void executeUpperBuildingPick(Player player, int pos) {
+        BuildingCard c = this.board.takeCardFromUpperBuildingRow(pos);
+        c.applyTo(player);
+    }
+
+    /**
+     * Actually performs the lower building acquisition.
+     */
+    public void executeLowerBuildingPick(Player player, int pos) {
         BuildingCard c = this.board.takeCardFromLowerBuildingRow(pos);
-        c.applyTo(this.getCurrentActivePlayer());
+        c.applyTo(player);
+    }
+
+    /**
+     * Updates the turn order for the current phase.
+     * @param newOrder the list of players in the order they must act.
+     */
+    public void setTurnOrder(List<Player> newOrder){
+        this.roundTurnOrder = new ArrayList<>(newOrder);
+        this.currentPlayerIndex = 0;
+    }
+
+    public TurnOrderTile getTurnOrderTile(){
+
+        return this.turnOrderTile;
+    }
+
+    public void resolveEndTurn() {
+        this.currentState.endTurn(this, this.getCurrentActivePlayer());
     }
 }

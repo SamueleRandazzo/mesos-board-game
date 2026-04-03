@@ -38,4 +38,9 @@ public class EventCard extends Card implements TribeDeck {
     public void applyTo(Player player) {
         throw new IllegalArgumentException("You can't obtain event card");
     }
+
+    @Override
+    public boolean isEvent() {
+        return true;
+    }
 }

@@ -4,14 +4,17 @@ import it.polimi.ingsw.model.Board.OfferTile;
 import it.polimi.ingsw.model.Game;
 import it.polimi.ingsw.model.Player;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class TotemPlacementState extends GameState {
 
     @Override
     public void placeTotem(Game context, Player player, int tileIndex) {
 
-        //check if it the player's turn
+        //check if it's the player's turn
         if (!player.equals(context.getCurrentActivePlayer())) {
-            throw new IllegalStateException("It is not" + player.getColor() + "'s turn!");
+            throw new IllegalStateException("It is not " + player.getColor() + "'s turn!");
         }
 
         //check if tileIndex is valid
@@ -23,7 +26,7 @@ public class TotemPlacementState extends GameState {
 
         if (chosenTile.isAvailable()) { //return true if the chosenTile is available
 
-            chosenTile.placeTotem(player);
+            context.executeTotemPlacement(player, tileIndex);
             context.advanceTurn();
 
         } else {
@@ -33,8 +36,17 @@ public class TotemPlacementState extends GameState {
 
         //if all the totem has been placed on the track moves to next state
         if (isPhaseOver(context)) {
-            // TODO: Ho commentato questa riga per riuscire a runnare i test, da decomentare quando necessario
-            //context.setState(new ActionResolutionState(context));
+            //Extract the new turn order (left to the right on the Offer Track)
+            List<Player> newOrder = context.getOfferTrack().getTiles().stream()
+                            .filter(tile -> !tile.isAvailable())
+                            .map(OfferTile::getPlacedPlayer)
+                            .collect(Collectors.toList());
+
+            //set the new order for Phase 2
+            context.setTurnOrder(newOrder);
+
+            //Move to next state
+            context.setState(new ActionResolutionState(context));
         }
 
     }
@@ -47,7 +59,5 @@ public class TotemPlacementState extends GameState {
                 .filter(tile -> !tile.isAvailable())
                 .count();
         return placedTotems == context.getNumPlayers();
-
     }
-
 }

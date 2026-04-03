@@ -14,4 +14,7 @@ public interface TribeDeck {
     public int getEra();
     public boolean getIsObtainable();
     public void applyTo(Player p);
+    public default boolean isEvent() {
+        return false;
+    }
 }

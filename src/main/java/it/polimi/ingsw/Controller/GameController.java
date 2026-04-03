@@ -51,7 +51,7 @@ public class GameController {
 
     public void handleEndTurnRequest() {
         try {
-            game.advanceTurn();
+            game.resolveEndTurn();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
