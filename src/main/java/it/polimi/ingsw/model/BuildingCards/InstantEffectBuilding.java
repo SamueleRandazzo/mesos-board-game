@@ -1,7 +1,6 @@
 package it.polimi.ingsw.model.BuildingCards;
 
 import it.polimi.ingsw.model.Cards.BuildingCard;
-import it.polimi.ingsw.model.Cards.Tribe;
 import it.polimi.ingsw.model.Player;
 
 public class InstantEffectBuilding extends BuildingCard {
@@ -11,7 +10,7 @@ public class InstantEffectBuilding extends BuildingCard {
     private final boolean extraCardFromUpper;
     private final boolean extraFoodFromBonus;
 
-    InstantEffectBuilding(int era, int minPlayer, boolean isObtainable, int foodCost, int prestigePoints,
+    public InstantEffectBuilding(int era, int minPlayer, boolean isObtainable, int foodCost, int prestigePoints,
                           int extraStars, boolean preventLoss, boolean doubleOnWinning, boolean extraCardFromUpper, boolean extraFoodFromBonus) {
         super(era, minPlayer, isObtainable, foodCost, prestigePoints);
         this.extraStars = extraStars;

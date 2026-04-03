@@ -1,120 +1,94 @@
 package it.polimi.ingsw.model.EventEffects;
 
 import it.polimi.ingsw.model.CharacterCards.Artist;
+import it.polimi.ingsw.model.BuildingCards.CavePaintingBuilding;
+import it.polimi.ingsw.model.CharacterTypeCounts.ArtistsCount;
 import it.polimi.ingsw.model.Enum.Color;
 import it.polimi.ingsw.model.Player;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Unit tests for CavePaintings event effect.
- * Tests focus on food gain from buildings and Prestige Points logic based on Artists.
- */
 class CavePaintingsTest {
 
-    private CavePaintings cavePaintings;
     private Player player;
-    private List<Player> players;
-
-    private final int PENALTY = 3;
+    private CavePaintings cavePaintingsEvent;
 
     @BeforeEach
     void setUp() {
-        // Threshold: 2, Bonus: 2 PP per artist, Penalty: 3 PP
-        cavePaintings = new CavePaintings(2, 2, PENALTY);
-
-        // Initializing player with a color as per Player.java constructor
-        player = new Player(Color.RED, "player-red");
-        players = new ArrayList<>();
-        players.add(player);
+        player = new Player(Color.YELLOW, "TestPlayer");
+        // Threshold: 2 Artists. Bonus: 3 PP per Artist. Penalty: 5 PP.
+        cavePaintingsEvent = new CavePaintings(2, 3, 5);
     }
 
     @Test
-    @DisplayName("Should apply penalty when the player has fewer artists than threshold")
-    void testPenaltyApplied() {
-        // Player starts with 0 artists (below threshold of 2)
-        int initialPoints = player.getPrestigePoints();
-
-        cavePaintings.resolve(players);
-
-        // Expected: 0 - 3 = -3
-        assertEquals(initialPoints - PENALTY, player.getPrestigePoints(),
-                "Player should receive a penalty of 3 points");
+    void testResolveExceptions() {
+        assertThrows(IllegalArgumentException.class, () -> cavePaintingsEvent.resolve(null));
+        assertThrows(IllegalStateException.class, () -> cavePaintingsEvent.resolve(Collections.emptyList()));
+        List<Player> listWithNull = new ArrayList<>();
+        listWithNull.add(null);
+        assertThrows(IllegalArgumentException.class, () -> cavePaintingsEvent.resolve(listWithNull));
     }
 
     @Test
-    @DisplayName("Should apply bonus when the player meets the artist threshold")
-    void testBonusAppliedAtThreshold() {
-        // Adding 2 Artists to reach the threshold
+    void testZeroArtistsAppliesPenalty() {
+        // SETUP: Player has 0 Artists (threshold is 2).
+
+        // EXECUTE
+        cavePaintingsEvent.resolve(List.of(player));
+
+        // ASSERT: Player is below threshold, loses 5 PP.
+        assertEquals(-5, player.getPrestigePoints(), "Player should lose 5 PP for having 0 Artists.");
+    }
+
+    @Test
+    void testPenaltyAppliedWhenBelowThreshold() {
+        // SETUP: Player has only 1 Artist (threshold is 2).
+        player.getTribe().addCard(new Artist(1, 2, true));
+
+        // EXECUTE
+        cavePaintingsEvent.resolve(List.of(player));
+
+        // ASSERT: Player is below threshold, should lose 5 PP.
+        assertEquals(-5, player.getPrestigePoints(), "Player should lose 5 PP for not meeting the Artist threshold.");
+        assertEquals(0, player.getFoodAmount(), "Player should not gain any food without buildings.");
+    }
+
+    @Test
+    void testBonusAppliedWhenThresholdMet() {
+        // SETUP: Player has 2 Artists (meets the threshold of 2).
         player.getTribe().addCard(new Artist(1, 2, true));
         player.getTribe().addCard(new Artist(1, 2, true));
 
-        int initialPoints = player.getPrestigePoints();
-        cavePaintings.resolve(players);
+        // EXECUTE
+        cavePaintingsEvent.resolve(List.of(player));
 
-        // Expected: 2 artists * 2 bonus = +4 points
-        assertEquals(initialPoints + 4, player.getPrestigePoints(),
-                "Player should gain 4 points (2 artists * 2 points)");
+        // ASSERT: Player met threshold. Bonus is 3 PP * 2 Artists = 6 PP.
+        assertEquals(6, player.getPrestigePoints(), "Player should gain 6 PP (3 per Artist).");
     }
 
     @Test
-    @DisplayName("Should apply bonus proportional to the number of artists")
-    void testBonusProportional() {
-        // Adding 3 Artists (above threshold)
-        player.getTribe().addCard(new Artist(1, 2, true));
+    void testCavePaintingBuildingBonusFood() {
+        // SETUP: Player has 2 Artists.
         player.getTribe().addCard(new Artist(1, 2, true));
         player.getTribe().addCard(new Artist(1, 2, true));
 
-        cavePaintings.resolve(players);
+        // Add a CavePaintingBuilding: gives 2 extra food per Artist
+        CavePaintingBuilding building = new CavePaintingBuilding(1, 2, true, 0, 0, 2, new ArtistsCount());
+        player.getTribe().addCard(building);
 
-        // Expected: 3 artists * 2 bonus = +6 points
-        assertEquals(6, player.getPrestigePoints());
-    }
+        // EXPECTATIONS: 2 Artists * 2 extra food = 4 food. Met threshold -> 2 Artists * 3 PP = 6 PP.
 
-    @Test
-    @DisplayName("Should verify food gain remains 0 if no buildings are present")
-    void testFoodGainNoBuildings() {
-        player.setFoodAmount(10);
+        // EXECUTE
+        cavePaintingsEvent.resolve(List.of(player));
 
-        cavePaintings.resolve(players);
-
-        // Without CavePaintingBuildings, food should not change
-        assertEquals(10, player.getFoodAmount());
-    }
-
-    @Test
-    @DisplayName("Should throw IllegalArgumentException if players list is null")
-    void testNullPlayersList() {
-        assertThrows(IllegalArgumentException.class, () -> cavePaintings.resolve(null));
-    }
-
-    @Test
-    @DisplayName("Should throw IllegalStateException if players list is empty")
-    void testEmptyPlayersList() {
-        List<Player> emptyList = new ArrayList<>();
-        assertThrows(IllegalStateException.class, () -> cavePaintings.resolve(emptyList));
-    }
-
-    @Test
-    @DisplayName("Should handle multiple players with different tribe compositions")
-    void testMultiplePlayers() {
-        Player player2 = new Player(Color.BLUE, "player-blue");
-        // Player 2 has 2 artists (Bonus +4), Player 1 has 0 (Penalty -3)
-        player2.getTribe().addCard(new Artist(1, 2, true));
-        player2.getTribe().addCard(new Artist(1, 2, true));
-
-        players.add(player2);
-        cavePaintings.resolve(players);
-
-        assertAll("Verify results for all players",
-                () -> assertEquals(-3, player.getPrestigePoints()),
-                () -> assertEquals(4, player2.getPrestigePoints())
-        );
+        // ASSERT
+        assertEquals(4, player.getFoodAmount(), "Player should gain 4 food from the building.");
+        assertEquals(6, player.getPrestigePoints(), "Player should still gain the 6 PP from the event.");
     }
 }

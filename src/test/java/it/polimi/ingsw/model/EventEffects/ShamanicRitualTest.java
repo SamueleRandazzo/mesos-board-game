@@ -1,143 +1,110 @@
 package it.polimi.ingsw.model.EventEffects;
 
+import it.polimi.ingsw.model.CharacterCards.Shaman;
+import it.polimi.ingsw.model.BuildingCards.InstantEffectBuilding;
 import it.polimi.ingsw.model.Enum.Color;
 import it.polimi.ingsw.model.Player;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class ShamanicRitualTest {
 
-    private ShamanicRitual ritual;
-    private List<Player> players;
-    private final int VICTORY_POINTS = 10;
-    private final int DEFEAT_POINTS = 5;
+    private Player p1, p2, p3;
+    private ShamanicRitual ritualEvent;
 
     @BeforeEach
     void setUp() {
-        // Initialize the ritual with 10 victory points and 5 defeat points
-        ritual = new ShamanicRitual(VICTORY_POINTS, DEFEAT_POINTS);
-        players = new ArrayList<>();
+        p1 = new Player(Color.RED, "Alice");
+        p2 = new Player(Color.BLUE, "Bob");
+        p3 = new Player(Color.YELLOW, "Charlie");
+        // Win reward: 10 PP. Defeat penalty: 5 PP.
+        ritualEvent = new ShamanicRitual(10, 5);
     }
 
     @Test
-    @DisplayName("Test basic resolution with one winner, one loser and one neutral player")
-    void testResolve_StandardScenario() {
-        Player winner = new Player(Color.RED, "winner");
-        Player neutral = new Player(Color.BLUE, "neutral");
-        Player loser = new Player(Color.YELLOW, "loser");
-
-        // Setting stars: Winner(10), Neutral(5), Loser(0)
-        winner.getTribe().getShamanicAttr().addStars(10);
-        neutral.getTribe().getShamanicAttr().addStars(5);
-        loser.getTribe().getShamanicAttr().addStars(0);
-
-        players.addAll(List.of(winner, neutral, loser));
-
-        ritual.resolve(players);
-
-        // Assertions
-        assertEquals(VICTORY_POINTS, winner.getPrestigePoints(), "Winner should gain standard victory points");
-        assertEquals(0, neutral.getPrestigePoints(), "Neutral player should not change prestige points");
-        assertEquals(-DEFEAT_POINTS, loser.getPrestigePoints(), "Loser should lose standard defeat points");
+    void testResolveExceptions() {
+        assertThrows(IllegalArgumentException.class, () -> ritualEvent.resolve(null));
+        assertThrows(IllegalStateException.class, () -> ritualEvent.resolve(Collections.emptyList()));
+        List<Player> listWithNull = new ArrayList<>();
+        listWithNull.add(null);
+        assertThrows(IllegalArgumentException.class, () -> ritualEvent.resolve(listWithNull));
     }
 
     @Test
-    @DisplayName("Test multiple winners and losers (Ties)")
-    void testResolve_MultipleWinnersAndLosers() {
-        Player win1 = new Player(Color.RED, "win1");
-        Player win2 = new Player(Color.BLUE, "win2");
-        Player loss1 = new Player(Color.WHITE, "loss1");
-        Player loss2 = new Player(Color.BLACK, "loss2");
+    void testClearWinnerAndLoser() {
+        // SETUP: p1 has 3 stars, p2 has 1 star, p3 has 2 stars
+        p1.getTribe().addCard(new Shaman(1, 2, true, 3));
+        p2.getTribe().addCard(new Shaman(1, 2, true, 1));
+        p3.getTribe().addCard(new Shaman(1, 2, true, 2));
 
-        win1.getTribe().getShamanicAttr().addStars(8);
-        win2.getTribe().getShamanicAttr().addStars(8);
-        loss1.getTribe().getShamanicAttr().addStars(2);
-        loss2.getTribe().getShamanicAttr().addStars(2);
+        // EXECUTE
+        ritualEvent.resolve(List.of(p1, p2, p3));
 
-        players.addAll(List.of(win1, win2, loss1, loss2));
-
-        ritual.resolve(players);
-
-        assertEquals(VICTORY_POINTS, win1.getPrestigePoints());
-        assertEquals(VICTORY_POINTS, win2.getPrestigePoints());
-        assertEquals(-DEFEAT_POINTS, loss1.getPrestigePoints());
-        assertEquals(-DEFEAT_POINTS, loss2.getPrestigePoints());
+        // ASSERT
+        assertEquals(10, p1.getPrestigePoints(), "P1 (Max) should gain 10 PP.");
+        assertEquals(-5, p2.getPrestigePoints(), "P2 (Min) should lose 5 PP.");
+        assertEquals(0, p3.getPrestigePoints(), "P3 (Middle) should not gain or lose PP.");
     }
 
     @Test
-    @DisplayName("Test Double On Winning attribute")
-    void testResolve_DoubleOnWinning() {
-        Player luckyWinner = new Player(Color.RED, "luckyWinner");
-        Player standardLoser = new Player(Color.BLUE, "standardLoser");
+    void testAbsoluteTieEveryoneAppliesBothBonusAndMalus() {
+        // SETUP: No players have any Shaman cards (Everyone has 0 stars).
+        // Since max = 0 and min = 0, every player is in BOTH maxPlayers and minPlayers.
+        // Therefore, every player gets +10 (win) and -5 (loss) = +5 PP net total.
 
-        luckyWinner.getTribe().getShamanicAttr().addStars(10);
-        luckyWinner.getTribe().getShamanicAttr().setDoubleOnWinning(true);
+        // EXECUTE
+        ritualEvent.resolve(List.of(p1, p2, p3));
 
-        standardLoser.getTribe().getShamanicAttr().addStars(5);
-
-        players.addAll(List.of(luckyWinner, standardLoser));
-
-        ritual.resolve(players);
-
-        // 10 * 2 = 20
-        assertEquals(VICTORY_POINTS * 2, luckyWinner.getPrestigePoints(), "Double reward should be applied");
+        // ASSERT: Everyone ends up with +5 PP
+        assertEquals(5, p1.getPrestigePoints(), "P1 should get +10 and -5 due to absolute tie.");
+        assertEquals(5, p2.getPrestigePoints(), "P2 should get +10 and -5 due to absolute tie.");
+        assertEquals(5, p3.getPrestigePoints(), "P3 should get +10 and -5 due to absolute tie.");
     }
 
     @Test
-    @DisplayName("Test Prevent Loss attribute")
-    void testResolve_PreventLoss() {
-        Player standardWinner = new Player(Color.RED, "standardWinner");
-        Player protectedLoser = new Player(Color.BLUE, "protectedLoser");
+    void testTiedWinnersAndLosers() {
+        // SETUP: p1 and p2 tie for Max (4 stars). p3 and an added p4 tie for Min (1 star).
+        Player p4 = new Player(Color.WHITE, "Dave");
 
-        standardWinner.getTribe().getShamanicAttr().addStars(10);
+        p1.getTribe().addCard(new Shaman(1, 2, true, 4));
+        p2.getTribe().addCard(new Shaman(1, 2, true, 4));
+        p3.getTribe().addCard(new Shaman(1, 2, true, 1));
+        p4.getTribe().addCard(new Shaman(1, 2, true, 1));
 
-        protectedLoser.getTribe().getShamanicAttr().addStars(2);
-        protectedLoser.getTribe().getShamanicAttr().setPreventLoss(true);
+        // EXECUTE
+        ritualEvent.resolve(List.of(p1, p2, p3, p4));
 
-        players.addAll(List.of(standardWinner, protectedLoser));
-
-        ritual.resolve(players);
-
-        assertEquals(0, protectedLoser.getPrestigePoints(), "Protected loser should not lose points");
+        // ASSERT: Both winners get +10, both losers get -5.
+        assertEquals(10, p1.getPrestigePoints());
+        assertEquals(10, p2.getPrestigePoints());
+        assertEquals(-5, p3.getPrestigePoints());
+        assertEquals(-5, p4.getPrestigePoints());
     }
 
     @Test
-    @DisplayName("Test edge case: All players have the same number of stars")
-    void testResolve_AllTied() {
-        Player p1 = new Player(Color.RED, "p1");
-        Player p2 = new Player(Color.BLUE, "p2");
+    void testDoubleOnWinningAndPreventLoss() {
+        // SETUP:
+        // p1 (Winner) has 3 stars AND a DoubleOnWinning building.
+        // p2 (Loser) has 1 star AND a PreventLoss building.
 
-        // Both have 5 stars
-        p1.getTribe().getShamanicAttr().addStars(5);
-        p2.getTribe().getShamanicAttr().addStars(5);
+        p1.getTribe().addCard(new Shaman(1, 2, true, 3));
+        // InstantEffectBuilding(era, minPlayer, isObtainable, foodCost, prestigePoints, extraStars, preventLoss, doubleOnWinning, extraCardFromUpper, extraFoodFromBonus)
+        p1.getTribe().addCard(new InstantEffectBuilding(1, 2, true, 0, 0, 0, false, true, false, false));
 
-        players.addAll(List.of(p1, p2));
+        p2.getTribe().addCard(new Shaman(1, 2, true, 1));
+        p2.getTribe().addCard(new InstantEffectBuilding(1, 2, true, 0, 0, 0, true, false, false, false));
 
-        ritual.resolve(players);
+        // EXECUTE
+        ritualEvent.resolve(List.of(p1, p2));
 
-        // According to current logic: both are in maxPlayers AND minPlayers
-        // Result: 0 + 10 (win) - 5 (loss) = 5
-        int expected = VICTORY_POINTS - DEFEAT_POINTS;
-        assertEquals(expected, p1.getPrestigePoints(), "Player should receive both reward and penalty if they are both max and min");
-        assertEquals(expected, p2.getPrestigePoints());
-    }
-
-    @Test
-    @DisplayName("Test edge case: Single player in the game")
-    void testResolve_SinglePlayer() {
-        Player p1 = new Player(Color.RED, "singlePlayer");
-        p1.getTribe().getShamanicAttr().addStars(5);
-        players.add(p1);
-
-        ritual.resolve(players);
-
-        // Single player is both max and min
-        assertEquals(VICTORY_POINTS - DEFEAT_POINTS, p1.getPrestigePoints());
+        // ASSERT
+        assertEquals(20, p1.getPrestigePoints(), "P1 should get Double Points (10 * 2).");
+        assertEquals(0, p2.getPrestigePoints(), "P2 should prevent the 5 PP loss.");
     }
 }
