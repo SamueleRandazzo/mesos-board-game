@@ -8,6 +8,7 @@ import it.polimi.ingsw.model.Cards.BuildingCard;
 import it.polimi.ingsw.model.Enum.Color;
 import it.polimi.ingsw.model.Enum.TileId;
 import it.polimi.ingsw.model.Interfaces.TribeDeck;
+import it.polimi.ingsw.model.states.TotemPlacementState;
 import org.junit.jupiter.api.Test;
 
 import java.rmi.RemoteException;
@@ -45,13 +46,15 @@ class GameControllerTest {
     }
 
     @Test
-    void handleTileSelection_shouldOccupyTileAndAdvanceTurn() throws RemoteException{
+    void handleTileSelection_shouldOccupyTileAndAdvanceTurn() throws RemoteException {
         List<Player> players = List.of(
                 new Player(Color.RED, "p1"),
                 new Player(Color.BLUE, "p2")
         );
 
         Game game = newGame(players);
+        game.initializeGame();
+        game.setState(new TotemPlacementState());
         GameController controller = new GameController(game);
 
         assertTrue(game.getOfferTrack().getTiles().get(0).isAvailable());
@@ -64,19 +67,19 @@ class GameControllerTest {
     }
 
     @Test
-    void handleEndTurnRequest_shouldAdvanceTurn() throws RemoteException {
+    void handleEndTurnRequest_shouldThrowWhenNotAllowedInCurrentState() throws RemoteException {
         List<Player> players = List.of(
                 new Player(Color.RED, "p1"),
                 new Player(Color.BLUE, "p2")
         );
 
         Game game = newGame(players);
+        game.initializeGame();
+        game.setState(new TotemPlacementState());
         GameController controller = new GameController(game);
 
         assertEquals(players.get(0), game.getCurrentActivePlayer());
 
-        controller.handleEndTurnRequest();
-
-        assertEquals(players.get(1), game.getCurrentActivePlayer());
+        assertThrows(RuntimeException.class, controller::handleEndTurnRequest);
     }
 }
