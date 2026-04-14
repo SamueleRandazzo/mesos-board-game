@@ -54,17 +54,23 @@ public class CLIView implements View {
     }
 
     @Override
-    public void showTimer(int seconds) {
-        System.out.println("Game starting in: " + seconds + "s");
-    }
-
-    @Override
     public void startGame(RemoteController controller) {
         System.out.println("THE GAME HAS STARTED!");
     }
 
     @Override
     public void showError(String error) {
-        System.out.println("error");
+        System.out.println(error);
+    }
+
+    @Override
+    public void askMaxPlayers() {
+        System.out.print("You are the host! How many players do you want (2-5)? ");
+        int n = Integer.parseInt(scanner.nextLine());
+        try {
+            network.setTotalPlayers(n);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

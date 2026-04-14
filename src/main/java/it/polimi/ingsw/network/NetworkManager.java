@@ -18,11 +18,7 @@ public class NetworkManager {
         serverStub.login(color, name, obs);
     }
 
-    public void setGameController(RemoteController controller) {
-        this.controller = controller;
-    }
-
-    public RemoteController getController() {
-        return controller;
+    public void setTotalPlayers(int n) throws RemoteException {
+        serverStub.setTotalPlayers(n);
     }
 }

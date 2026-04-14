@@ -7,4 +7,5 @@ import java.rmi.RemoteException;
 
 public interface Loggable extends Remote {
     void login(Color color, String nickname, GameObserver obs) throws RemoteException;
+    void setTotalPlayers(int num) throws RemoteException;
 }

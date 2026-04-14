@@ -17,13 +17,19 @@ public class ClientObserver implements GameObserver {
         view.showLobby(current, total);
     }
 
-    @Override
-    public void onTimerUpdate(int secondsLeft) throws RemoteException {
-        view.showTimer(secondsLeft);
-    }
 
     @Override
     public void onGameStarted(RemoteController controller) throws RemoteException {
         view.startGame(controller);
+    }
+
+    @Override
+    public void askMaxPlayers() throws RemoteException {
+        view.askMaxPlayers();
+    }
+
+    @Override
+    public void onShowError(String error) throws RemoteException {
+        view.showError(error);
     }
 }

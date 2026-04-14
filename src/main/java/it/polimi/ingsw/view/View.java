@@ -7,7 +7,7 @@ public interface View {
     void setObserver(GameObserver observer);
     void showLogin();
     void showLobby(int currentPlayers, int maxPlayers);
-    void showTimer(int seconds);
     void startGame(RemoteController controller);
     void showError(String message);
+    void askMaxPlayers();
 }

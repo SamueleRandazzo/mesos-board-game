@@ -20,12 +20,13 @@ import java.util.*;
 public class ServerMain extends UnicastRemoteObject implements Loggable {
     private static int PORT = 1234;
 
-    private List<Player> waitingPlayers = new ArrayList<>();
     private final int MAX_PLAYERS = 5;
     private int MIN_PLAYERS = 2;
 
-    private int player;
-    private Map<String, GameObserver> remoteObservers = new HashMap<>();
+    private int targetPlayers = -1;
+    private final List<GameObserver> remoteObservers = new ArrayList<>();
+    private final List<String> nicknames = new ArrayList<>();
+    private final List<Color> colors = new ArrayList<>();
     private GameController gameController;
 
     protected ServerMain() throws RemoteException {
@@ -54,64 +55,74 @@ public class ServerMain extends UnicastRemoteObject implements Loggable {
      */
     @Override
     public synchronized void login(Color color, String nickname, GameObserver observer) throws RemoteException {
-        if (waitingPlayers.size() >= MAX_PLAYERS) {
-            throw new RemoteException("Game is full!");
+        if (targetPlayers != -1 && nicknames.size() >= targetPlayers) {
+            throw new RemoteException("Lobby is full!");
         }
 
-        remoteObservers.put(nickname, observer);
-        waitingPlayers.add(new Player(color, nickname));
-
-        System.out.println(nickname + " connected.");
-
-        // Notify everyone that a new player joined
-        broadcastPlayerCount();
-
-        // Start game immediately if maximum capacity reached
-        if (waitingPlayers.size() == MAX_PLAYERS) {
-            startGame();
+        if (nicknames.contains(nickname)) {
+            throw new RemoteException("Nickname already used!");
         }
-    }
 
-    /**
-     * Initializes the game model and controller, then notifies all
-     * connected clients that the match has started.
-     */
-    private void startGame() {
-        // TODO: Properly load decks, cards, and initialize the Game instance here.
-        /*
-        // loading data
-        List<TribeDeck> decks = loadDecks();
-        List<BuildingCard> e1 = loadBuildings(1);
-        List<BuildingCard> e2 = loadBuildings(2);
-        List<BuildingCard> e3 = loadBuildings(3);
-        OfferTrack track = new OfferTrack();
+        if (colors.contains(color)){
+            throw new RemoteException("Color already used!");
+        }
 
-        this.game = new Game(waitingPlayers, decks, e1, e2, e3, track);
-        this.gameController = new GameController(this.game);
-        */
+        nicknames.add(nickname);
+        colors.add(color);
+        remoteObservers.add(observer);
 
-        System.out.println("Initializing Game and Controller...");
-
-        // Notifying all observers about the game start
-        for (GameObserver obs : remoteObservers.values()) {
-            try {
-                obs.onGameStarted(this.gameController);
-            } catch (RemoteException e) {
-                System.err.println("Error notifying observer: " + e.getMessage());
-            }
+        if (nicknames.size() == 1) {
+            System.out.println(nickname + " is the Host. Waiting for target players number");
+            observer.askMaxPlayers();
+        } else {
+            System.out.println(nickname + " joined.");
+            checkStartCondition();
         }
     }
 
-    /**
-     * Broadcasts the current number of players in the lobby to all connected clients.
-     */
-    private void broadcastPlayerCount() {
-        remoteObservers.values().forEach(obs -> {
-            try {
-                obs.onPlayerJoined(waitingPlayers.size(), MAX_PLAYERS);
-            } catch (RemoteException e) {
-                // Handle or log disconnected client if necessary
+    public synchronized void setTotalPlayers(int num) throws RemoteException {
+        if (num < MIN_PLAYERS || num > MAX_PLAYERS) {
+            GameObserver hostObserver = remoteObservers.get(0);
+            hostObserver.onShowError("Numero non valido! Scegli tra 2 e 5.");
+
+            hostObserver.askMaxPlayers();
+            return;
+        }
+
+        this.targetPlayers = num;
+        System.out.println("Game set for " + num + " players.");
+        checkStartCondition();
+    }
+
+    private void checkStartCondition() throws RemoteException {
+        if (targetPlayers != -1 && nicknames.size() == targetPlayers) {
+            System.out.println("Game starting!");
+
+            List<Player> players = new ArrayList<>();
+            for (int i = 0; i < nicknames.size(); i++) {
+                players.add(new Player(colors.get(i), nicknames.get(i)));
             }
-        });
+
+            // TODO: Properly load decks, cards, and initialize the Game instance here.
+            /*
+            // loading data
+            List<TribeDeck> decks = loadDecks();
+            List<BuildingCard> e1 = loadBuildings(1);
+            List<BuildingCard> e2 = loadBuildings(2);
+            List<BuildingCard> e3 = loadBuildings(3);
+            OfferTrack track = new OfferTrack();
+
+            this.game = new Game(players, decks, e1, e2, e3, track);
+            this.gameController = new GameController(this.game);
+            */
+
+            for (GameObserver o : remoteObservers) {
+                o.onGameStarted(this.gameController);
+            }
+        } else {
+            for (GameObserver o : remoteObservers) {
+                o.onPlayerJoined(nicknames.size(), targetPlayers == -1 ? 0 : targetPlayers);
+            }
+        }
     }
 }
