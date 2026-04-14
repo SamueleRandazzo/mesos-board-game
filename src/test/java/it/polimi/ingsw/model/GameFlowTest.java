@@ -6,6 +6,7 @@ import it.polimi.ingsw.model.Cards.BuildingCard;
 import it.polimi.ingsw.model.Enum.Color;
 import it.polimi.ingsw.model.Enum.TileId;
 import it.polimi.ingsw.model.Interfaces.TribeDeck;
+import it.polimi.ingsw.model.states.TotemPlacementState;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -86,6 +87,8 @@ class GameFlowTest {
         );
 
         Game game = newGame(players);
+        game.initializeGame();
+        game.setState(new TotemPlacementState());
 
         assertTrue(game.getOfferTrack().getTiles().get(0).isAvailable());
         assertEquals(players.get(0), game.getCurrentActivePlayer());
@@ -104,6 +107,8 @@ class GameFlowTest {
         );
 
         Game game = newGame(players);
+        game.initializeGame();
+        game.setState(new TotemPlacementState());
 
         game.placePlayerTotem(0);
 
@@ -151,9 +156,11 @@ class GameFlowTest {
         );
 
         Game game = newGame(players);
+        game.initializeGame();
+        game.setState(new TotemPlacementState());
 
-        assertThrows(IndexOutOfBoundsException.class, () -> game.placePlayerTotem(-1));
-        assertThrows(IndexOutOfBoundsException.class, () -> game.placePlayerTotem(99));
+        assertThrows(IllegalStateException.class, () -> game.placePlayerTotem(-1));
+        assertThrows(IllegalStateException.class, () -> game.placePlayerTotem(99));
     }
 
     @Test

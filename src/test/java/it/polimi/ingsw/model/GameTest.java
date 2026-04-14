@@ -1,12 +1,19 @@
 package it.polimi.ingsw.model;
 
+import it.polimi.ingsw.model.Board.Board;
 import it.polimi.ingsw.model.Board.OfferTile;
 import it.polimi.ingsw.model.Board.OfferTrack;
 import it.polimi.ingsw.model.Cards.BuildingCard;
+import it.polimi.ingsw.model.Cards.Card;
+import it.polimi.ingsw.model.Cards.EventCard;
 import it.polimi.ingsw.model.Enum.Color;
+import it.polimi.ingsw.model.Interfaces.EventEffect;
 import it.polimi.ingsw.model.Interfaces.TribeDeck;
+import it.polimi.ingsw.model.states.TotemPlacementState;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +30,7 @@ class GameTest {
     }
 
     private static Player newPlayer(Color color, int prestige, int food) {
-        Player p = new Player(color, "test"); // nickname dummy
+        Player p = new Player(color, "test");
         p.setPrestigePoints(prestige);
         p.setFoodAmount(food);
         return p;
@@ -42,6 +49,48 @@ class GameTest {
                 emptyBuildingList(),
                 newOfferTrack()
         );
+    }
+
+    private static void setPrivateField(Object target, String fieldName, Object value) {
+        try {
+            Field field = target.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(target, value);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> T getPrivateField(Object target, String fieldName) {
+        try {
+            Field field = target.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+            return (T) field.get(target);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void invokePrivateVoid(Object target, String methodName) {
+        try {
+            Method method = target.getClass().getDeclaredMethod(methodName);
+            method.setAccessible(true);
+            method.invoke(target);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static class FakeTribeCard extends Card implements TribeDeck {
+        protected FakeTribeCard(int era) {
+            super(era, 2, true);
+        }
+
+        @Override
+        public void applyTo(Player player) {
+            // no-op
+        }
     }
 
     @Test
@@ -292,5 +341,49 @@ class GameTest {
 
         assertEquals(1, winners.size());
         assertSame(p3, winners.get(0));
+    }
+
+    @Test
+    void initializeGame_shouldSetTotemPlacementState() {
+        List<Player> players = List.of(
+                newPlayer(Color.RED, 0, 0),
+                newPlayer(Color.BLUE, 0, 0)
+        );
+
+        Game game = newGameWithPlayers(players);
+
+        game.initializeGame();
+
+        Object currentState = getPrivateField(game, "currentState");
+
+        assertTrue(currentState instanceof TotemPlacementState);
+    }
+
+    @Test
+    void resolveEventsInLowerRow_shouldResolveOnlyLowerRowEventsAndIgnoreNonEvents() {
+        List<Player> players = List.of(
+                newPlayer(Color.RED, 0, 0),
+                newPlayer(Color.BLUE, 0, 0)
+        );
+
+        Game game = newGameWithPlayers(players);
+        Board board = game.getBoard();
+
+        final int[] counter = {0};
+        EventEffect effect = ps -> counter[0] += ps.size();
+
+        EventCard event1 = new EventCard(1, 2, false, effect);
+        EventCard event2 = new EventCard(1, 2, false, effect);
+
+        List<TribeDeck> bottomRow = new ArrayList<>();
+        bottomRow.add(event1);
+        bottomRow.add(new FakeTribeCard(1));
+        bottomRow.add(event2);
+
+        setPrivateField(board, "lowerTribeCards", bottomRow);
+
+        invokePrivateVoid(game, "resolveEventsInLowerRow");
+
+        assertEquals(4, counter[0]);
     }
 }
