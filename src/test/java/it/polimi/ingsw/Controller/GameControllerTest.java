@@ -10,6 +10,7 @@ import it.polimi.ingsw.model.Enum.TileId;
 import it.polimi.ingsw.model.Interfaces.TribeDeck;
 import org.junit.jupiter.api.Test;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +45,7 @@ class GameControllerTest {
     }
 
     @Test
-    void handleTileSelection_shouldOccupyTileAndAdvanceTurn() {
+    void handleTileSelection_shouldOccupyTileAndAdvanceTurn() throws RemoteException{
         List<Player> players = List.of(
                 new Player(Color.RED, "p1"),
                 new Player(Color.BLUE, "p2")
@@ -63,7 +64,7 @@ class GameControllerTest {
     }
 
     @Test
-    void handleEndTurnRequest_shouldAdvanceTurn() {
+    void handleEndTurnRequest_shouldAdvanceTurn() throws RemoteException {
         List<Player> players = List.of(
                 new Player(Color.RED, "p1"),
                 new Player(Color.BLUE, "p2")
