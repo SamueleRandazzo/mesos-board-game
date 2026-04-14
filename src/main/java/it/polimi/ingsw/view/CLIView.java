@@ -8,9 +8,14 @@ import it.polimi.ingsw.network.RemoteController;
 import java.util.Scanner;
 
 public class CLIView implements View {
-    private Scanner scanner = new Scanner(System.in);
+    private Scanner scanner;
     private NetworkManager network;
     private GameObserver myObserver;
+
+    public CLIView(NetworkManager network) {
+        this.network = network;
+        this.scanner = new Scanner(System.in);
+    }
 
     public void setObserver(GameObserver observer) {
         this.myObserver = observer;

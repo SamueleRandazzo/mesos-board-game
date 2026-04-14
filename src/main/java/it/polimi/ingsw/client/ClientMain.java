@@ -1,6 +1,7 @@
 package it.polimi.ingsw.client;
 
 import it.polimi.ingsw.network.Loggable;
+import it.polimi.ingsw.network.NetworkManager;
 import it.polimi.ingsw.view.*;
 
 import java.rmi.registry.LocateRegistry;
@@ -13,16 +14,18 @@ public class ClientMain {
     static String IP = "127.0.0.1";
 
     public static void main(String[] args) {
-        View view = new CLIView();
+        NetworkManager network = new NetworkManager();
+
+        View view = new CLIView(network);
         if (Arrays.asList(args).contains("--cli")) {
-            view = new CLIView();
+            view = new CLIView(network);
         } else {
             // view = new GUIView();
         }
 
         try {
-            Registry registry = LocateRegistry.getRegistry(IP, PORT);
-            Loggable server = (Loggable) registry.lookup("Loggable");
+            network.connect(IP, PORT);
+            System.out.println("Connected to server registry.");
 
             ClientObserver observer = new ClientObserver(view);
             UnicastRemoteObject.exportObject(observer, 0);
