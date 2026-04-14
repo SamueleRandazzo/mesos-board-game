@@ -22,14 +22,11 @@ public class ServerMain extends UnicastRemoteObject implements Loggable {
 
     private List<Player> waitingPlayers = new ArrayList<>();
     private final int MAX_PLAYERS = 5;
-    private final int MIN_PLAYERS = 2;
+    private int MIN_PLAYERS = 2;
 
+    private int player;
     private Map<String, GameObserver> remoteObservers = new HashMap<>();
     private GameController gameController;
-
-    private Timer startTimer;
-    private int COUNTDOWN = 45;
-    private int currentCountdown;
 
     protected ServerMain() throws RemoteException {
         super();
@@ -69,11 +66,6 @@ public class ServerMain extends UnicastRemoteObject implements Loggable {
         // Notify everyone that a new player joined
         broadcastPlayerCount();
 
-        // Start countdown if minimum threshold reached
-        if (waitingPlayers.size() == MIN_PLAYERS) {
-            startCountdown();
-        }
-
         // Start game immediately if maximum capacity reached
         if (waitingPlayers.size() == MAX_PLAYERS) {
             startGame();
@@ -85,10 +77,6 @@ public class ServerMain extends UnicastRemoteObject implements Loggable {
      * connected clients that the match has started.
      */
     private void startGame() {
-        if (startTimer != null) {
-            startTimer.cancel();
-        }
-
         // TODO: Properly load decks, cards, and initialize the Game instance here.
         /*
         // loading data
@@ -115,54 +103,12 @@ public class ServerMain extends UnicastRemoteObject implements Loggable {
     }
 
     /**
-     * Starts a countdown timer. When it reaches zero, the game starts with
-     * the currently connected players (if they are at least MIN_PLAYERS).
-     */
-    private void startCountdown() {
-        currentCountdown = COUNTDOWN;
-        startTimer = new Timer();
-        startTimer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                synchronized (ServerMain.this) {
-                    if (gameController != null) { // Game already started by full lobby
-                        this.cancel();
-                        return;
-                    }
-
-                    broadcastTimer(currentCountdown);
-
-                    if (currentCountdown <= 0) {
-                        this.cancel();
-                        startGame();
-                    }
-                    currentCountdown--;
-                }
-            }
-        }, 0, 1000);
-    }
-
-    /**
      * Broadcasts the current number of players in the lobby to all connected clients.
      */
     private void broadcastPlayerCount() {
         remoteObservers.values().forEach(obs -> {
             try {
                 obs.onPlayerJoined(waitingPlayers.size(), MAX_PLAYERS);
-            } catch (RemoteException e) {
-                // Handle or log disconnected client if necessary
-            }
-        });
-    }
-
-    /**
-     * Broadcasts the current countdown value to all connected clients.
-     * @param seconds the remaining seconds until the game starts.
-     */
-    private void broadcastTimer(int seconds) {
-        remoteObservers.values().forEach(obs -> {
-            try {
-                obs.onTimerUpdate(seconds);
             } catch (RemoteException e) {
                 // Handle or log disconnected client if necessary
             }
