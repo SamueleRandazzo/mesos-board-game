@@ -1,8 +1,9 @@
-package it.polimi.ingsw.Controller;
+package it.polimi.ingsw.controller;
 
 import it.polimi.ingsw.model.Game;
+import it.polimi.ingsw.network.RemoteController;
 
-public class GameController {
+public class GameController implements RemoteController {
     private Game game;
 
     public GameController(Game game) {
