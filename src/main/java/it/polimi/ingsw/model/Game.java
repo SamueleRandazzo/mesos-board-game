@@ -8,6 +8,7 @@ import it.polimi.ingsw.model.states.EndGameState;
 import it.polimi.ingsw.model.states.GameState;
 import it.polimi.ingsw.model.states.SetupGameState;
 import it.polimi.ingsw.model.states.TotemPlacementState;
+import it.polimi.ingsw.network.DTO.OfferTileDTO;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -145,16 +146,54 @@ public class Game {
         this.setState(new TotemPlacementState());
     }
 
+    /**
+     * Registers a new game event listener to the list of subscribers.
+     * Registered listeners will receive notifications regarding state changes
+     * and turn transitions throughout the different phases of the match.
+     *
+     * @param listener the {@link GameEventListener} instance to be added.
+     */
     public void addListener(GameEventListener listener) {
         listeners.add(listener);
     }
 
+    /**
+     * Notifies all registered listeners that the turn has changed during the Totem Placement phase.
+     * <p>
+     * This method performs a mapping of the internal {@link OfferTile} model objects into
+     * a list of {@link OfferTileDTO} (Data Transfer Objects). This ensures that the View
+     * receives a decoupled and serializable representation of the offer track,
+     * containing only the necessary information for display.
+     * </p>
+     */
     public void notifyTotemPlacementTurnChanged() {
+        List<OfferTile> modelTiles = offerTrack.getTiles();
+        List<OfferTileDTO> tiles = new ArrayList<>();
+
+        for (int i = 0; i < modelTiles.size(); i++) {
+            OfferTile t = modelTiles.get(i);
+            String nick = t.isAvailable() ? null : t.getPlacedPlayer().getNickname();
+
+            tiles.add(new OfferTileDTO(
+                    i,
+                    t.getFoodBonus(),
+                    t.getTopRowDraws(),
+                    t.getBottomRowDraws(),
+                    nick
+            ));
+        }
         for (GameEventListener l : listeners) {
-            l.onTotemPlacementTurnChanged(this.getCurrentActivePlayer().getNickname());
+            l.onTotemPlacementTurnChanged(this.getCurrentActivePlayer().getNickname(), tiles);
         }
     }
 
+    /**
+     * Notifies all registered listeners that the turn has changed during the Action Resolution phase.
+     * <p>
+     * It sends the nickname of the currently active player to the listeners,
+     * allowing the View to update its state and prompt the correct user for input.
+     * </p>
+     */
     public void notifyActionResultTurnChanged () {
         for (GameEventListener l : listeners) {
             l.onActionResultTurnChanged(this.getCurrentActivePlayer().getNickname());

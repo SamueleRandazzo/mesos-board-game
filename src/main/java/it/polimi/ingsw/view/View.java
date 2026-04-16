@@ -1,7 +1,10 @@
 package it.polimi.ingsw.view;
 
+import it.polimi.ingsw.network.DTO.OfferTileDTO;
 import it.polimi.ingsw.network.GameObserver;
 import it.polimi.ingsw.network.RemoteController;
+
+import java.util.List;
 
 public interface View {
     void setObserver(GameObserver observer);
@@ -10,5 +13,5 @@ public interface View {
     void startGame(RemoteController controller);
     void showError(String message);
     void askMaxPlayers();
-    void askTotemPlacement();
+    void askTotemPlacement(List<OfferTileDTO> tiles);
 }

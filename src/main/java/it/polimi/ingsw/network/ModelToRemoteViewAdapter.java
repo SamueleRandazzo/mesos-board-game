@@ -1,6 +1,7 @@
 package it.polimi.ingsw.network;
 
 import it.polimi.ingsw.model.Interfaces.GameEventListener;
+import it.polimi.ingsw.network.DTO.OfferTileDTO;
 import java.rmi.RemoteException;
 import java.util.*;
 
@@ -12,11 +13,11 @@ public class ModelToRemoteViewAdapter implements GameEventListener {
     }
 
     @Override
-    public void onTotemPlacementTurnChanged(String playerNickname) {
-        GameObserver obs = playerObservers.get( playerNickname);
+    public void onTotemPlacementTurnChanged(String playerNickname, List<OfferTileDTO> tiles) {
+        GameObserver obs = playerObservers.get(playerNickname);
         if (obs != null) {
             try {
-                obs.askTotemPlacement();
+                obs.askTotemPlacement(tiles);
             } catch (RemoteException e) {
                 System.err.println("Network error with " +  playerNickname);
             }
