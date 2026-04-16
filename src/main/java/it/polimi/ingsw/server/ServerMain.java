@@ -1,6 +1,7 @@
 package it.polimi.ingsw.server;
 
 import it.polimi.ingsw.controller.GameController;
+import it.polimi.ingsw.exception.CustomException;
 import it.polimi.ingsw.model.Enum.Color;
 import it.polimi.ingsw.model.Player;
 import it.polimi.ingsw.network.GameObserver;
@@ -56,15 +57,15 @@ public class ServerMain extends UnicastRemoteObject implements Loggable {
     @Override
     public synchronized void login(Color color, String nickname, GameObserver observer) throws RemoteException {
         if (targetPlayers != -1 && nicknames.size() >= targetPlayers) {
-            throw new RemoteException("Lobby is full!");
+            throw new CustomException.LobbyFullException();
         }
 
         if (nicknames.contains(nickname)) {
-            throw new RemoteException("Nickname already used!");
+            throw new CustomException.NicknameAlreadyUsedException();
         }
 
         if (colors.contains(color)){
-            throw new RemoteException("Color already used!");
+            throw new CustomException.ColorAlreadyUsedException();
         }
 
         nicknames.add(nickname);
@@ -73,28 +74,48 @@ public class ServerMain extends UnicastRemoteObject implements Loggable {
 
         if (nicknames.size() == 1) {
             System.out.println(nickname + " is the Host. Waiting for target players number");
-            observer.askMaxPlayers();
+            new Thread(() -> {
+                try {
+                    observer.askMaxPlayers();
+                } catch (RemoteException e) {
+                    System.err.println("Host disconnected while setting players number.");
+                    synchronized(this) {
+                        nicknames.remove(nickname);
+                        colors.remove(color);
+                        remoteObservers.remove(observer);
+                    }
+                }
+            }).start();
         } else {
             System.out.println(nickname + " joined.");
-            checkStartCondition();
+            new Thread(() ->  {
+                try {
+                    checkStartCondition();
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
+            }).start();
         }
     }
 
-    public synchronized void setTotalPlayers(int num) throws RemoteException {
+    public void setTotalPlayers(int num) throws RemoteException {
         if (num < MIN_PLAYERS || num > MAX_PLAYERS) {
-            GameObserver hostObserver = remoteObservers.get(0);
-            hostObserver.onShowError("Numero non valido! Scegli tra 2 e 5.");
-
-            hostObserver.askMaxPlayers();
-            return;
+            throw new CustomException.InvalidTargetPlayersNumberException(MIN_PLAYERS, MAX_PLAYERS);
         }
 
         this.targetPlayers = num;
         System.out.println("Game set for " + num + " players.");
-        checkStartCondition();
+
+        new Thread(() -> {
+            try {
+                checkStartCondition();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
-    private void checkStartCondition() throws RemoteException {
+    private synchronized void checkStartCondition() throws RemoteException {
         if (targetPlayers != -1 && nicknames.size() == targetPlayers) {
             System.out.println("Game starting!");
 
