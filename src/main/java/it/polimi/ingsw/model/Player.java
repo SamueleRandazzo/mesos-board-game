@@ -49,6 +49,7 @@ public class Player
         foodAmount += variation;
     }
 
-    public Color getColor(){return this.color; }
+    public Color getColor() { return this.color; }
 
+    public String getNickname() { return this.nickname; }
 }

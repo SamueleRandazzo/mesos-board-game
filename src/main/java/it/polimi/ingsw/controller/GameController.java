@@ -3,16 +3,18 @@ package it.polimi.ingsw.controller;
 import it.polimi.ingsw.model.Game;
 import it.polimi.ingsw.network.RemoteController;
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 
 /**
  * Implementation of the remote controller for the game.
  * This class acts as the mediator between the network layer (client requests)
  * and the game model, translating client actions into model state changes.
  */
-public class GameController implements RemoteController {
+public class GameController extends UnicastRemoteObject implements RemoteController {
     private Game game;
 
-    public GameController(Game game) {
+    public GameController(Game game) throws RemoteException {
+        super();
         this.game = game;
     }
 

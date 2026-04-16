@@ -86,4 +86,15 @@ public class CLIView implements View {
             }
         }
     }
+
+    @Override
+    public void askTotemPlacement() {
+        System.out.print("Choose the offer tile: ");
+        int tileIndex = Integer.parseInt(scanner.nextLine());
+        try {
+            network.tileSelection(tileIndex);
+        } catch (RemoteException e) {
+            System.out.println(cleanRemoteException(e));
+        }
+    }
 }

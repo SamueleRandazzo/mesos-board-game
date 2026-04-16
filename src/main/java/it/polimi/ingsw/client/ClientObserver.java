@@ -17,7 +17,6 @@ public class ClientObserver implements GameObserver {
         view.showLobby(current, total);
     }
 
-
     @Override
     public void onGameStarted(RemoteController controller) throws RemoteException {
         view.startGame(controller);
@@ -27,6 +26,12 @@ public class ClientObserver implements GameObserver {
     public void askMaxPlayers() throws RemoteException {
         view.askMaxPlayers();
     }
+
+    @Override
+    public void askTotemPlacement() throws RemoteException {
+        view.askTotemPlacement();
+    }
+
 
     @Override
     public void onShowError(String error) throws RemoteException {

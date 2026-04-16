@@ -10,4 +10,5 @@ public interface View {
     void startGame(RemoteController controller);
     void showError(String message);
     void askMaxPlayers();
+    void askTotemPlacement();
 }

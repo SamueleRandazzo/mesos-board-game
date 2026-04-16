@@ -6,8 +6,8 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 public class NetworkManager {
-    private Loggable serverStub;       // Per il login
-    private RemoteController controller; // Per le mosse di gioco (arriva dopo)
+    private Loggable serverStub;
+    private RemoteController controller;
 
     public void connect(String ip, int port) throws Exception {
         Registry registry = LocateRegistry.getRegistry(ip, port);
@@ -20,5 +20,9 @@ public class NetworkManager {
 
     public void setTotalPlayers(int n) throws RemoteException {
         serverStub.setTotalPlayers(n);
+    }
+
+    public void tileSelection(int tileIndex) throws RemoteException {
+        controller.handleTileSelection(tileIndex);
     }
 }

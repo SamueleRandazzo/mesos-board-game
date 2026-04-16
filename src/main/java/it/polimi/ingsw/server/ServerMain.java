@@ -3,9 +3,12 @@ package it.polimi.ingsw.server;
 import it.polimi.ingsw.controller.GameController;
 import it.polimi.ingsw.exception.CustomException;
 import it.polimi.ingsw.model.Enum.Color;
+import it.polimi.ingsw.model.Game;
 import it.polimi.ingsw.model.Player;
 import it.polimi.ingsw.network.GameObserver;
 import it.polimi.ingsw.network.Loggable;
+import it.polimi.ingsw.network.ModelToRemoteViewAdapter;
+
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -28,7 +31,9 @@ public class ServerMain extends UnicastRemoteObject implements Loggable {
     private final List<GameObserver> remoteObservers = new ArrayList<>();
     private final List<String> nicknames = new ArrayList<>();
     private final List<Color> colors = new ArrayList<>();
+    private final Map<String, GameObserver> playerObservers = new HashMap<>();
     private GameController gameController;
+    private Game game;
 
     protected ServerMain() throws RemoteException {
         super();
@@ -71,6 +76,7 @@ public class ServerMain extends UnicastRemoteObject implements Loggable {
         nicknames.add(nickname);
         colors.add(color);
         remoteObservers.add(observer);
+        playerObservers.put(nickname, observer);
 
         if (nicknames.size() == 1) {
             System.out.println(nickname + " is the Host. Waiting for target players number");
@@ -83,6 +89,7 @@ public class ServerMain extends UnicastRemoteObject implements Loggable {
                         nicknames.remove(nickname);
                         colors.remove(color);
                         remoteObservers.remove(observer);
+                        playerObservers.remove(nickname);
                     }
                 }
             }).start();
@@ -124,6 +131,7 @@ public class ServerMain extends UnicastRemoteObject implements Loggable {
                 players.add(new Player(colors.get(i), nicknames.get(i)));
             }
 
+            Collections.shuffle(players);
             // TODO: Properly load decks, cards, and initialize the Game instance here.
             /*
             // loading data
@@ -140,6 +148,11 @@ public class ServerMain extends UnicastRemoteObject implements Loggable {
             for (GameObserver o : remoteObservers) {
                 o.onGameStarted(this.gameController);
             }
+
+            ModelToRemoteViewAdapter adapter = new ModelToRemoteViewAdapter(this.playerObservers);
+            this.game.addListener(adapter);
+
+            this.game.notifyTotemPlacementTurnChanged();
         } else {
             for (GameObserver o : remoteObservers) {
                 o.onPlayerJoined(nicknames.size(), targetPlayers == -1 ? 0 : targetPlayers);

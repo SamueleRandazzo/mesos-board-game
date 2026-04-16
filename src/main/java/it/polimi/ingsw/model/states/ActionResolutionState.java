@@ -178,6 +178,8 @@ public class ActionResolutionState extends GameState {
             }
         }
 
+        context.advanceTurn();
+
         //check if the Phase (and round) is over
         if(context.getCurrentPlayerIndex() == (context.getNumPlayers() - 1)) {
             List<Player> nextRoundOrder = context.getTurnOrderTile().getNextRoundOrder();
@@ -187,6 +189,9 @@ public class ActionResolutionState extends GameState {
             context.nextRound();
 
             context.setState(new TotemPlacementState());
+            context.notifyTotemPlacementTurnChanged();
+        } else {
+            context.notifyActionResultTurnChanged();
         }
     }
 }

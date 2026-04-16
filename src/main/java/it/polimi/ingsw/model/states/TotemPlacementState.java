@@ -47,8 +47,11 @@ public class TotemPlacementState extends GameState {
 
             //Move to next state
             context.setState(new ActionResolutionState(context));
-        }
 
+            context.notifyActionResultTurnChanged();
+        } else {
+            context.notifyTotemPlacementTurnChanged();
+        }
     }
 
     /**

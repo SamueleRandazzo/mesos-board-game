@@ -75,6 +75,7 @@ public class Game {
     /**the sequence of players for the current phase.*/
     private List<Player> roundTurnOrder;
 
+    private final List<GameEventListener> listeners = new ArrayList<>();
     //endregion
 
     /**
@@ -131,6 +132,8 @@ public class Game {
         this.board = new Board(tribeDeck, era1Buildings);
 
         this.currentState = new SetupGameState();
+
+        initializeGame();
     }
 
     public void initializeGame() {
@@ -140,6 +143,22 @@ public class Game {
         this.currentPlayerIndex = 0;
 
         this.setState(new TotemPlacementState());
+    }
+
+    public void addListener(GameEventListener listener) {
+        listeners.add(listener);
+    }
+
+    public void notifyTotemPlacementTurnChanged() {
+        for (GameEventListener l : listeners) {
+            l.onTotemPlacementTurnChanged(this.getCurrentActivePlayer().getNickname());
+        }
+    }
+
+    public void notifyActionResultTurnChanged () {
+        for (GameEventListener l : listeners) {
+            l.onActionResultTurnChanged(this.getCurrentActivePlayer().getNickname());
+        }
     }
 
     /**
