@@ -1,0 +1,70 @@
+[
+  {
+    "id": "card_1",
+    "subtype": "hunter",
+    "era": 1,
+    "minPlayers": 2
+  },
+  {
+    "id": "card_2",
+    "subtype": "hunter",
+    "era": 1,
+    "minPlayers": 2,
+    "immediateFood": 1
+  },
+  {
+    "id": "card_3",
+    "subtype": "hunter",
+    "era": 1,
+    "minPlayers": 2
+  },
+  {
+    "id": "card_4",
+    "subtype": "hunter",
+    "era": 1,
+    "minPlayers": 2
+  },
+  {
+    "id": "card_5",
+    "subtype": "hunter",
+    "era": 1,
+    "minPlayers": 3
+  },
+
+  {
+    "id": "card_6",
+    "subtype": "builder",
+    "era": 1,
+    "minPlayers": 2,
+    "buildingDiscount": 1
+  },
+  {
+    "id": "card_7",
+    "subtype": "builder",
+    "era": 1,
+    "minPlayers": 2,
+    "buildingDiscount": 2
+  },
+  {
+    "id": "card_8",
+    "subtype": "builder",
+    "era": 1,
+    "minPlayers": 2,
+    "buildingDiscount": 2
+  },
+  {
+    "id": "card_9",
+    "subtype": "builder",
+    "era": 1,
+    "minPlayers": 2,
+    "buildingDiscount": 1
+  },
+
+  {
+    "id": "card_10",
+    "subtype": "gatherer",
+    "era": 1,
+    "minPlayers": 2,
+    "sustenanceDiscount": 3
+  }
+]

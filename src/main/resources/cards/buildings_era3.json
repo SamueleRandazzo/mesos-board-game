@@ -1,0 +1,15 @@
+[
+  {
+    "id": "building_3",
+    "subtype": "scoring",
+    "era": 3,
+    "minPlayers": 2,
+    "foodCost": 3,
+    "prestigePoints": 4,
+    "fixedPoints": 2,
+    "multiplier": 1,
+    "pointsPerUnit": 2,
+    "setDim": 2,
+    "countType": "BUILDERS_COUNT"
+  }
+]

@@ -1,0 +1,37 @@
+[
+  {
+    "id": "event_1",
+    "era": 1,
+    "minPlayers": 2,
+    "isFinal": false,
+    "effectType": "HUNT",
+    "prestigePerHunter": 2
+  },
+  {
+    "id": "event_2",
+    "era": 1,
+    "minPlayers": 2,
+    "isFinal": false,
+    "effectType": "SUSTENANCE",
+    "prestigeLossPerUnfed": 2
+  },
+  {
+    "id": "event_3",
+    "era": 1,
+    "minPlayers": 2,
+    "isFinal": false,
+    "effectType": "SHAMANIC_RITUAL",
+    "majorityPrestigeGain": 10,
+    "minorityPrestigeLoss": 5
+  },
+  {
+    "id": "event_4",
+    "era": 1,
+    "minPlayers": 2,
+    "isFinal": false,
+    "effectType": "CAVE_PAINTINGS",
+    "minArtists": 2,
+    "prestigeLossIfBelow": 3,
+    "prestigePerArtistIfAbove": 2
+  }
+]

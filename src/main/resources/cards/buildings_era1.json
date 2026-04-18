@@ -1,0 +1,13 @@
+[
+  {
+    "id": "building_1",
+    "subtype": "hunt",
+    "era": 1,
+    "minPlayers": 2,
+    "foodCost": 1,
+    "prestigePoints": 2,
+    "extraFood": 1,
+    "extraPoints": 1,
+    "countType": "HUNTERS_COUNT"
+  }
+]

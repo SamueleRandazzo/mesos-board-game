@@ -8,6 +8,10 @@ import it.polimi.ingsw.model.Player;
 import it.polimi.ingsw.network.GameObserver;
 import it.polimi.ingsw.network.Loggable;
 import it.polimi.ingsw.network.ModelToRemoteViewAdapter;
+import it.polimi.ingsw.model.Board.OfferTrack;
+import it.polimi.ingsw.model.Cards.BuildingCard;
+import it.polimi.ingsw.model.Interfaces.TribeDeck;
+import it.polimi.ingsw.model.factories.GameDataLoader;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -132,18 +136,18 @@ public class ServerMain extends UnicastRemoteObject implements Loggable {
             }
 
             Collections.shuffle(players);
-            // TODO: Properly load decks, cards, and initialize the Game instance here.
-            /*
-            // loading data
-            List<TribeDeck> decks = loadDecks();
-            List<BuildingCard> e1 = loadBuildings(1);
-            List<BuildingCard> e2 = loadBuildings(2);
-            List<BuildingCard> e3 = loadBuildings(3);
-            OfferTrack track = new OfferTrack();
 
-            this.game = new Game(players, decks, e1, e2, e3, track);
+            GameDataLoader loader = new GameDataLoader();
+
+            List<TribeDeck> decks = loader.loadDecks();
+            List<BuildingCard> era1Buildings = loader.loadBuildings(1);
+            List<BuildingCard> era2Buildings = loader.loadBuildings(2);
+            List<BuildingCard> era3Buildings = loader.loadBuildings(3);
+            OfferTrack offerTrack = loader.loadOfferTrack(players.size());
+
+            this.game = new Game(players, decks, era1Buildings, era2Buildings, era3Buildings, offerTrack);
             this.gameController = new GameController(this.game);
-            */
+
 
             for (GameObserver o : remoteObservers) {
                 o.onGameStarted(this.gameController);
