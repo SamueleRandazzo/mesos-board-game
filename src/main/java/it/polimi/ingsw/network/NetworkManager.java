@@ -14,6 +14,10 @@ public class NetworkManager {
         this.serverStub = (Loggable) registry.lookup("Loggable");
     }
 
+    public void setController(RemoteController controller) {
+        this.controller = controller;
+    }
+
     public void login(Color color, String name, GameObserver obs) throws RemoteException {
         serverStub.login(color, name, obs);
     }

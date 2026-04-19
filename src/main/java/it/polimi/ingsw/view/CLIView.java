@@ -91,6 +91,7 @@ public class CLIView implements View {
      */
     @Override
     public void startGame(RemoteController controller) {
+        network.setController(controller);
         System.out.println("THE GAME HAS STARTED!");
     }
 
