@@ -122,6 +122,8 @@ public class ActionResolutionState extends GameState {
 
         hasBoughtBuilding = true;
 
+        upperPicksLeft--;
+
     }
 
     @Override
@@ -149,6 +151,7 @@ public class ActionResolutionState extends GameState {
 
         hasBoughtBuilding = true;
 
+        lowerPicksLeft--;
     }
 
     @Override
