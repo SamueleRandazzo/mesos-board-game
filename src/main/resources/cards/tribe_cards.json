@@ -502,16 +502,152 @@
     "subtype": "BUILDER",
     "era": 3,
     "minPlayers": 2,
-    "buildingDiscount": 1,
-    "prestigePoints": 5
+    "buildingDiscount": 2,
+    "prestigePoints": 2
   },
 
   {
     "id": "tribeCard_66",
-    "subtype": "BUILDER",
+    "subtype": "GATHERER",
     "era": 3,
-    "minPlayers": 5,
-    "buildingDiscount": 1,
-    "prestigePoints": 4
+    "minPlayers": 5
+  },
+
+  {
+    "id": "tribeCard_67",
+    "subtype": "GATHERER",
+    "era": 3,
+    "minPlayers": 4
+  },
+
+  {
+    "id": "tribeCard_68",
+    "subtype": "GATHERER",
+    "era": 3,
+    "minPlayers": 2
+  },
+
+  {
+    "id": "tribeCard_69",
+    "subtype": "ARTIST",
+    "era": 3,
+    "minPlayers": 5
+  },
+
+  {
+    "id": "tribeCard_70",
+    "subtype": "ARTIST",
+    "era": 3,
+    "minPlayers": 2
+  },
+
+  {
+    "id": "tribeCard_71",
+    "subtype": "ARTIST",
+    "era": 3,
+    "minPlayers": 2
+  },
+
+  {
+    "id": "tribeCard_72",
+    "subtype": "ARTIST",
+    "era": 3,
+    "minPlayers": 2
+  },
+
+  {
+    "id": "tribeCard_73",
+    "subtype": "INVENTOR",
+    "era": 3,
+    "minPlayers": 4,
+    "inventionIcon": "NECKLACE"
+  },
+
+  {
+    "id": "tribeCard_74",
+    "subtype": "INVENTOR",
+    "era": 3,
+    "minPlayers": 3,
+    "inventionIcon": "CANOE"
+  },
+
+  {
+    "id": "tribeCard_75",
+    "subtype": "INVENTOR",
+    "era": 3,
+    "minPlayers": 3,
+    "inventionIcon": "ARROWHEAD"
+  },
+
+  {
+    "id": "tribeCard_76",
+    "subtype": "INVENTOR",
+    "era": 3,
+    "minPlayers": 2,
+    "inventionIcon": "FIGURINE"
+  },
+
+  {
+    "id": "tribeCard_77",
+    "subtype": "INVENTOR",
+    "era": 3,
+    "minPlayers": 2,
+    "inventionIcon": "FISHHOOK"
+  },
+
+  {
+    "id": "tribeCard_78",
+    "subtype": "INVENTOR",
+    "era": 3,
+    "minPlayers": 2,
+    "inventionIcon": "NECKLACE"
+  },
+
+  {
+    "id": "tribeCard_79",
+    "subtype": "INVENTOR",
+    "era": 3,
+    "minPlayers": 2,
+    "inventionIcon": "BREAD"
+  },
+
+  {
+    "id": "tribeCard_80",
+    "subtype": "SHAMAN",
+    "era": 3,
+    "minPlayers": 3,
+    "shamanStars": 2
+  },
+
+  {
+    "id": "tribeCard_81",
+    "subtype": "SHAMAN",
+    "era": 3,
+    "minPlayers": 2,
+    "shamanStars": 3
+  },
+
+  {
+    "id": "tribeCard_82",
+    "subtype": "SHAMAN",
+    "era": 3,
+    "minPlayers": 2,
+    "shamanStars": 2
+  },
+
+  {
+    "id": "tribeCard_83",
+    "subtype": "SHAMAN",
+    "era": 3,
+    "minPlayers": 2,
+    "shamanStars": 3
+  },
+
+  {
+    "id": "tribeCard_84",
+    "subtype": "SHAMAN",
+    "era": 3,
+    "minPlayers": 4,
+    "shamanStars": 2
   }
 ]
