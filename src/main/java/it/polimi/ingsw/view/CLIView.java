@@ -152,7 +152,7 @@ public class CLIView implements View {
 
         System.out.printf("%-4s | %-6s | %-10s | %-10s | %-12s%n",
                 "ID", "FOOD", "TOP DRAW", "BOT DRAW", "STATUS");
-        System.out.println("---------------------------------------------------------------");
+        System.out.println("-----------------------------------------------------------");
 
         for (OfferTileDTO dto : tiles) {
             String status = dto.isAvailable() ? "FREE" : "[" + dto.getNickname() + "]";
@@ -164,6 +164,6 @@ public class CLIView implements View {
                     dto.getBottomRowDraws(),
                     status);
         }
-        System.out.println("===============================================================\n");
+        System.out.println("===========================================================\n");
     }
 }

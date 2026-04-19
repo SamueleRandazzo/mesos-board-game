@@ -11,14 +11,16 @@ public class OfferTile {
     private final int topRowDraws;
     private final int bottomRowDraws;
     private Player placedPlayer;
+    private final int minPlayers;
 
     /** Constructor for OfferTile */
-    public OfferTile(int foodBonus, TileId tileId, int topRowDraws, int bottomRowDraws){
+    public OfferTile(int foodBonus, TileId tileId, int topRowDraws, int bottomRowDraws, int minPlayers){
         this.foodBonus = foodBonus;
         this.tileId = tileId;
         this.topRowDraws = topRowDraws;
         this.bottomRowDraws = bottomRowDraws;
         this.placedPlayer = null;
+        this.minPlayers = minPlayers;
     }
 
     /** returns the eventual food bonus of the tile*/
@@ -47,6 +49,9 @@ public class OfferTile {
     public boolean isAvailable(){
         return placedPlayer == null;
     }
+
+    /** returns min players required to load the tile**/
+    public int getMinPlayers() { return  minPlayers; }
 
     /** places a totem on this tile, param "totem" is the totem to place*/
     public void placeTotem(Player player){

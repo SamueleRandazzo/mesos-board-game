@@ -19,7 +19,7 @@ class GameDataLoaderTest {
     void loadDecks_shouldLoadTribeCardsFromJson() {
         GameDataLoader loader = new GameDataLoader();
 
-        List<TribeDeck> deck = loader.loadDecks();
+        List<TribeDeck> deck = loader.loadDecks(2);
 
         // NON più == 10 perché ora ci sono anche gli eventi
         assertTrue(deck.size() >= 10);
@@ -34,7 +34,7 @@ class GameDataLoaderTest {
     void loadDecks_shouldIncludeEventCards() {
         GameDataLoader loader = new GameDataLoader();
 
-        List<TribeDeck> deck = loader.loadDecks();
+        List<TribeDeck> deck = loader.loadDecks(2);
 
         boolean hasEvent = deck.stream()
                 .anyMatch(card -> card instanceof EventCard);
@@ -46,7 +46,7 @@ class GameDataLoaderTest {
     void loadDecks_shouldLoadCorrectNumberOfEventCards() {
         GameDataLoader loader = new GameDataLoader();
 
-        List<TribeDeck> deck = loader.loadDecks();
+        List<TribeDeck> deck = loader.loadDecks(2);
 
         long eventCount = deck.stream()
                 .filter(card -> card instanceof EventCard)
@@ -60,7 +60,7 @@ class GameDataLoaderTest {
     void loadBuildings_shouldLoadEra1() {
         GameDataLoader loader = new GameDataLoader();
 
-        List<BuildingCard> buildings = loader.loadBuildings(1);
+        List<BuildingCard> buildings = loader.loadBuildings(1, 2);
 
         assertFalse(buildings.isEmpty());
     }
@@ -71,7 +71,7 @@ class GameDataLoaderTest {
 
         GameDataLoader loader = new GameDataLoader();
 
-        List<BuildingCard> buildings = loader.loadBuildings(2);
+        List<BuildingCard> buildings = loader.loadBuildings(2, 2);
 
         assertFalse(buildings.isEmpty());
 
@@ -85,7 +85,7 @@ class GameDataLoaderTest {
 
         GameDataLoader loader = new GameDataLoader();
 
-        List<BuildingCard> buildings = loader.loadBuildings(3);
+        List<BuildingCard> buildings = loader.loadBuildings(3, 2);
 
         assertFalse(buildings.isEmpty());
 

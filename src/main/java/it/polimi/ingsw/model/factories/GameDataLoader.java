@@ -10,89 +10,102 @@ import it.polimi.ingsw.model.Interfaces.TribeDeck;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class GameDataLoader {
 
     private final ObjectMapper objectMapper;
     private final CardFactory cardFactory;
 
+    private static final int[][] CONFIG_TABLE = {
+            {1, 2, 3}, // 2 Players
+            {2, 2, 4}, // 3 Players
+            {2, 3, 4}, // 4 Players
+            {2, 3, 5}  // 5 Players
+    };
+
     public GameDataLoader() {
         this.objectMapper = new ObjectMapper();
         this.cardFactory = new CardFactory();
     }
 
-    public List<TribeDeck> loadDecks() {
-        List<RawTribeCardData> tribeCards = readJsonList(
-                "/cards/tribe_cards.json",
-                new TypeReference<List<RawTribeCardData>>() {}
-        );
+    public List<TribeDeck> loadDecks(int playersNum) {
+        List<RawTribeCardData> rawTribes = readJsonList("/cards/tribe_cards.json", new TypeReference<>() {});
+        List<RawEventCardData> rawEvents = readJsonList("/cards/event_cards.json", new TypeReference<>() {});
 
-        List<RawEventCardData> eventCards = readJsonList(
-                "/cards/event_cards.json",
-                new TypeReference<List<RawEventCardData>>() {}
-        );
+        List<TribeDeck> allNormalCards = new ArrayList<>();
 
-        List<TribeDeck> deck = new ArrayList<>();
+        rawTribes.stream()
+                .filter(d -> d.minPlayers <= playersNum)
+                .map(cardFactory::createTribeCard)
+                .forEach(allNormalCards::add);
 
-        for (RawTribeCardData data : tribeCards) {
-            deck.add(cardFactory.createTribeCard(data));
+        rawEvents.stream()
+                .filter(d -> d.minPlayers <= playersNum && !d.isFinal)
+                .map(cardFactory::createEventCard)
+                .forEach(allNormalCards::add);
+
+        Map<Integer, List<TribeDeck>> cardsByEra = allNormalCards.stream()
+                .collect(Collectors.groupingBy(TribeDeck::getEra));
+
+        List<TribeDeck> finalDeck = new ArrayList<>();
+
+        for (int era = 1; era <= 3; era++) {
+            List<TribeDeck> eraCards = cardsByEra.getOrDefault(era, new ArrayList<>());
+            Collections.shuffle(eraCards);
+            finalDeck.addAll(eraCards);
         }
 
-        for (RawEventCardData data : eventCards) {
-            deck.add(cardFactory.createEventCard(data));
-        }
+        List<TribeDeck> finalEvents = rawEvents.stream()
+                .filter(d -> d.isFinal && d.era == 3)
+                .map(cardFactory::createEventCard)
+                .collect(Collectors.toCollection(ArrayList::new));
 
-        return deck;
+        Collections.shuffle(finalEvents);
+        finalDeck.addAll(finalEvents.subList(0, Math.min(2, finalEvents.size())));
+
+        return finalDeck;
     }
 
-    public List<BuildingCard> loadBuildings(int era) {
-        String path;
-        switch (era) {
-            case 1:
-                path = "/cards/buildings_era1.json";
-                break;
-            case 2:
-                path = "/cards/buildings_era2.json";
-                break;
-            case 3:
-                path = "/cards/buildings_era3.json";
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid era: " + era);
+    public List<BuildingCard> loadBuildings(int era, int playersNum) {
+        if (playersNum < 2 || playersNum > 5 || era < 1 || era > 3) {
+            throw new IllegalArgumentException("Parametri fuori range");
         }
+
+        String path = String.format("/cards/buildings_era%d.json", era);
 
         List<RawBuildingCardData> rawBuildings = readJsonList(
                 path,
                 new TypeReference<List<RawBuildingCardData>>() {}
         );
 
-        List<BuildingCard> buildings = new ArrayList<>();
-        for (RawBuildingCardData data : rawBuildings) {
-            buildings.add(cardFactory.createBuildingCard(data));
-        }
+        int countToTake = CONFIG_TABLE[playersNum - 2][era - 1];
 
-        return buildings;
+        Collections.shuffle(rawBuildings);
+
+        return rawBuildings.stream()
+                .limit(countToTake)
+                .map(cardFactory::createBuildingCard)
+                .collect(Collectors.toList());
     }
 
     public OfferTrack loadOfferTrack(int numPlayers) {
+        List<OfferTile> allTiles = List.of(
+                new OfferTile(3, TileId.A, 0, 0, 5),
+                new OfferTile(0, TileId.B, 0, 1, 2),
+                new OfferTile(0, TileId.C, 1, 0, 2),
+                new OfferTile(0, TileId.D, 0, 2, 3),
+                new OfferTile(0, TileId.E, 1, 1, 2),
+                new OfferTile(0, TileId.F, 2, 0, 2),
+                new OfferTile(0, TileId.G, 2, 1, 4)
+        );
 
-        List<OfferTile> tiles = new ArrayList<>();
+        List<OfferTile> filteredTiles = allTiles.stream()
+                .filter(tile -> tile.getMinPlayers() <= numPlayers)
+                .collect(Collectors.toList());
 
-        // CONFIG BASE (puoi cambiarla dopo)
-        tiles.add(new OfferTile(0, TileId.A, 1, 0));
-        tiles.add(new OfferTile(1, TileId.B, 0, 1));
-        tiles.add(new OfferTile(2, TileId.C, 1, 1));
-        tiles.add(new OfferTile(3, TileId.D, 2, 0));
-        tiles.add(new OfferTile(4, TileId.E, 0, 2));
-
-        // se vuoi puoi adattare in base ai player
-        if (numPlayers <= 2) {
-            return new OfferTrack(tiles.subList(0, 3));
-        }
-
-        return new OfferTrack(tiles);
+        return new OfferTrack(filteredTiles);
     }
 
     private <T> T readJsonList(String resourcePath, TypeReference<T> typeReference) {

@@ -139,15 +139,14 @@ public class ServerMain extends UnicastRemoteObject implements Loggable {
 
             GameDataLoader loader = new GameDataLoader();
 
-            List<TribeDeck> decks = loader.loadDecks();
-            List<BuildingCard> era1Buildings = loader.loadBuildings(1);
-            List<BuildingCard> era2Buildings = loader.loadBuildings(2);
-            List<BuildingCard> era3Buildings = loader.loadBuildings(3);
+            List<TribeDeck> decks = loader.loadDecks(targetPlayers);
+            List<BuildingCard> era1Buildings = loader.loadBuildings(1, targetPlayers);
+            List<BuildingCard> era2Buildings = loader.loadBuildings(2, targetPlayers);
+            List<BuildingCard> era3Buildings = loader.loadBuildings(3, targetPlayers);
             OfferTrack offerTrack = loader.loadOfferTrack(players.size());
 
             this.game = new Game(players, decks, era1Buildings, era2Buildings, era3Buildings, offerTrack);
             this.gameController = new GameController(this.game);
-
 
             for (GameObserver o : remoteObservers) {
                 o.onGameStarted(this.gameController);
