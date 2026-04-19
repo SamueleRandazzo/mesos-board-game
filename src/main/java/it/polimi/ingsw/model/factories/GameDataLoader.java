@@ -70,7 +70,7 @@ public class GameDataLoader {
 
     public List<BuildingCard> loadBuildings(int era, int playersNum) {
         if (playersNum < 2 || playersNum > 5 || era < 1 || era > 3) {
-            throw new IllegalArgumentException("Parametri fuori range");
+            throw new IllegalArgumentException("Parameters out of range");
         }
 
         String path = String.format("/cards/buildings_era%d.json", era);
