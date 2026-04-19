@@ -6,10 +6,12 @@ public class RawTribeCardData {
     public int era;
     public int minPlayers;
 
-    // opzionali, in base alla carta
+    // these are optional depending on the card type
     public String inventionIcon;
-    public Integer shamanSymbols;
+    public Integer shamanStars;
     public Integer immediateFood;
     public Integer buildingDiscount;
     public Integer sustenanceDiscount;
+    public Integer prestigePoints;
+
 }

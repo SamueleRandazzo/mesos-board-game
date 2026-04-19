@@ -54,7 +54,7 @@ public class CardFactory {
 
             case "builder":
                 int discount = data.buildingDiscount != null ? data.buildingDiscount : 0;
-                int prestigePoints = 0;
+                int prestigePoints = data.prestigePoints;
 
                 return new Builder(
                         data.era,
@@ -92,7 +92,7 @@ public class CardFactory {
                 );
 
             case "shaman":
-                int symbols = data.shamanSymbols != null ? data.shamanSymbols : 1;
+                int symbols = data.shamanStars != null ? data.shamanStars : 1;
 
                 return new Shaman(
                         data.era,

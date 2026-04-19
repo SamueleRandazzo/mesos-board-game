@@ -1,70 +1,517 @@
 [
   {
-    "id": "card_1",
-    "subtype": "hunter",
-    "era": 1,
-    "minPlayers": 2
-  },
-  {
-    "id": "card_2",
-    "subtype": "hunter",
+    "id": "tribeCard_1",
+    "subtype": "HUNTER",
     "era": 1,
     "minPlayers": 2,
     "immediateFood": 1
   },
+
   {
-    "id": "card_3",
-    "subtype": "hunter",
+    "id": "tribeCard_2",
+    "subtype": "HUNTER",
+    "era": 1,
+    "minPlayers": 2,
+    "immediateFood": 1
+  },
+
+  {
+    "id": "tribeCard_3",
+    "subtype": "HUNTER",
     "era": 1,
     "minPlayers": 2
   },
+
   {
-    "id": "card_4",
-    "subtype": "hunter",
+    "id": "tribeCard_4",
+    "subtype": "HUNTER",
     "era": 1,
     "minPlayers": 2
   },
+
   {
-    "id": "card_5",
-    "subtype": "hunter",
+    "id": "tribeCard_5",
+    "subtype": "HUNTER",
     "era": 1,
     "minPlayers": 3
   },
 
   {
-    "id": "card_6",
-    "subtype": "builder",
+    "id": "tribeCard_6",
+    "subtype": "BUILDER",
     "era": 1,
     "minPlayers": 2,
-    "buildingDiscount": 1
-  },
-  {
-    "id": "card_7",
-    "subtype": "builder",
-    "era": 1,
-    "minPlayers": 2,
-    "buildingDiscount": 2
-  },
-  {
-    "id": "card_8",
-    "subtype": "builder",
-    "era": 1,
-    "minPlayers": 2,
-    "buildingDiscount": 2
-  },
-  {
-    "id": "card_9",
-    "subtype": "builder",
-    "era": 1,
-    "minPlayers": 2,
-    "buildingDiscount": 1
+    "buildingDiscount": 1,
+    "prestigePoints": 3
   },
 
   {
-    "id": "card_10",
-    "subtype": "gatherer",
+    "id": "tribeCard_7",
+    "subtype": "BUILDER",
     "era": 1,
     "minPlayers": 2,
-    "sustenanceDiscount": 3
+    "buildingDiscount": 2,
+    "prestigePoints": 0
+  },
+
+  {
+    "id": "tribeCard_8",
+    "subtype": "BUILDER",
+    "era": 1,
+    "minPlayers": 5,
+    "buildingDiscount": 2,
+    "prestigePoints": 1
+  },
+
+  {
+    "id": "tribeCard_9",
+    "subtype": "BUILDER",
+    "era": 1,
+    "minPlayers": 2,
+    "buildingDiscount": 1,
+    "prestigePoints": 2
+  },
+
+  {
+    "id": "tribeCard_10",
+    "subtype": "GATHERER",
+    "era": 1,
+    "minPlayers": 2
+  },
+
+  {
+    "id": "tribeCard_11",
+    "subtype": "GATHERER",
+    "era": 1,
+    "minPlayers": 2
+  },
+
+  {
+    "id": "tribeCard_12",
+    "subtype": "GATHERER",
+    "era": 1,
+    "minPlayers": 3
+  },
+
+  {
+    "id": "tribeCard_13",
+    "subtype": "GATHERER",
+    "era": 1,
+    "minPlayers": 5
+  },
+
+  {
+    "id": "tribeCard_14",
+    "subtype": "ARTIST",
+    "era": 1,
+    "minPlayers": 2
+  },
+
+  {
+    "id": "tribeCard_15",
+    "subtype": "ARTIST",
+    "era": 1,
+    "minPlayers": 2
+  },
+
+  {
+    "id": "tribeCard_16",
+    "subtype": "ARTIST",
+    "era": 1,
+    "minPlayers": 2
+  },
+
+  {
+    "id": "tribeCard_17",
+    "subtype": "ARTIST",
+    "era": 1,
+    "minPlayers": 3
+  },
+
+  {
+    "id": "tribeCard_18",
+    "subtype": "ARTIST",
+    "era": 1,
+    "minPlayers": 4
+  },
+
+  {
+    "id": "tribeCard_19",
+    "subtype": "INVENTOR",
+    "era": 1,
+    "minPlayers": 2,
+    "inventionIcon": "LEATHER"
+  },
+
+  {
+    "id": "tribeCard_20",
+    "subtype": "INVENTOR",
+    "era": 1,
+    "minPlayers": 2,
+    "inventionIcon": "CANOE"
+  },
+
+  {
+    "id": "tribeCard_21",
+    "subtype": "INVENTOR",
+    "era": 1,
+    "minPlayers": 2,
+    "inventionIcon": "ARROWHEAD"
+  },
+
+  {
+    "id": "tribeCard_22",
+    "subtype": "INVENTOR",
+    "era": 1,
+    "minPlayers": 2,
+    "inventionIcon": "BREAD"
+  },
+
+  {
+    "id": "tribeCard_23",
+    "subtype": "INVENTOR",
+    "era": 1,
+    "minPlayers": 4,
+    "inventionIcon": "ROPE"
+  },
+
+  {
+    "id": "tribeCard_24",
+    "subtype": "INVENTOR",
+    "era": 1,
+    "minPlayers": 4,
+    "inventionIcon": "FLUTE"
+  },
+
+  {
+    "id": "tribeCard_25",
+    "subtype": "INVENTOR",
+    "era": 1,
+    "minPlayers": 4,
+    "inventionIcon": "MORTAR"
+  },
+
+  {
+    "id": "tribeCard_26",
+    "subtype": "SHAMAN",
+    "era": 1,
+    "minPlayers": 5,
+    "shamanStars": 2
+  },
+
+  {
+    "id": "tribeCard_27",
+    "subtype": "SHAMAN",
+    "era": 1,
+    "minPlayers": 2,
+    "shamanStars": 2
+  },
+
+  {
+    "id": "tribeCard_28",
+    "subtype": "SHAMAN",
+    "era": 1,
+    "minPlayers": 2,
+    "shamanStars": 1
+  },
+
+  {
+    "id": "tribeCard_29",
+    "subtype": "SHAMAN",
+    "era": 1,
+    "minPlayers": 4,
+    "shamanStars": 1
+  },
+
+  {
+    "id": "tribeCard_30",
+    "subtype": "HUNTER",
+    "era": 2,
+    "minPlayers": 2
+  },
+
+  {
+    "id": "tribeCard_31",
+    "subtype": "HUNTER",
+    "era": 2,
+    "minPlayers": 2
+  },
+
+  {
+    "id": "tribeCard_32",
+    "subtype": "HUNTER",
+    "era": 2,
+    "minPlayers": 3
+    "immediateFood": 1
+  },
+
+  {
+    "id": "tribeCard_33",
+    "subtype": "HUNTER",
+    "era": 2,
+    "minPlayers": 2,
+    "immediateFood": 1
+  },
+
+  {
+    "id": "tribeCard_34",
+    "subtype": "HUNTER",
+    "era": 2,
+    "minPlayers": 4,
+    "immediateFood": 1
+  },
+
+  {
+    "id": "tribeCard_35",
+    "subtype": "HUNTER",
+    "era": 2,
+    "minPlayers": 2
+  },
+
+  {
+    "id": "tribeCard_36",
+    "subtype": "BUILDER",
+    "era": 2,
+    "minPlayers": 2,
+    "buildingDiscount": 1,
+    "prestigePoints": 4
+  },
+
+  {
+    "id": "tribeCard_37",
+    "subtype": "BUILDER",
+    "era": 2,
+    "minPlayers": 2,
+    "buildingDiscount": 2,
+    "prestigePoints": 1
+  },
+
+  {
+    "id": "tribeCard_38",
+    "subtype": "BUILDER",
+    "era": 2,
+    "minPlayers": 3,
+    "buildingDiscount": 1,
+    "prestigePoints": 2
+  },
+
+  {
+    "id": "tribeCard_39",
+    "subtype": "BUILDER",
+    "era": 2,
+    "minPlayers": 2,
+    "buildingDiscount": 2,
+    "prestigePoints": 3
+  },
+
+  {
+    "id": "tribeCard_40",
+    "subtype": "GATHERER",
+    "era": 2,
+    "minPlayers": 2
+  },
+
+  {
+    "id": "tribeCard_41",
+    "subtype": "GATHERER",
+    "era": 2,
+    "minPlayers": 3
+  },
+
+  {
+    "id": "tribeCard_42",
+    "subtype": "GATHERER",
+    "era": 2,
+    "minPlayers": 4
+  },
+
+  {
+    "id": "tribeCard_43",
+    "subtype": "GATHERER",
+    "era": 2,
+    "minPlayers": 5
+  },
+
+  {
+    "id": "tribeCard_44",
+    "subtype": "ARTIST",
+    "era": 2,
+    "minPlayers": 3
+  },
+
+  {
+    "id": "tribeCard_45",
+    "subtype": "GATHERER",
+    "era": 2,
+    "minPlayers": 2
+  },
+
+  {
+    "id": "tribeCard_46",
+    "subtype": "GATHERER",
+    "era": 2,
+    "minPlayers": 2
+  },
+
+  {
+    "id": "tribeCard_47",
+    "subtype": "GATHERER",
+    "era": 2,
+    "minPlayers": 2
+  },
+
+  {
+    "id": "tribeCard_48",
+    "subtype": "INVENTOR",
+    "era": 2,
+    "minPlayers": 2,
+    "inventionIcon": "FIGURINE"
+  },
+
+  {
+    "id": "tribeCard_49",
+    "subtype": "INVENTOR",
+    "era": 2,
+    "minPlayers": 4,
+    "inventionIcon": "FISHHOOK"
+  },
+
+  {
+    "id": "tribeCard_50",
+    "subtype": "INVENTOR",
+    "era": 2,
+    "minPlayers": 2,
+    "inventionIcon": "ROPE"
+  },
+
+  {
+    "id": "tribeCard_51",
+    "subtype": "INVENTOR",
+    "era": 2,
+    "minPlayers": 2,
+    "inventionIcon": "FLUTE"
+  },
+
+  {
+    "id": "tribeCard_52",
+    "subtype": "INVENTOR",
+    "era": 2,
+    "minPlayers": 2,
+    "inventionIcon": "MORTAR"
+  },
+
+  {
+    "id": "tribeCard_53",
+    "subtype": "INVENTOR",
+    "era": 2,
+    "minPlayers": 2,
+    "inventionIcon": "LEATHER"
+  },
+
+  {
+    "id": "tribeCard_54",
+    "subtype": "SHAMAN",
+    "era": 2,
+    "minPlayers": 2,
+    "shamanStars": 2
+  },
+
+  {
+    "id": "tribeCard_55",
+    "subtype": "SHAMAN",
+    "era": 2,
+    "minPlayers": 2,
+    "shamanStars": 2
+  },
+
+  {
+    "id": "tribeCard_56",
+    "subtype": "SHAMAN",
+    "era": 2,
+    "minPlayers": 5,
+    "shamanStars": 1
+  },
+
+  {
+    "id": "tribeCard_57",
+    "subtype": "SHAMAN",
+    "era": 2,
+    "minPlayers": 5,
+    "shamanStars": 2
+  },
+
+  {
+    "id": "tribeCard_58",
+    "subtype": "HUNTER",
+    "era": 3,
+    "minPlayers": 5,
+    "immediateFood": 1
+  },
+
+  {
+    "id": "tribeCard_59",
+    "subtype": "HUNTER",
+    "era": 3,
+    "minPlayers": 2
+  },
+
+  {
+    "id": "tribeCard_60",
+    "subtype": "HUNTER",
+    "era": 3,
+    "minPlayers": 2
+  },
+
+  {
+    "id": "tribeCard_61",
+    "subtype": "HUNTER",
+    "era": 3,
+    "minPlayers": 2,
+    "immediateFood": 1
+  },
+
+  {
+    "id": "tribeCard_62",
+    "subtype": "BUILDER",
+    "era": 3,
+    "minPlayers": 2,
+    "buildingDiscount": 1,
+    "prestigePoints": 5
+  },
+
+  {
+    "id": "tribeCard_63",
+    "subtype": "BUILDER",
+    "era": 3,
+    "minPlayers": 2,
+    "buildingDiscount": 2,
+    "prestigePoints": 3
+  },
+
+  {
+    "id": "tribeCard_64",
+    "subtype": "BUILDER",
+    "era": 3,
+    "minPlayers": 5,
+    "buildingDiscount": 1,
+    "prestigePoints": 4
+  },
+
+  {
+    "id": "tribeCard_65",
+    "subtype": "BUILDER",
+    "era": 3,
+    "minPlayers": 2,
+    "buildingDiscount": 1,
+    "prestigePoints": 5
+  },
+
+  {
+    "id": "tribeCard_66",
+    "subtype": "BUILDER",
+    "era": 3,
+    "minPlayers": 5,
+    "buildingDiscount": 1,
+    "prestigePoints": 4
   }
 ]
