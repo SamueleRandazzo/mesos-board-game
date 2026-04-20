@@ -12,14 +12,13 @@ import it.polimi.ingsw.model.factories.GameDataLoader;
 import it.polimi.ingsw.network.GameObserver;
 import it.polimi.ingsw.network.ModelToRemoteViewAdapter;
 import org.jetbrains.annotations.NotNull;
-
 import java.rmi.RemoteException;
 import java.util.*;
 
 public class Lobby {
 
-    private final int MAX_PLAYERS = 5;
-    private int MIN_PLAYERS = 2;
+    private static final int MAX_PLAYERS = 5;
+    private static final int MIN_PLAYERS = 2;
 
     private int targetPlayers = -1;
     private final List<GameObserver> remoteObservers = new ArrayList<>();
@@ -135,7 +134,6 @@ public class Lobby {
         List<BuildingCard> era3Buildings = loader.loadBuildings(3, targetPlayers);
         OfferTrack offerTrack = loader.loadOfferTrack(players.size());
 
-        Game game = new Game(players, decks, era1Buildings, era2Buildings, era3Buildings, offerTrack);
-        return game;
+        return new Game(players, decks, era1Buildings, era2Buildings, era3Buildings, offerTrack);
     }
 }
