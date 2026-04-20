@@ -1,6 +1,5 @@
 package it.polimi.ingsw.model.EventEffects;
 
-<<<<<<< Updated upstream
 import it.polimi.ingsw.model.CharacterCards.Artist;
 import it.polimi.ingsw.model.CharacterCards.Gatherer;
 import it.polimi.ingsw.model.BuildingCards.SustenanceBuilding;
@@ -12,24 +11,12 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
-=======
-import it.polimi.ingsw.model.Enum.Color;
-import it.polimi.ingsw.model.Player;
-import it.polimi.ingsw.model.CharacterCards.Artist;
-import it.polimi.ingsw.model.CharacterCards.Gatherer;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
->>>>>>> Stashed changes
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class SustenanceTest {
 
-<<<<<<< Updated upstream
     private Sustenance sustenanceEvent;
     private Player player;
 
@@ -132,105 +119,5 @@ class SustenanceTest {
         // ASSERT: The event should gracefully ignore negative 'toFeed' values.
         assertEquals(0, player.getFoodAmount(), "Food should remain unaffected.");
         assertEquals(0, player.getPrestigePoints(), "No prestige points should be lost.");
-=======
-    private Sustenance sustenance;
-    private List<Player> players;
-    private final int PENALTY_PER_FOOD = 3;
-
-    @BeforeEach
-    void setUp() {
-        // Penalty of 3 prestige points for each missing food
-        sustenance = new Sustenance(PENALTY_PER_FOOD);
-        players = new ArrayList<>();
-    }
-
-    @Test
-    @DisplayName("Test sufficient food: food is consumed, prestige remains unchanged")
-    void testResolve_SufficientFood() {
-        Player p = new Player(Color.RED);
-        // Tribe of 2 Artists (requires 2 food)
-        p.getTribe().addCard(new Artist(1, 2, true));
-        p.getTribe().addCard(new Artist(1, 2, true));
-        p.setFoodAmount(10);
-
-        players.add(p);
-        sustenance.resolve(players);
-
-        assertEquals(8, p.getFoodAmount(), "10 - 2 = 8 food remaining");
-        assertEquals(0, p.getPrestigePoints(), "Prestige should not change");
-    }
-
-    @Test
-    @DisplayName("Test insufficient food: food goes to 0 and prestige penalty is applied")
-    void testResolve_InsufficientFood() {
-        Player p = new Player(Color.BLUE);
-        // 4 Artists = 4 food needed
-        for(int i=0; i<4; i++) p.getTribe().addCard(new Artist(1, 2, true));
-
-        p.setFoodAmount(1); // 3 food missing
-        players.add(p);
-
-        sustenance.resolve(players);
-
-        // Missing 3 * Penalty 3 = -9 points
-        assertEquals(0, p.getFoodAmount(), "Food should be clamped to 0");
-        assertEquals(-9, p.getPrestigePoints(), "Penalty should be missingFood * pointsPenalty");
-    }
-
-    @Test
-    @DisplayName("Test Gatherers reduction: 1 Gatherer feeds 3 people")
-    void testResolve_GathererEffect() {
-        Player p = new Player(Color.YELLOW);
-        // 4 Characters: 1 Gatherer + 3 Artists
-        p.getTribe().addCard(new Gatherer(1, 2, true));
-        p.getTribe().addCard(new Artist(1, 2, true));
-        p.getTribe().addCard(new Artist(1, 2, true));
-        p.getTribe().addCard(new Artist(1, 2, true));
-
-        // Requirement: 4 - (1 * 3) = 1 food needed
-        p.setFoodAmount(1);
-        players.add(p);
-
-        sustenance.resolve(players);
-
-        assertEquals(0, p.getFoodAmount(), "The 1 required food was consumed");
-        assertEquals(0, p.getPrestigePoints(), "No penalty should be applied");
-    }
-
-    @Test
-    @DisplayName("Test negative requirement: food should not increase")
-    void testResolve_ExcessGatherers() {
-        Player p = new Player(Color.WHITE);
-        // 1 Character, but 1 Gatherer (feeds 3). Requirement: 1 - 3 = -2.
-        p.getTribe().addCard(new Gatherer(1, 2, true));
-        p.setFoodAmount(5);
-        players.add(p);
-
-        sustenance.resolve(players);
-
-        // if toFeed <= 0, the event does nothing
-        assertEquals(5, p.getFoodAmount(), "Food should not change if requirement is zero or negative");
-    }
-
-    @Test
-    @DisplayName("Test validation: null or empty player list")
-    void testResolve_Validation() {
-        // Test null list
-        assertThrows(IllegalArgumentException.class, () -> sustenance.resolve(null));
-
-        // Test empty list
-        List<Player> emptyList = new ArrayList<>();
-        assertThrows(IllegalStateException.class, () -> sustenance.resolve(emptyList));
-
-        // Test list containing null player
-        players.add(null);
-        assertThrows(IllegalArgumentException.class, () -> sustenance.resolve(players));
-    }
-
-    @Test
-    @DisplayName("Test constructor: pointsPenalty must be non-negative")
-    void testConstructor_Validation() {
-        assertThrows(IllegalArgumentException.class, () -> new Sustenance(-1));
->>>>>>> Stashed changes
     }
 }
