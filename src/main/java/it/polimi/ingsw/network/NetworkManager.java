@@ -36,11 +36,11 @@ public class NetworkManager {
     }
 
     public void login(Color color, String name, GameObserver obs) throws RemoteException {
-        serverStub.login(color, name, obs);
+        serverStub.login(name, color, obs);
     }
 
     public void setTotalPlayers(int n) throws RemoteException {
-        serverStub.setTotalPlayers(n);
+        serverStub.setTargetPlayers(n);
     }
 
     public void tileSelection(int tileIndex) throws RemoteException {

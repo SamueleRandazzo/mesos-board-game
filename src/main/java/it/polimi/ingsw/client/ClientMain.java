@@ -1,11 +1,7 @@
 package it.polimi.ingsw.client;
 
-import it.polimi.ingsw.network.Loggable;
 import it.polimi.ingsw.network.NetworkManager;
 import it.polimi.ingsw.view.*;
-
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Arrays;
 
