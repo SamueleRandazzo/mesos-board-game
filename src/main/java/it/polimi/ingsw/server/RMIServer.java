@@ -1,13 +1,10 @@
 package it.polimi.ingsw.server;
 
-import it.polimi.ingsw.exception.CustomException;
 import it.polimi.ingsw.model.Enum.Color;
 import it.polimi.ingsw.network.GameObserver;
 import it.polimi.ingsw.network.Loggable;
-
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-
 import static it.polimi.ingsw.exception.CustomException.cleanRemoteException;
 
 public class RMIServer extends UnicastRemoteObject implements Loggable {
