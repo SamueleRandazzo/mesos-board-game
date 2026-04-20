@@ -241,7 +241,7 @@
     "id": "tribeCard_32",
     "subtype": "HUNTER",
     "era": 2,
-    "minPlayers": 3
+    "minPlayers": 3,
     "immediateFood": 1
   },
 

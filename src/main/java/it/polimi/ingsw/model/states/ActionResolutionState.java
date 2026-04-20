@@ -156,7 +156,7 @@ public class ActionResolutionState extends GameState {
 
     @Override
     public void endTurn(Game context, Player player){
-        if(upperPicksLeft > 0 || lowerPicksLeft > 0){
+        if (upperPicksLeft > 0 || lowerPicksLeft > 0) {
             throw new IllegalStateException("You must draw all your required tribe cards before ending your turn!");
 
         }
@@ -174,9 +174,9 @@ public class ActionResolutionState extends GameState {
         } else if(foodModifier < 0) {
             int cost = Math.abs(foodModifier);
 
-            if(player.getFoodAmount() >= cost) {
+            if (player.getFoodAmount() >= cost) {
                 player.changeFoodAmount(foodModifier);
-            }else {
+            } else {
                 player.changePrestigePoints(MISSING_FOOD_MALUS);
             }
         }

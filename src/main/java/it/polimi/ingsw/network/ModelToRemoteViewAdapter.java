@@ -31,6 +31,13 @@ public class ModelToRemoteViewAdapter implements GameEventListener {
 
     @Override
     public void onActionResultTurnChanged(String playerNickname) {
-
+        GameObserver obs = playerObservers.get(playerNickname);
+        if (obs != null) {
+            try {
+                obs.askCardChoose();
+            } catch (RemoteException e) {
+                System.err.println("Network error with " +  playerNickname);
+            }
+        }
     }
 }

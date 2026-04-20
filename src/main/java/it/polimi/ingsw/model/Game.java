@@ -146,6 +146,7 @@ public class Game {
         this.setState(new TotemPlacementState());
     }
 
+    //region Listener
     /**
      * Registers a new game event listener to the list of subscribers.
      * Registered listeners will receive notifications regarding state changes
@@ -199,6 +200,7 @@ public class Game {
             l.onActionResultTurnChanged(this.getCurrentActivePlayer().getNickname());
         }
     }
+    //endregion
 
     /**
      * Fills the lower row (numPlayers + 1 cards) and then the upper row

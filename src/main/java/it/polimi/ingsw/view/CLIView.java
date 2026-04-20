@@ -167,4 +167,22 @@ public class CLIView implements View {
         }
         System.out.println("=========================================================\n");
     }
+
+    @Override
+    public void askCardChoose() {
+        displayChoosableCard();
+
+        System.out.print("Choose the card to pick: ");
+        String cardPosition = scanner.nextLine();
+        try {
+            network.cardSelection(cardPosition);
+        } catch (RemoteException e) {
+            System.out.println(cleanRemoteException(e));
+        }
+    }
+
+    // TODO display choosable card and player pick remained
+    public void displayChoosableCard() {
+        System.out.println("\n====================== CHOOSABLE CARD ======================");
+    }
 }
