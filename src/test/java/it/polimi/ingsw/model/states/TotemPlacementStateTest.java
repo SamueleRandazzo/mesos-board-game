@@ -20,8 +20,8 @@ class TotemPlacementStateTest {
 
     private static Game newGame(List<Player> players) {
         List<OfferTile> tiles = new ArrayList<>();
-        tiles.add(new OfferTile(0, TileId.A, 1, 0));
-        tiles.add(new OfferTile(1, TileId.B, 0, 1));
+        tiles.add(new OfferTile(0, TileId.A, 1, 0, 2));
+        tiles.add(new OfferTile(1, TileId.B, 0, 1, 2));
 
         return new Game(
                 players,
