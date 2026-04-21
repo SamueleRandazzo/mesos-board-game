@@ -34,7 +34,7 @@ public class Lobby {
      * @param observer the remote observer for client-side updates.
      * @throws RemoteException if the game is full or the server is unreachable.
      */
-    public synchronized void addPlayer(String nickname, Color color, GameObserver observer) throws RemoteException {
+    public synchronized void addPlayer(String nickname, Color color, GameObserver observer) throws Exception {
         if (targetPlayers != -1 && nicknames.size() >= targetPlayers) {
             throw new CustomException.LobbyFullException();
         }
@@ -72,14 +72,14 @@ public class Lobby {
             new Thread(() ->  {
                 try {
                     checkStartCondition();
-                } catch (RemoteException e) {
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }).start();
         }
     }
 
-    public void setTargetPlayers(int num) throws RemoteException {
+    public void setTargetPlayers(int num) throws Exception {
         if (num < MIN_PLAYERS || num > MAX_PLAYERS) {
             throw new CustomException.InvalidTargetPlayersNumberException(MIN_PLAYERS, MAX_PLAYERS);
         }
@@ -90,13 +90,13 @@ public class Lobby {
         new Thread(() -> {
             try {
                 checkStartCondition();
-            } catch (RemoteException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }).start();
     }
 
-    private synchronized void checkStartCondition() throws RemoteException {
+    private synchronized void checkStartCondition() throws Exception {
         if (targetPlayers != -1 && nicknames.size() == targetPlayers) {
             System.out.println("Game starting!");
 

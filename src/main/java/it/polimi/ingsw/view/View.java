@@ -7,7 +7,6 @@ import it.polimi.ingsw.network.RemoteController;
 import java.util.List;
 
 public interface View {
-    void setObserver(GameObserver observer);
     void showLogin();
     void showLobby(int currentPlayers, int maxPlayers);
     void startGame(RemoteController controller);

@@ -1,21 +1,21 @@
 package it.polimi.ingsw.network;
 
 import it.polimi.ingsw.model.Enum.Color;
+import it.polimi.ingsw.view.View;
+
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class NetworkManager {
-    private Loggable serverStub;
-    private RemoteController controller;
-    private final Map<String, RemoteAction> cardActions = new HashMap<>();
+public abstract class NetworkManager {
+    protected RemoteController controller;
+    protected final Map<String, RemoteAction> cardActions = new HashMap<>();
+    protected View view;
 
     @FunctionalInterface
-    private interface RemoteAction {
+    protected interface RemoteAction {
         void apply(int n) throws RemoteException;
     }
 
@@ -26,28 +26,20 @@ public class NetworkManager {
         cardActions.put("BB", n -> controller.handleLowerBuildingSelection(n));
     }
 
-    public void connect(String ip, int port) throws Exception {
-        Registry registry = LocateRegistry.getRegistry(ip, port);
-        this.serverStub = (Loggable) registry.lookup("Loggable");
+    public void setView(View view) {
+        this.view = view;
     }
+
+    public abstract void connect(String ip, int port) throws Exception;
+    public abstract void login(Color color, String name) throws Exception;
+    public abstract void setTotalPlayers(int n) throws Exception;
+    public abstract void tileSelection(int tileIndex) throws Exception;
 
     public void setController(RemoteController controller) {
-        this.controller = controller;
+
     }
 
-    public void login(Color color, String name, GameObserver obs) throws RemoteException {
-        serverStub.login(name, color, obs);
-    }
-
-    public void setTotalPlayers(int n) throws RemoteException {
-        serverStub.setTargetPlayers(n);
-    }
-
-    public void tileSelection(int tileIndex) throws RemoteException {
-        controller.handleTileSelection(tileIndex);
-    }
-
-    public void cardSelection(String cardPosition) throws RemoteException {
+    public void cardSelection(String cardPosition) throws Exception {
         Pattern pattern = Pattern.compile("^([A-Z]+)(\\d+)$");
         Matcher matcher = pattern.matcher(cardPosition);
 
@@ -55,12 +47,9 @@ public class NetworkManager {
             String prefix = matcher.group(1);
             int n = Integer.parseInt(matcher.group(2));
 
-            RemoteAction action = cardActions.get(prefix);
-            if (action != null) {
-                action.apply(n);
-            } else {
-                System.err.println("Tipo di carta non supportato: " + prefix);
-            }
+            handleCardAction(prefix, n);
         }
     }
+
+    protected abstract void handleCardAction(String prefix, int n) throws Exception;
 }

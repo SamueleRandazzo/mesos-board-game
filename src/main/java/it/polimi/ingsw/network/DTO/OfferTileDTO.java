@@ -4,11 +4,14 @@ import java.io.Serializable;
 public class OfferTileDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final int index;
-    private final int foodBonus;
-    private final int topRowDraws;
-    private final int bottomRowDraws;
-    private final String nickname;
+    private int index;
+    private int foodBonus;
+    private int topRowDraws;
+    private int bottomRowDraws;
+    private String nickname;
+
+    protected OfferTileDTO() {
+    }
 
     public OfferTileDTO(int index, int foodBonus, int topRowDraws, int bottomRowDraws, String nicknameOccupante) {
         this.index = index;

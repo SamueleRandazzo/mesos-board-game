@@ -21,7 +21,6 @@ import static it.polimi.ingsw.exception.CustomException.cleanRemoteException;
 public class CLIView implements View {
     private final Scanner scanner;
     private final NetworkManager network;
-    private GameObserver myObserver;
 
     /**
      * Constructs a new CLIView.
@@ -30,15 +29,6 @@ public class CLIView implements View {
     public CLIView(NetworkManager network) {
         this.network = network;
         this.scanner = new Scanner(System.in);
-    }
-
-    /**
-     * Sets the observer associated with this view.
-     * The observer is used by the server to send asynchronous notifications to the client.
-     * * @param observer the game observer instance.
-     */
-    public void setObserver(GameObserver observer) {
-        this.myObserver = observer;
     }
 
     /**
@@ -66,11 +56,11 @@ public class CLIView implements View {
             }
 
             try {
-                network.login(selectedColor, nickname, myObserver);
+                network.login(selectedColor, nickname);
                 System.out.println("Login request sent. Waiting for server confirmation...");
                 loggedIn = true;
-            } catch (RemoteException e) {
-                System.out.println(cleanRemoteException(e));
+            } catch (Exception e) {
+                handleNetworkError(e);
             }
         }
     }
@@ -119,8 +109,8 @@ public class CLIView implements View {
                 success = true;
             } catch (NumberFormatException e) {
                 System.out.println("Insert a valid number!");
-            } catch (RemoteException e) {
-                System.out.println(cleanRemoteException(e));
+            } catch (Exception e) {
+                handleNetworkError(e);
             }
         }
     }
@@ -138,8 +128,8 @@ public class CLIView implements View {
         int tileIndex = Integer.parseInt(scanner.nextLine());
         try {
             network.tileSelection(tileIndex);
-        } catch (RemoteException e) {
-            System.out.println(cleanRemoteException(e));
+        } catch (Exception e) {
+            handleNetworkError(e);
         }
     }
 
@@ -176,13 +166,21 @@ public class CLIView implements View {
         String cardPosition = scanner.nextLine();
         try {
             network.cardSelection(cardPosition);
-        } catch (RemoteException e) {
-            System.out.println(cleanRemoteException(e));
+        } catch (Exception e) {
+            handleNetworkError(e);
         }
     }
 
     // TODO display choosable card and player pick remained
     public void displayChoosableCard() {
         System.out.println("\n====================== CHOOSABLE CARD ======================");
+    }
+
+    private void handleNetworkError(Exception e) {
+        if (e instanceof RemoteException) {
+            System.out.println(cleanRemoteException((RemoteException) e));
+        } else {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 }
