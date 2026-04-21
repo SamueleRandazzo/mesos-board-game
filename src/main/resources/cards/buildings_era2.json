@@ -1,6 +1,16 @@
 [
   {
-    "id": "building_2",
+    "id": "b2_1",
+    "subtype": "sustenance",
+    "era": 2,
+    "minPlayers": 2,
+    "foodCost": 2,
+    "prestigePoints": 3,
+    "foodBonus": 1,
+    "countType": "GATHERERS_COUNT"
+  },
+  {
+    "id": "b2_2",
     "subtype": "sustenance",
     "era": 2,
     "minPlayers": 2,

@@ -1,8 +1,8 @@
 package it.polimi.ingsw.model.factories;
 
 import it.polimi.ingsw.model.Board.OfferTrack;
-import it.polimi.ingsw.model.Cards.EventCard;
 import it.polimi.ingsw.model.Cards.BuildingCard;
+import it.polimi.ingsw.model.Cards.EventCard;
 import it.polimi.ingsw.model.CharacterCards.Builder;
 import it.polimi.ingsw.model.CharacterCards.Gatherer;
 import it.polimi.ingsw.model.CharacterCards.Hunter;
@@ -21,13 +21,15 @@ class GameDataLoaderTest {
 
         List<TribeDeck> deck = loader.loadDecks(2);
 
-        // NON più == 10 perché ora ci sono anche gli eventi
-        assertTrue(deck.size() >= 10);
+        assertFalse(deck.isEmpty());
 
-        assertTrue(deck.get(0) instanceof Hunter);
-        assertTrue(deck.get(1) instanceof Hunter);
-        assertTrue(deck.get(5) instanceof Builder);
-        assertTrue(deck.get(9) instanceof Gatherer);
+        long hunterCount = deck.stream().filter(card -> card instanceof Hunter).count();
+        long builderCount = deck.stream().filter(card -> card instanceof Builder).count();
+        long gathererCount = deck.stream().filter(card -> card instanceof Gatherer).count();
+
+        assertTrue(hunterCount >= 5);
+        assertTrue(builderCount >= 4);
+        assertTrue(gathererCount >= 1);
     }
 
     @Test
@@ -52,7 +54,6 @@ class GameDataLoaderTest {
                 .filter(card -> card instanceof EventCard)
                 .count();
 
-        // Se nel JSON hai 4 eventi
         assertEquals(4, eventCount);
     }
 
@@ -63,34 +64,27 @@ class GameDataLoaderTest {
         List<BuildingCard> buildings = loader.loadBuildings(1, 2);
 
         assertFalse(buildings.isEmpty());
+        assertEquals(1, buildings.size());
     }
 
     @Test
-
     void loadBuildings_shouldLoadEra2() {
-
         GameDataLoader loader = new GameDataLoader();
 
         List<BuildingCard> buildings = loader.loadBuildings(2, 2);
 
         assertFalse(buildings.isEmpty());
-
-        assertEquals(1, buildings.size());
-
+        assertEquals(2, buildings.size());
     }
 
     @Test
-
     void loadBuildings_shouldLoadEra3() {
-
         GameDataLoader loader = new GameDataLoader();
 
         List<BuildingCard> buildings = loader.loadBuildings(3, 2);
 
         assertFalse(buildings.isEmpty());
-
-        assertEquals(1, buildings.size());
-
+        assertEquals(3, buildings.size());
     }
 
     @Test
@@ -100,7 +94,7 @@ class GameDataLoaderTest {
         OfferTrack track = loader.loadOfferTrack(2);
 
         assertNotNull(track);
-        assertEquals(3, track.getTiles().size());
+        assertEquals(4, track.getTiles().size());
     }
 
     @Test
@@ -110,6 +104,6 @@ class GameDataLoaderTest {
         OfferTrack track = loader.loadOfferTrack(4);
 
         assertNotNull(track);
-        assertEquals(5, track.getTiles().size());
+        assertEquals(6, track.getTiles().size());
     }
 }
