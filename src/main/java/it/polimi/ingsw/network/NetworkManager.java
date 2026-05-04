@@ -11,19 +11,10 @@ import java.util.regex.Pattern;
 
 public abstract class NetworkManager {
     protected RemoteController controller;
-    protected final Map<String, RemoteAction> cardActions = new HashMap<>();
     protected View view;
 
-    @FunctionalInterface
-    protected interface RemoteAction {
-        void apply(int n) throws RemoteException;
-    }
-
     public NetworkManager() {
-        cardActions.put("U", n -> controller.handleUpperCardSelection(n));
-        cardActions.put("B", n -> controller.handleLowerCardSelection(n));
-        cardActions.put("BU", n -> controller.handleUpperBuildingSelection(n));
-        cardActions.put("BB", n -> controller.handleLowerBuildingSelection(n));
+
     }
 
     public void setView(View view) {

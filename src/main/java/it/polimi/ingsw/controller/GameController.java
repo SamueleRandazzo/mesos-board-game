@@ -4,6 +4,8 @@ import it.polimi.ingsw.model.Game;
 import it.polimi.ingsw.network.RemoteController;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Implementation of the remote controller for the game.
@@ -12,10 +14,61 @@ import java.rmi.server.UnicastRemoteObject;
  */
 public class GameController extends UnicastRemoteObject implements RemoteController {
     private Game game;
+    private final Map<String, RemoteAction> cardActions = new HashMap<>();
 
+    @FunctionalInterface
+    protected interface RemoteAction {
+        /**
+         * Applies the action with the given parameter.
+         *
+         * @param n the index or position parameter for the game logic.
+         * @throws RemoteException if a network-related error occurs during execution.
+         */
+        void apply(int n) throws RemoteException;
+    }
+
+    /**
+     * Constructs a new GameController and links it to the provided game model.
+     * It also initializes the internal mapping of action prefixes to their respective methods.
+     *
+     * @param game the game model instance this controller will manipulate.
+     * @throws RemoteException if there is an error during the export of the remote object.
+     */
     public GameController(Game game) throws RemoteException {
         super();
         this.game = game;
+        initializeCardActions();
+    }
+
+    /**
+     * Populates the {@code cardActions} map with command prefixes and their corresponding
+     * method references. This centralizes the command-to-logic mapping on the server side,
+     * allowing both RMI and Socket clients to use a unified command protocol.
+     */
+    private void initializeCardActions() {
+        cardActions.put("U", this::handleUpperCardSelection);
+        cardActions.put("B", this::handleLowerCardSelection);
+        cardActions.put("BU", this::handleUpperBuildingSelection);
+        cardActions.put("BB", this::handleLowerBuildingSelection);
+    }
+
+    /**
+     * Executes a game action based on a string prefix and an integer argument.
+     * This acts as the primary entry point for networked commands, decoupling the
+     * transmission protocol from the specific controller methods.
+     *
+     * @param prefix the unique string identifier for the action (e.g., "U", "BU").
+     * @param n the numerical argument for the selection or action.
+     * @throws RemoteException if the underlying game logic throws a RemoteException.
+     */
+    @Override
+    public void executeCardAction(String prefix, int n) throws RemoteException {
+        RemoteAction action = cardActions.get(prefix);
+        if (action != null) {
+            action.apply(n);
+        } else {
+           System.err.println("Unknown card action prefix: " + prefix);
+        }
     }
 
     /**

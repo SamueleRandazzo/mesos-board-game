@@ -36,8 +36,7 @@ public class RMINetworkManager extends NetworkManager {
 
     @Override
     protected void handleCardAction(String prefix, int n) throws RemoteException {
-        RemoteAction action = cardActions.get(prefix);
-        if (action != null) action.apply(n);
+       controller.executeCardAction(prefix, n);
     }
 
     @Override

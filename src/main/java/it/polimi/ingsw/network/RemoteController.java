@@ -10,4 +10,5 @@ public interface RemoteController extends Remote {
     void handleLowerCardSelection(int pos) throws RemoteException;
     void handleUpperBuildingSelection(int pos) throws RemoteException;
     void handleLowerBuildingSelection(int pos) throws RemoteException;
+    void executeCardAction(String prefix, int n) throws RemoteException;
 }
