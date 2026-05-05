@@ -31,7 +31,7 @@ public class ClientMain {
 
         // TODO network.connect() inside JavaFXMain
         if (argList.contains("--gui")) {
-            JavaFXMain.startGui(network);
+            JavaFXMain.startGui(network, IP, currentPort);
         } else {
             View view = new CLIView(network);
             network.setView(view);
