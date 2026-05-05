@@ -3,11 +3,13 @@ package it.polimi.ingsw.network.commands.clientHandler;
 import it.polimi.ingsw.network.RemoteController;
 import it.polimi.ingsw.network.commands.ClientCommandHandler;
 import it.polimi.ingsw.server.Lobby;
+
+import java.io.PrintWriter;
 import java.rmi.RemoteException;
 
 public class CardSelectHandler implements ClientCommandHandler {
     @Override
-    public void handle(String[] args, Lobby lobby, RemoteController controller) {
+    public void handle(String[] args, Lobby lobby, RemoteController controller, PrintWriter out) {
         if (args.length < 2) return;
 
         try {

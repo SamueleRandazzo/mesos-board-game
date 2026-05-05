@@ -15,7 +15,7 @@ public class ClientMain {
     static final String IP = "127.0.0.1";
 
     public static void main(String[] args) {
-        System.setProperty("java.rmi.server.hostname", IP);
+        //System.setProperty("java.rmi.server.hostname", IP);
 
         List<String> argList = Arrays.asList(args);
         NetworkManager network;
@@ -29,7 +29,6 @@ public class ClientMain {
             currentPort = RMI_PORT;
         }
 
-        // TODO network.connect() inside JavaFXMain
         if (argList.contains("--gui")) {
             JavaFXMain.startGui(network, IP, currentPort);
         } else {
@@ -39,7 +38,8 @@ public class ClientMain {
             try {
                 network.connect(IP, currentPort);
             } catch (Exception e) {
-                //
+                System.err.println("Server error: " + e.getMessage());
+                view.showError("Impossible connect to server (" + IP + ":" + currentPort + ")");
             }
 
             view.showLogin();

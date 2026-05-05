@@ -43,7 +43,7 @@ public class SocketClientHandler extends Thread {
 
                 ClientCommandHandler handler = ClientCommandFactory.getHandler(header);
                 if (handler != null) {
-                    handler.handle(args, lobby, controller);
+                    handler.handle(args, lobby, controller, out);
                 } else {
                     out.println("ERROR unknown command " + header);
                 }

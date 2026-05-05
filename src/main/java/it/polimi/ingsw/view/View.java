@@ -16,4 +16,5 @@ public interface View {
     void askCardChoose();
     void showMessage(String message);
     void showPlayersOrder(List<String> playersOrder);
+    void retryTotemPlacement();
 }

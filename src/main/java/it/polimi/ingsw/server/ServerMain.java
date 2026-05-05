@@ -11,9 +11,8 @@ public class ServerMain {
     private static final int TCP_PORT = 1235;
 
     public static void main(String[] args) {
-        String serverIp = "10.72.192.51";
-
-        System.setProperty("java.rmi.server.hostname", serverIp);
+        // String serverIp = "127.0.0.1";
+        // System.setProperty("java.rmi.server.hostname", serverIp);
 
         Lobby lobby = new Lobby();
 

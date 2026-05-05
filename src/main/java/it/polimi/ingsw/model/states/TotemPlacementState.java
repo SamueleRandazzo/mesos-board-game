@@ -11,15 +11,9 @@ public class TotemPlacementState extends GameState {
 
     @Override
     public void placeTotem(Game context, Player player, int tileIndex) {
-
-        //check if it's the player's turn
-        if (!player.equals(context.getCurrentActivePlayer())) {
-            throw new IllegalStateException("It is not " + player.getColor() + "'s turn!");
-        }
-
         //check if tileIndex is valid
         if (tileIndex < 0 || tileIndex >= context.getOfferTrack().getTiles().size()) {
-            throw new IllegalStateException("Invalid tile index: " + tileIndex);
+            throw new IllegalStateException("Invalid tile index.");
         }
 
         OfferTile chosenTile = context.getOfferTrack().getTiles().get(tileIndex);

@@ -16,6 +16,7 @@ public class GUIView implements View {
     private final NetworkManager network;
     private Stage stage;
     private SceneController currentController;
+    private List<OfferTileDTO> lastTiles;
 
     public GUIView(NetworkManager network, Stage stage) {
         this.network = network;
@@ -78,9 +79,15 @@ public class GUIView implements View {
 
     @Override
     public void askTotemPlacement(List<OfferTileDTO> tiles) {
+        this.lastTiles = tiles;
         Platform.runLater(() -> {
             currentController.displayOfferTrack(tiles);
         });
+    }
+
+    @Override
+    public void retryTotemPlacement() {
+        askTotemPlacement(this.lastTiles);
     }
 
     @Override
