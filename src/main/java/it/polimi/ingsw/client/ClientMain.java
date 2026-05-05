@@ -11,9 +11,12 @@ import it.polimi.ingsw.view.GUI.*;
 public class ClientMain {
     static final int RMI_PORT = 1234;
     static final int SOCKET_PORT = 1235;
+    //static final String IP = "10.72.192.51";
     static final String IP = "127.0.0.1";
 
     public static void main(String[] args) {
+        System.setProperty("java.rmi.server.hostname", IP);
+
         List<String> argList = Arrays.asList(args);
         NetworkManager network;
         int currentPort;
@@ -26,20 +29,19 @@ public class ClientMain {
             currentPort = RMI_PORT;
         }
 
-        try {
-            network.connect(IP, currentPort);
-            System.out.println("Connected to the server on port " + currentPort);
-        } catch (Exception e) {
-            System.err.println("Fatal error during connection: " + e.getMessage());
-            return;
-        }
-
+        // TODO network.connect() inside JavaFXMain
         if (argList.contains("--gui")) {
             JavaFXMain.startGui(network);
         } else {
-            // Per la CLI
             View view = new CLIView(network);
             network.setView(view);
+
+            try {
+                network.connect(IP, currentPort);
+            } catch (Exception e) {
+                //
+            }
+
             view.showLogin();
         }
     }
