@@ -2,6 +2,7 @@
   {
     "id": "event_1",
     "era": 1,
+    "minPlayers": 2,
     "isFinal": false,
     "effectType": "HUNT",
     "prestigePerHunter": 1
@@ -9,6 +10,7 @@
   {
     "id": "event_2",
     "era": 1,
+    "minPlayers": 2,
     "isFinal": false,
     "effectType": "SUSTENANCE",
     "prestigeLossPerUnfed": 1
@@ -16,6 +18,7 @@
   {
     "id": "event_3",
     "era": 1,
+    "minPlayers": 2,
     "isFinal": false,
     "effectType": "SHAMANIC_RITUAL",
     "majorityPrestigeGain": 5,
@@ -24,6 +27,7 @@
   {
     "id": "event_4",
     "era": 1,
+    "minPlayers": 2,
     "isFinal": false,
     "effectType": "CAVE_PAINTINGS",
     "minArtists": 1,
@@ -33,6 +37,7 @@
   {
     "id": "event_5",
     "era": 2,
+    "minPlayers": 2,
     "isFinal": false,
     "effectType": "HUNT",
     "prestigePerHunter": 2
@@ -40,6 +45,7 @@
   {
     "id": "event_6",
     "era": 2,
+    "minPlayers": 2,
     "isFinal": false,
     "effectType": "SUSTENANCE",
     "prestigeLossPerUnfed": 2
@@ -47,6 +53,7 @@
   {
     "id": "event_7",
     "era": 2,
+    "minPlayers": 2,
     "isFinal": false,
     "effectType": "SHAMANIC_RITUAL",
     "majorityPrestigeGain": 10,
@@ -55,6 +62,7 @@
   {
     "id": "event_8",
     "era": 2,
+    "minPlayers": 2,
     "isFinal": false,
     "effectType": "CAVE_PAINTINGS",
     "minArtists": 2,
@@ -64,6 +72,7 @@
   {
     "id": "event_9",
     "era": 3,
+    "minPlayers": 2,
     "isFinal": false,
     "effectType": "HUNT",
     "prestigePerHunter": 3
@@ -71,6 +80,7 @@
   {
     "id": "event_10",
     "era": 3,
+    "minPlayers": 2,
     "isFinal": false,
     "effectType": "CAVE_PAINTINGS",
     "minArtists": 3,
@@ -80,6 +90,7 @@
   {
     "id": "event_11",
     "era": 3,
+    "minPlayers": 2,
     "isFinal": true,
     "effectType": "SUSTENANCE",
     "prestigeLossPerUnfed": 3
@@ -87,6 +98,7 @@
   {
     "id": "event_12",
     "era": 3,
+    "minPlayers": 2,
     "isFinal": true,
     "effectType": "SHAMANIC_RITUAL",
     "majorityPrestigeGain": 15,

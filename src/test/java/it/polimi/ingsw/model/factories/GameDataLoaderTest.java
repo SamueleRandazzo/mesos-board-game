@@ -54,7 +54,7 @@ class GameDataLoaderTest {
                 .filter(card -> card instanceof EventCard)
                 .count();
 
-        assertEquals(4, eventCount);
+        assertEquals(12, eventCount);
     }
 
     @Test
