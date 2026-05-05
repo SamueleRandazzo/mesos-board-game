@@ -1,41 +1,90 @@
 [
   {
-    "id": "b3_1",
+    "id": "building_11",
     "subtype": "scoring",
     "era": 3,
-    "minPlayers": 2,
-    "foodCost": 3,
+    "foodCost": 8,
+    "prestigePoints": 8,
+    "fixedPoints": 0,
+    "multiplier": 3,
+    "pointsPerUnit": 3,
+    "countType": "HUNTERS_COUNT"
+  },
+  {
+    "id": "building_12",
+    "subtype": "scoring",
+    "era": 3,
+    "foodCost": 7,
+    "prestigePoints": 6,
+    "fixedPoints": 0,
+    "multiplier": 4,
+    "pointsPerUnit": 4,
+    "countType": "GATHERERS_COUNT"
+  },
+  {
+    "id": "building_13",
+    "subtype": "scoring",
+    "era": 3,
+    "foodCost": 7,
     "prestigePoints": 4,
-    "fixedPoints": 2,
-    "multiplier": 1,
-    "pointsPerUnit": 2,
-    "setDim": 2,
+    "fixedPoints": 0,
+    "multiplier": 4,
+    "pointsPerUnit": 4,
+    "countType": "SHAMANS_COUNT"
+  },
+  {
+    "id": "building_14",
+    "subtype": "scoring",
+    "era": 3,
+    "foodCost": 6,
+    "prestigePoints": 3,
+    "fixedPoints": 0,
+    "multiplier": 4,
+    "pointsPerUnit": 4,
     "countType": "BUILDERS_COUNT"
   },
   {
-    "id": "b3_2",
+    "id": "building_15",
     "subtype": "scoring",
     "era": 3,
-    "minPlayers": 2,
-    "foodCost": 3,
+    "foodCost": 7,
     "prestigePoints": 4,
-    "fixedPoints": 2,
-    "multiplier": 1,
-    "pointsPerUnit": 2,
-    "setDim": 2,
-    "countType": "BUILDERS_COUNT"
+    "fixedPoints": 0,
+    "multiplier": 4,
+    "pointsPerUnit": 4,
+    "countType": "ARTISTS_COUNT"
   },
   {
-    "id": "b3_3",
+    "id": "building_16",
     "subtype": "scoring",
     "era": 3,
-    "minPlayers": 2,
-    "foodCost": 3,
-    "prestigePoints": 4,
-    "fixedPoints": 2,
-    "multiplier": 1,
+    "foodCost": 6,
+    "prestigePoints": 6,
+    "fixedPoints": 0,
+    "multiplier": 2,
     "pointsPerUnit": 2,
-    "setDim": 2,
-    "countType": "BUILDERS_COUNT"
+    "countType": "INVENTORS_COUNT"
+  },
+  {
+    "id": "building_17",
+    "subtype": "instant",
+    "era": 3,
+    "foodCost": 9,
+    "prestigePoints": 3,
+    "extraStars": 0,
+    "preventLoss": false,
+    "doubleOnWinning": false,
+    "extraCardFromUpper": true,
+    "extraFoodFromBonus": false
+  },
+  {
+    "id": "building_18",
+    "subtype": "scoring",
+    "era": 3,
+    "foodCost": 10,
+    "prestigePoints": 25,
+    "fixedPoints": 0,
+    "multiplier": 0,
+    "pointsPerUnit": 0
   }
 ]
