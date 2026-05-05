@@ -60,7 +60,7 @@ public class SocketClientHandler extends Thread {
             String[] parts = line.split(" ");
             if (parts[0].equals("LOGIN") && parts.length == 3) {
                 try {
-                    String nick = parts[1];
+                    String nick = parts[1].replace("_", " ");
                     Color chosenColor = Color.valueOf(parts[2].toUpperCase());
                     SocketVirtualView vView = new SocketVirtualView(out, this);
                     lobby.addPlayer(nick, chosenColor, vView);

@@ -21,7 +21,7 @@ public class SocketNetworkManager extends NetworkManager {
 
     @Override
     public void login(Color color, String name) {
-        out.println("LOGIN " + name + " " + color);
+        out.println("LOGIN " + name.replace(" ", "_") + " " + color);
         out.flush();
     }
 
