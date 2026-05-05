@@ -7,6 +7,7 @@ import it.polimi.ingsw.network.GameObserver;
 import it.polimi.ingsw.network.RemoteController;
 import it.polimi.ingsw.network.commands.ClientCommandFactory;
 import it.polimi.ingsw.network.commands.ClientCommandHandler;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -145,7 +146,8 @@ class SocketVirtualView implements GameObserver {
     @Override
     public void onShowPlayersOrder(List<String> playersOrder) throws RemoteException {
         try {
-            out.println("PLAYERS_ORDER " + playersOrder);
+            String joinedNames = String.join(",", playersOrder);
+            out.println("PLAYERS_ORDER " + joinedNames);
         } catch (Exception e) {
             System.err.println("Serialization error: " + e.getMessage());
         }

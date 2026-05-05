@@ -1,7 +1,7 @@
 package it.polimi.ingsw.network;
 
 import it.polimi.ingsw.model.Enum.Color;
-import it.polimi.ingsw.server.SocketServerListener;
+import it.polimi.ingsw.client.SocketServerListener;
 
 import java.io.PrintWriter;
 import java.net.Socket;
