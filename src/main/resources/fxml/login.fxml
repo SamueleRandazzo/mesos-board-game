@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="it.polimi.ingsw.view.GUI.LoginController"
+            prefHeight="400.0" prefWidth="600.0"
+            style="-fx-background-color: #f4f4f4;">
+
+    <children>
+        <VBox alignment="CENTER" spacing="20.0"
+              AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+              AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <Label text="Benvenuto in MESOS">
+                <font>
+                    <Font name="System Bold" size="28.0" />
+                </font>
+            </Label>
+
+            <Label text="Inserisci il tuo nickname per iniziare" style="-fx-text-fill: #555555;" />
+
+            <TextField fx:id="nicknameField"
+                       promptText="Nickname..."
+                       maxWidth="250.0"
+                       style="-fx-padding: 8px;" />
+
+            <VBox alignment="CENTER" spacing="5.0">
+                <Label text="Scegli il tuo colore:" style="-fx-text-fill: #555555;" />
+                <ComboBox fx:id="colorComboBox"
+                          promptText="Seleziona..."
+                          prefWidth="250.0"
+                          style="-fx-padding: 5px;" />
+            </VBox>
+            <Button fx:id="loginButton"
+                    text="ENTRA"
+                    onAction="#handleLogin"
+                    prefWidth="100.0"
+                    style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" />
+
+        </VBox>
+    </children>
+</AnchorPane>

@@ -6,6 +6,7 @@ import it.polimi.ingsw.network.SocketNetworkManager;
 import it.polimi.ingsw.view.*;
 import java.util.Arrays;
 import java.util.List;
+import it.polimi.ingsw.view.GUI.*;
 
 public class ClientMain {
     static final int RMI_PORT = 1234;
@@ -14,37 +15,32 @@ public class ClientMain {
 
     public static void main(String[] args) {
         List<String> argList = Arrays.asList(args);
-
         NetworkManager network;
         int currentPort;
 
         if (argList.contains("--socket")) {
             network = new SocketNetworkManager();
             currentPort = SOCKET_PORT;
-            System.out.println("SOCKET start...");
         } else {
             network = new RMINetworkManager();
             currentPort = RMI_PORT;
-            System.out.println("RMI start");
-        }
-
-        View view;
-        if (argList.contains("--gui")) {
-            // view = new GUIView(network);
-            view = new CLIView(network);
-        } else {
-            view = new CLIView(network);
         }
 
         try {
-            network.setView(view);
             network.connect(IP, currentPort);
-            System.out.println("Connected to the server on the port " + currentPort);
-
-            view.showLogin();
+            System.out.println("Connected to the server on port " + currentPort);
         } catch (Exception e) {
-            System.err.println("Fatal error: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("Fatal error during connection: " + e.getMessage());
+            return;
+        }
+
+        if (argList.contains("--gui")) {
+            JavaFXMain.startGui(network);
+        } else {
+            // Per la CLI
+            View view = new CLIView(network);
+            network.setView(view);
+            view.showLogin();
         }
     }
 }
