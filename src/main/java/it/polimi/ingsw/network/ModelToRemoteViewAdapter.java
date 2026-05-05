@@ -14,27 +14,57 @@ public class ModelToRemoteViewAdapter implements GameEventListener {
 
     @Override
     public void onTotemPlacementTurnChanged(String playerNickname, List<OfferTileDTO> tiles) {
-        GameObserver obs = playerObservers.get(playerNickname);
-        if (obs != null) {
+        GameObserver activeObs = playerObservers.get(playerNickname);
+        if (activeObs != null) {
+            for (GameObserver o : playerObservers.values()) {
+                if (o != activeObs) {
+                    try {
+                        o.onShowMessage(playerNickname + " is choosing the tile.");
+                    } catch (RemoteException e) {
+                        System.err.println("Network error with: " + playerNickname);
+                    }
+                }
+            }
+
             try {
-                obs.askTotemPlacement(tiles);
+                activeObs.askTotemPlacement(tiles);
             } catch (RemoteException e) {
-                System.err.println("Network error with " +  playerNickname);
+                System.err.println("Network error with: " + playerNickname);
             }
         }
     }
 
     @Override
     public void onTotemPlaced(String playerNickname, int tileIndex) {
-
+        GameObserver activeObs = playerObservers.get(playerNickname);
+        if (activeObs != null) {
+            for (GameObserver o : playerObservers.values()) {
+                try {
+                    if (o != activeObs)
+                        o.onShowMessage(playerNickname + " choose the tile " + tileIndex + ".");
+                } catch (RemoteException e) {
+                    System.err.println("Network error with " +  playerNickname);
+                }
+            }
+        }
     }
 
     @Override
     public void onActionResultTurnChanged(String playerNickname) {
-        GameObserver obs = playerObservers.get(playerNickname);
-        if (obs != null) {
+        GameObserver activeObs = playerObservers.get(playerNickname);
+        if (activeObs != null) {
+            for (GameObserver o : playerObservers.values()) {
+                if (o != activeObs) {
+                    try {
+                        o.onShowMessage(playerNickname + " is choosing the cards to pick.");
+                    } catch (RemoteException e) {
+                        System.err.println("Network error with: " + playerNickname);
+                    }
+                }
+            }
+
             try {
-                obs.askCardChoose();
+                activeObs.askCardChoose();
             } catch (RemoteException e) {
                 System.err.println("Network error with " +  playerNickname);
             }

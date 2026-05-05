@@ -9,11 +9,7 @@ import it.polimi.ingsw.model.states.GameState;
 import it.polimi.ingsw.model.states.SetupGameState;
 import it.polimi.ingsw.model.states.TotemPlacementState;
 import it.polimi.ingsw.network.DTO.OfferTileDTO;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -198,6 +194,12 @@ public class Game {
     public void notifyActionResultTurnChanged () {
         for (GameEventListener l : listeners) {
             l.onActionResultTurnChanged(this.getCurrentActivePlayer().getNickname());
+        }
+    }
+
+    public void notifyOnTotemPlaced (int tileIndex) {
+        for (GameEventListener l : listeners) {
+            l.onTotemPlaced(this.getCurrentActivePlayer().getNickname(), tileIndex);
         }
     }
     //endregion

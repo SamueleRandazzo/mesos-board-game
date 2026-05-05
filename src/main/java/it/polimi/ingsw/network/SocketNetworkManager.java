@@ -1,6 +1,8 @@
 package it.polimi.ingsw.network;
 
 import it.polimi.ingsw.model.Enum.Color;
+import it.polimi.ingsw.server.SocketServerListener;
+
 import java.io.PrintWriter;
 import java.net.Socket;
 
@@ -20,6 +22,7 @@ public class SocketNetworkManager extends NetworkManager {
     @Override
     public void login(Color color, String name) {
         out.println("LOGIN " + name + " " + color);
+        out.flush();
     }
 
     @Override

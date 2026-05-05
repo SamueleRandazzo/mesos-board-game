@@ -65,10 +65,10 @@ public class SocketClientHandler extends Thread {
                     lobby.addPlayer(nick, chosenColor, vView);
                     return true;
                 } catch (Exception e) {
-                    out.println("ERROR " + e.getMessage());
+                    out.println("LOGIN_ERROR " + e.getMessage());
                 }
             } else {
-                out.println("ERROR login first");
+                out.println("LOGIN_ERROR login first");
             }
         }
         return false;
@@ -116,7 +116,11 @@ class SocketVirtualView implements GameObserver {
 
     @Override
     public void onShowError(String error) throws RemoteException {
-
+        try {
+            out.println("ERROR " + error);
+        } catch (Exception e) {
+            System.err.println("Serialization error: " + e.getMessage());
+        }
     }
 
     //TODO
@@ -124,6 +128,24 @@ class SocketVirtualView implements GameObserver {
     public void askCardChoose() throws RemoteException {
         try {
             out.println("ASK_CARD_CHOOSE");
+        } catch (Exception e) {
+            System.err.println("Serialization error: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void onShowMessage(String message) throws RemoteException {
+        try {
+            out.println("MESSAGE " + message);
+        } catch (Exception e) {
+            System.err.println("Serialization error: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void onShowPlayersOrder(List<String> playersOrder) throws RemoteException {
+        try {
+            out.println("PLAYERS_ORDER " + playersOrder);
         } catch (Exception e) {
             System.err.println("Serialization error: " + e.getMessage());
         }

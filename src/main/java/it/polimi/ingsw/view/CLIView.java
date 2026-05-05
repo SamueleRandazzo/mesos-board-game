@@ -2,12 +2,15 @@ package it.polimi.ingsw.view;
 
 import it.polimi.ingsw.model.Enum.Color;
 import it.polimi.ingsw.network.DTO.OfferTileDTO;
-import it.polimi.ingsw.network.GameObserver;
 import it.polimi.ingsw.network.NetworkManager;
 import it.polimi.ingsw.network.RemoteController;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.rmi.RemoteException;
 import java.util.List;
-import java.util.Scanner;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static it.polimi.ingsw.exception.CustomException.cleanRemoteException;
 
@@ -19,7 +22,7 @@ import static it.polimi.ingsw.exception.CustomException.cleanRemoteException;
  * via the {@link NetworkManager}.
  */
 public class CLIView implements View {
-    private final Scanner scanner;
+    private final BufferedReader reader;
     private final NetworkManager network;
 
     /**
@@ -28,7 +31,25 @@ public class CLIView implements View {
      */
     public CLIView(NetworkManager network) {
         this.network = network;
-        this.scanner = new Scanner(System.in);
+        this.reader = new BufferedReader(new InputStreamReader(System.in));
+    }
+
+    private void clearInputBuffer() {
+        try {
+            while (reader.ready()) {
+                readLine();
+            }
+        } catch (IOException e) {
+            // Silence
+        }
+    }
+
+    private String readLine() {
+        try {
+            return reader.readLine();
+        } catch (IOException e) {
+            return "";
+        }
     }
 
     /**
@@ -37,27 +58,27 @@ public class CLIView implements View {
      */
     @Override
     public void showLogin() {
-        System.out.println("=== WELCOME TO MESOS ===");
-
         boolean loggedIn = false;
         while (!loggedIn) {
+            System.out.println("=== WELCOME TO MESOS ===");
+
             System.out.print("Enter your nickname: ");
-            String nickname = scanner.nextLine();
+            String nickname = readLine();
 
             System.out.println("Available colors: RED, BLUE, BLACK, YELLOW, WHITE");
             Color selectedColor = null;
             while (selectedColor == null) {
                 System.out.print("Choose your color: ");
                 try {
-                    selectedColor = Color.valueOf(scanner.nextLine().toUpperCase());
+                    selectedColor = Color.valueOf(readLine().toUpperCase());
                 } catch (IllegalArgumentException e) {
                     System.out.println("Invalid color. Please try again.");
                 }
             }
 
             try {
-                network.login(selectedColor, nickname);
                 System.out.println("Login request sent. Waiting for server confirmation...");
+                network.login(selectedColor, nickname);
                 loggedIn = true;
             } catch (Exception e) {
                 handleNetworkError(e);
@@ -91,7 +112,7 @@ public class CLIView implements View {
      */
     @Override
     public void showError(String error) {
-        System.out.println(error);
+        System.err.println(error);
     }
 
     /**
@@ -104,7 +125,7 @@ public class CLIView implements View {
         while (!success) {
             System.out.print("You are the host! How many players do you want (2-5)? ");
             try {
-                int n = Integer.parseInt(scanner.nextLine());
+                int n = Integer.parseInt(readLine());
                 network.setTotalPlayers(n);
                 success = true;
             } catch (NumberFormatException e) {
@@ -122,10 +143,12 @@ public class CLIView implements View {
      */
     @Override
     public void askTotemPlacement(List<OfferTileDTO> tiles) {
+        clearInputBuffer();
+
         displayOfferTrack(tiles);
 
         System.out.print("Choose the offer tile: ");
-        int tileIndex = Integer.parseInt(scanner.nextLine());
+        int tileIndex = Integer.parseInt(readLine());
         try {
             network.tileSelection(tileIndex);
         } catch (Exception e) {
@@ -163,7 +186,7 @@ public class CLIView implements View {
         displayChoosableCard();
 
         System.out.print("Choose the card to pick: ");
-        String cardPosition = scanner.nextLine();
+        String cardPosition = readLine();
         try {
             network.cardSelection(cardPosition);
         } catch (Exception e) {
@@ -182,5 +205,21 @@ public class CLIView implements View {
         } else {
             System.out.println("Error: " + e.getMessage());
         }
+    }
+
+    @Override
+    public void showMessage(String message) {
+        System.out.println(message);
+    }
+
+    @Override
+    public void showPlayersOrder(List<String> playersOrder) {
+        String orderMessage = IntStream.range(0, playersOrder.size())
+                .mapToObj(i -> (i + 1) + ". " + playersOrder.get(i))
+                .collect(Collectors.joining("\n"));
+
+        String finalMessage = "Players order is:\n" + orderMessage;
+
+        System.out.println(finalMessage);
     }
 }

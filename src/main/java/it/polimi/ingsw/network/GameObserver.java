@@ -12,4 +12,6 @@ public interface GameObserver extends Remote {
     void askTotemPlacement(List<OfferTileDTO> tiles) throws RemoteException;
     void onShowError(String error) throws RemoteException;
     void askCardChoose() throws RemoteException;
+    void onShowMessage(String message) throws RemoteException;
+    void onShowPlayersOrder(List<String> playersOrder)  throws RemoteException;
 }

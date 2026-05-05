@@ -14,6 +14,7 @@ import it.polimi.ingsw.network.ModelToRemoteViewAdapter;
 import org.jetbrains.annotations.NotNull;
 import java.rmi.RemoteException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Lobby {
 
@@ -37,6 +38,10 @@ public class Lobby {
     public synchronized void addPlayer(String nickname, Color color, GameObserver observer) throws Exception {
         if (targetPlayers != -1 && nicknames.size() >= targetPlayers) {
             throw new CustomException.LobbyFullException();
+        }
+
+        if (!nicknames.isEmpty() && targetPlayers == -1) {
+            throw new CustomException.HostStillSettingLobbyException();
         }
 
         if (nicknames.contains(nickname)) {
@@ -110,8 +115,11 @@ public class Lobby {
             Game game = getGame(players, targetPlayers);
             GameController gameController = new GameController(game);
 
+            List<String> playerOrders = players.stream().map(Player::getNickname).collect(Collectors.toList());
+
             for (GameObserver o : remoteObservers) {
                 o.onGameStarted(gameController);
+                o.onShowPlayersOrder(playerOrders);
             }
 
             ModelToRemoteViewAdapter adapter = new ModelToRemoteViewAdapter(this.playerObservers);

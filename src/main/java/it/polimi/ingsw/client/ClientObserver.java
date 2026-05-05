@@ -43,4 +43,14 @@ public class ClientObserver implements GameObserver {
     public void askCardChoose() throws RemoteException {
         view.askCardChoose();
     }
+
+    @Override
+    public void onShowMessage(String message) throws RemoteException {
+        view.showMessage(message);
+    }
+
+    @Override
+    public void onShowPlayersOrder(List<String> playersOrder) throws RemoteException {
+        view.showPlayersOrder(playersOrder);
+    }
 }

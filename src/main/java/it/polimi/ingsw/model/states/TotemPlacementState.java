@@ -27,12 +27,11 @@ public class TotemPlacementState extends GameState {
         if (chosenTile.isAvailable()) { //return true if the chosenTile is available
 
             context.executeTotemPlacement(player, tileIndex);
+            context.notifyOnTotemPlaced(tileIndex);
             context.advanceTurn();
-
         } else {
             throw new IllegalStateException("The selected tile is already taken!");
         }
-
 
         //if all the totem has been placed on the track moves to next state
         if (isPhaseOver(context)) {

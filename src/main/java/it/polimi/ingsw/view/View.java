@@ -14,4 +14,6 @@ public interface View {
     void askMaxPlayers();
     void askTotemPlacement(List<OfferTileDTO> tiles);
     void askCardChoose();
+    void showMessage(String message);
+    void showPlayersOrder(List<String> playersOrder);
 }

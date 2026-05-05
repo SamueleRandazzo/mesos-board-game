@@ -42,4 +42,10 @@ public class CustomException {
             super("Invalid players number, it must be between " + minPlayers + " and " + maxPlayers);
         }
     }
+
+    public static class HostStillSettingLobbyException extends BaseGameException {
+        public HostStillSettingLobbyException() {
+            super("Host is choosing players number, try later.");
+        }
+    }
 }
