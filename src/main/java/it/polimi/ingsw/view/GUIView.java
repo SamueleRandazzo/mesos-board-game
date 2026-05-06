@@ -24,9 +24,9 @@ public class GUIView implements View {
     }
 
     /**
-     * Metodo generico per caricare un file FXML e cambiare scena.
-     * @param fxmlFileName nome del file (es. "login.fxml")
-     * @return Il controller associato alla nuova scena
+     * Generic method to upload a file FXML and change scene
+     * @param fxmlFileName file nome (ex. "login.fxml")
+     * @return the controller associated to the new scene
      */
     private SceneController loadScene(String fxmlFileName) {
         try {
@@ -38,6 +38,7 @@ public class GUIView implements View {
             controller.setView(this);
             this.currentController = controller;
 
+            //runLater ensures that only the main thread of JavaFX will update dates
             Platform.runLater(() -> {
                 Scene scene = new Scene(root);
                 stage.setScene(scene);
@@ -59,6 +60,9 @@ public class GUIView implements View {
 
     @Override
     public void showLobby(int current, int total) {
+
+        loadScene("lobby.fxml");
+
         Platform.runLater(() -> {
             if (currentController != null) {
                 currentController.updateLobby(current, total);

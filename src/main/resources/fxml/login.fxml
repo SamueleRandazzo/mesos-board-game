@@ -40,6 +40,16 @@
                           prefWidth="250.0"
                           style="-fx-padding: 5px;" />
             </VBox>
+
+            <Label fx:id="errorLabel"
+                   text=""
+                   textFill="#e74c3c"
+                   visible="false"
+                   wrapText="true"
+                   maxWidth="250.0"
+                   style="-fx-font-weight: bold; -fx-text-alignment: center;">
+            </Label>
+
             <Button fx:id="loginButton"
                     text="ENTRA"
                     onAction="#handleLogin"
