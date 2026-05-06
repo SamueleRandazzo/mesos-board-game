@@ -140,12 +140,8 @@ public class CLIView implements View {
      * * @param tiles a list of {@link OfferTileDTO} representing the current state of the offer track.
      */
     @Override
-    public void askTotemPlacement(List<OfferTileDTO> tiles) {
-        this.lastTiles = tiles;
-
+    public void askTotemPlacement() {
         clearInputBuffer();
-
-        displayOfferTrack(tiles);
 
         System.out.print("Choose the offer tile: ");
         int tileIndex = Integer.parseInt(readLine());
@@ -153,7 +149,7 @@ public class CLIView implements View {
             network.tileSelection(tileIndex);
         } catch (Exception e) {
             showError(handleNetworkError(e));
-            askTotemPlacement(tiles);
+            askTotemPlacement();
         }
     }
 
@@ -162,7 +158,10 @@ public class CLIView implements View {
      * It displays indices, bonuses, and the occupancy status of each tile.
      * * @param tiles the list of data transfer objects containing tile information.
      */
+    @Override
     public void displayOfferTrack(List<OfferTileDTO> tiles) {
+        this.lastTiles = tiles;
+
         System.out.println("\n====================== OFFER TRACK ======================");
 
         System.out.printf("%-4s | %-6s | %-10s | %-10s | %-12s%n",
@@ -185,7 +184,8 @@ public class CLIView implements View {
     @Override
     public void retryTotemPlacement() {
         if (lastTiles != null) {
-            askTotemPlacement(lastTiles);
+            displayOfferTrack(lastTiles);
+            askTotemPlacement();
         }
     }
 

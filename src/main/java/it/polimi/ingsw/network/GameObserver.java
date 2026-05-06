@@ -9,9 +9,10 @@ public interface GameObserver extends Remote {
     void onPlayerJoined(int currentPlayers, int totalNeeded) throws RemoteException;
     void onGameStarted(RemoteController controller) throws RemoteException;
     void askMaxPlayers() throws RemoteException;
-    void askTotemPlacement(List<OfferTileDTO> tiles) throws RemoteException;
+    void askTotemPlacement() throws RemoteException;
     void onShowError(String error) throws RemoteException;
     void askCardChoose() throws RemoteException;
     void onShowMessage(String message) throws RemoteException;
-    void onShowPlayersOrder(List<String> playersOrder)  throws RemoteException;
+    void onShowPlayersOrder(List<String> playersOrder) throws RemoteException;
+    void onDisplayOfferTrack(List<OfferTileDTO> tiles) throws RemoteException;
 }

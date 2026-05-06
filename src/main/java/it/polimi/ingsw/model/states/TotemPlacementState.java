@@ -27,6 +27,8 @@ public class TotemPlacementState extends GameState {
             throw new IllegalStateException("The selected tile is already taken!");
         }
 
+        context.notifyOnShowOfferTrack();
+
         //if all the totem has been placed on the track moves to next state
         if (isPhaseOver(context)) {
             //Extract the new turn order (left to the right on the Offer Track)

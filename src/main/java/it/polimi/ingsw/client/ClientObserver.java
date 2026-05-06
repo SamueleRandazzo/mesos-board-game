@@ -30,8 +30,13 @@ public class ClientObserver implements GameObserver {
     }
 
     @Override
-    public void askTotemPlacement(List<OfferTileDTO> tiles) throws RemoteException {
-        view.askTotemPlacement(tiles);
+    public void askTotemPlacement() throws RemoteException {
+        view.askTotemPlacement();
+    }
+
+    @Override
+    public void onDisplayOfferTrack(List<OfferTileDTO> tiles) {
+        view.displayOfferTrack(tiles);
     }
 
     @Override

@@ -13,7 +13,7 @@ public class ModelToRemoteViewAdapter implements GameEventListener {
     }
 
     @Override
-    public void onTotemPlacementTurnChanged(String playerNickname, List<OfferTileDTO> tiles) {
+    public void onTotemPlacementTurnChanged(String playerNickname) {
         GameObserver activeObs = playerObservers.get(playerNickname);
         if (activeObs != null) {
             for (GameObserver o : playerObservers.values()) {
@@ -27,9 +27,20 @@ public class ModelToRemoteViewAdapter implements GameEventListener {
             }
 
             try {
-                activeObs.askTotemPlacement(tiles);
+                activeObs.askTotemPlacement();
             } catch (RemoteException e) {
                 System.err.println("Network error with: " + playerNickname);
+            }
+        }
+    }
+
+    @Override
+    public void onShowOfferTrack(List<OfferTileDTO> tiles) {
+        for (GameObserver o : playerObservers.values()) {
+            try {
+                o.onDisplayOfferTrack(tiles);
+            } catch (RemoteException e) {
+                System.err.println("Network error");
             }
         }
     }
@@ -69,5 +80,15 @@ public class ModelToRemoteViewAdapter implements GameEventListener {
                 System.err.println("Network error with " +  playerNickname);
             }
         }
+    }
+
+    @Override
+    public void onCardChosen() {
+
+    }
+
+    @Override
+    public void onChooseOtherCards() {
+
     }
 }

@@ -4,10 +4,7 @@ import it.polimi.ingsw.model.Enum.Color;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.event.ActionEvent;
 
 public class LoginController extends SceneController {
@@ -33,6 +30,37 @@ public class LoginController extends SceneController {
 
             errorLabel.setVisible(false);
         }
+
+        colorComboBox.setCellFactory(lv -> new ListCell<Color>() {
+            @Override
+            protected void updateItem(Color item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    setText(item.name());
+                    setStyle("-fx-text-fill: " + item.name().toLowerCase() + "; -fx-font-weight: bold; -fx-background-color: #222;");
+                }
+            }
+        });
+
+        colorComboBox.setButtonCell(new ListCell<Color>() {
+            @Override
+            protected void updateItem(Color item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText("Select color...");
+                    setStyle("-fx-text-fill: white !important; -fx-opacity: 0.8;");
+                } else {
+                    setText(item.name());
+                    setStyle("-fx-text-fill: " + item.name().toLowerCase() + "; -fx-font-weight: bold;");
+                }
+            }
+        });
+
+        loginButton.setOnMouseEntered(e -> loginButton.setStyle(loginButton.getStyle() + "-fx-background-color: linear-gradient(to bottom, #e67e22, #ff9f43);"));
+        loginButton.setOnMouseExited(e -> loginButton.setStyle(loginButton.getStyle().replace("-fx-background-color: linear-gradient(to bottom, #e67e22, #ff9f43);", "")));
     }
 
     @Override
@@ -56,21 +84,21 @@ public class LoginController extends SceneController {
         Color selectedColor = colorComboBox.getValue();
 
         if (nickname == null || nickname.trim().isEmpty()) {
-            showErrorMessage("Il nickname non può essere vuoto!");
+            showErrorMessage("Nickname can't be empty!");
             return;
         }
 
         if (selectedColor == null) {
-            showErrorMessage("Devi selezionare un colore!");
+            showErrorMessage("Choose a color!");
             return;
         }
 
-        System.out.println("Login con Nick: " + nickname + " e Colore: " + selectedColor);
+        System.out.println("Login with Nick: " + nickname + " and Color: " + selectedColor);
 
         try {
             network.login(selectedColor, nickname);
         } catch (Exception e) {
-            showErrorMessage("Errore di rete: " + e.getMessage());
+            showErrorMessage(handleNetworkError(e));
         }
     }
 }

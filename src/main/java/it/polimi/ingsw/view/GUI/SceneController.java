@@ -3,8 +3,9 @@ package it.polimi.ingsw.view.GUI;
 import it.polimi.ingsw.network.DTO.OfferTileDTO;
 import it.polimi.ingsw.network.NetworkManager;
 import it.polimi.ingsw.view.GUIView;
-
+import java.rmi.RemoteException;
 import java.util.List;
+import static it.polimi.ingsw.exception.CustomException.cleanRemoteException;
 
 public abstract class SceneController {
     protected NetworkManager network;
@@ -14,8 +15,19 @@ public abstract class SceneController {
     public void setView(GUIView view) { this.view = view; }
     public void updateLobby(int current, int total) {}
     public void displayOfferTrack(List<OfferTileDTO> tiles) {}
+    public void askTotemPlacement() {};
     public void displayChoosableCards() {}
     public void showErrorMessage(String msg) {}
     public void showNotification(String msg) {}
     public void updatePlayersOrder(List<String> order) {}
+
+    String handleNetworkError(Exception e) {
+        if (e instanceof RemoteException) {
+            return cleanRemoteException((RemoteException) e);
+        } else {
+            return e.getMessage().contains(": ")
+                    ? e.getMessage().substring(e.getMessage().lastIndexOf(": ") + 2)
+                    : e.getMessage();
+        }
+    }
 }

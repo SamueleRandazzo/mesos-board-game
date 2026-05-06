@@ -62,54 +62,52 @@ public class ActionResolutionState extends GameState {
     public void resolveUpperCardPick(Game context, Player player, int pos) {
         if (!player.equals(context.getCurrentActivePlayer())) {
             throw new IllegalStateException("It is not " + player.getColor() + "'s turn!");
-
         }
 
         initializeTurnIfNeeded(context, player);
 
         if (upperPicksLeft <= 0) {
             throw new IllegalStateException("You have no upper row picks left!");
-
         }
 
         context.executeUpperCardPick(player, pos);
 
         upperPicksLeft--;
 
+        if (lowerPicksLeft == 0 && upperPicksLeft == 0)
+            context.resolveEndTurn();
     }
 
     @Override
     public void resolveLowerCardPick(Game context, Player player, int pos) {
         if (!player.equals(context.getCurrentActivePlayer())) {
             throw new IllegalStateException("It is not " + player.getColor() + "'s turn!");
-
         }
 
         initializeTurnIfNeeded(context, player);
 
         if (lowerPicksLeft <= 0) {
             throw new IllegalStateException("You have no lower row picks left!");
-
         }
 
         context.executeLowerCardPick(player, pos);
 
         lowerPicksLeft--;
 
+        if (lowerPicksLeft == 0 && upperPicksLeft == 0)
+            context.resolveEndTurn();
     }
 
     @Override
     public void resolveUpperBuildingPick(Game context, Player player, int pos) {
         if (!player.equals(context.getCurrentActivePlayer())) {
             throw new IllegalStateException("It is not " + player.getColor() + "'s turn!");
-
         }
 
         initializeTurnIfNeeded(context, player);
 
         if (hasBoughtBuilding) {
             throw new IllegalStateException("You have already pick a building this turn");
-
         }
 
         int cost = context.getBoard().getUpperBuildingCards().get(pos).getFoodCost();
@@ -124,41 +122,42 @@ public class ActionResolutionState extends GameState {
 
         upperPicksLeft--;
 
+        if (lowerPicksLeft == 0 && upperPicksLeft == 0)
+            context.resolveEndTurn();
     }
 
     @Override
     public void resolveLowerBuildingPick(Game context, Player player, int pos) {
         if (!player.equals(context.getCurrentActivePlayer())) {
             throw new IllegalStateException("It is not " + player.getColor() + "'s turn!");
-
         }
 
         initializeTurnIfNeeded(context, player);
 
         if (hasBoughtBuilding) {
             throw new IllegalStateException("You have already pick a building this turn");
-
         }
 
         int cost = context.getBoard().getLowerBuildingCards().get(pos).getFoodCost();
 
-        if(player.getFoodAmount() < cost){
+        if (player.getFoodAmount() < cost){
             throw new IllegalStateException("Not enough food to buy this building!");
         }
-
 
         context.executeLowerBuildingPick(player, pos);
 
         hasBoughtBuilding = true;
 
         lowerPicksLeft--;
+
+        if (lowerPicksLeft == 0 && upperPicksLeft == 0)
+            context.resolveEndTurn();
     }
 
     @Override
     public void endTurn(Game context, Player player){
         if (upperPicksLeft > 0 || lowerPicksLeft > 0) {
             throw new IllegalStateException("You must draw all your required tribe cards before ending your turn!");
-
         }
 
         //remove the totem from the Offer Track
@@ -169,9 +168,9 @@ public class ActionResolutionState extends GameState {
         //Place totem on the Turn Order Tile (Automatically finds the first empty slot)
         int foodModifier = context.getTurnOrderTile().placeTotem(player);
 
-        if(foodModifier > 0){
+        if (foodModifier > 0) {
             player.changeFoodAmount(foodModifier);
-        } else if(foodModifier < 0) {
+        } else if (foodModifier < 0) {
             int cost = Math.abs(foodModifier);
 
             if (player.getFoodAmount() >= cost) {

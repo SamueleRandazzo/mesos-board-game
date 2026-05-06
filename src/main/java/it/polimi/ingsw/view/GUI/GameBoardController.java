@@ -22,6 +22,11 @@ public class GameBoardController extends SceneController {
     @FXML
     private HBox offerTrackContainer;
 
+    @FXML
+    public void initialize() {
+        offerTrackContainer.setDisable(true);
+    }
+
     @Override
     public void showNotification(String msg) {
         Platform.runLater(() -> {
@@ -51,6 +56,7 @@ public class GameBoardController extends SceneController {
      */
     @Override
     public void displayOfferTrack(List<OfferTileDTO> tiles) {
+        offerTrackContainer.setDisable(true);
         Platform.runLater(() -> {
             // Clear the previous tiles from the screen
             offerTrackContainer.getChildren().clear();
@@ -99,8 +105,12 @@ public class GameBoardController extends SceneController {
                 // add the generated button to the HBox on the screen
                 offerTrackContainer.getChildren().add(tileButton);
             }
-
-            showNotification("It's your turn! Choose an Offer Tile.");
         });
+    }
+
+    @Override
+    public void askTotemPlacement() {
+        showNotification("It's your turn! Choose an Offer Tile.");
+        offerTrackContainer.setDisable(false);
     }
 }

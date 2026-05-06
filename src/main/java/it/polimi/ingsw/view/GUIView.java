@@ -37,12 +37,13 @@ public class GUIView implements View {
             controller.setNetwork(network);
             controller.setView(this);
             this.currentController = controller;
-
             //runLater ensures that only the main thread of JavaFX will update dates
             Platform.runLater(() -> {
-                Scene scene = new Scene(root);
+                Scene scene = new Scene(root, 1200, 675);
                 stage.setScene(scene);
+                stage.setResizable(true);
                 stage.show();
+                stage.centerOnScreen();
             });
 
             return controller;
@@ -82,7 +83,14 @@ public class GUIView implements View {
     }
 
     @Override
-    public void askTotemPlacement(List<OfferTileDTO> tiles) {
+    public void askTotemPlacement() {
+        Platform.runLater(() -> {
+            currentController.askTotemPlacement();
+        });
+    }
+
+    @Override
+    public void displayOfferTrack(List<OfferTileDTO> tiles) {
         this.lastTiles = tiles;
         Platform.runLater(() -> {
             currentController.displayOfferTrack(tiles);
@@ -91,7 +99,8 @@ public class GUIView implements View {
 
     @Override
     public void retryTotemPlacement() {
-        askTotemPlacement(this.lastTiles);
+        displayOfferTrack(this.lastTiles);
+        askTotemPlacement();
     }
 
     @Override

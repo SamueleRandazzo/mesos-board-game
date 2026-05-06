@@ -79,7 +79,6 @@
     "fixedPoints": 0,
     "multiplier": 6,
     "pointsPerUnit": 0,
-    "setDim": 6,
-    "countType": "DIFFERENT_CHARACTER_SET"
+    "setDim": 6
   }
 ]

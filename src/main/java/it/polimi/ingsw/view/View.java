@@ -12,9 +12,10 @@ public interface View {
     void startGame(RemoteController controller);
     void showError(String message);
     void askMaxPlayers();
-    void askTotemPlacement(List<OfferTileDTO> tiles);
+    void askTotemPlacement();
     void askCardChoose();
     void showMessage(String message);
     void showPlayersOrder(List<String> playersOrder);
     void retryTotemPlacement();
+    void displayOfferTrack(List<OfferTileDTO> tiles);
 }

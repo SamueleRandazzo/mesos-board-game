@@ -102,14 +102,23 @@ class SocketVirtualView implements GameObserver {
     }
 
     @Override
-    public void askTotemPlacement(List<OfferTileDTO> tiles) throws RemoteException {
+    public void askTotemPlacement() throws RemoteException {
+        try {
+            out.println("ASK_TOTEM_PLACEMENT");
+        } catch (Exception e) {
+            System.err.println("Serialization error: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void onDisplayOfferTrack(List<OfferTileDTO> tiles) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(tiles);
 
             String cleanedJson = json.replace(" ", "").replace("\n", "").replace("\r", "");
 
-            out.println("ASK_TOTEM_PLACEMENT " + cleanedJson);
+            out.println("DISPLAY_OFFER_TRACK " + cleanedJson);
         } catch (Exception e) {
             System.err.println("Serialization error: " + e.getMessage());
         }

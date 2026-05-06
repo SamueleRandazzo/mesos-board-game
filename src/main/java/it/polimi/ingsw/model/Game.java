@@ -164,23 +164,8 @@ public class Game {
      * </p>
      */
     public void notifyTotemPlacementTurnChanged() {
-        List<OfferTile> modelTiles = offerTrack.getTiles();
-        List<OfferTileDTO> tiles = new ArrayList<>();
-
-        for (int i = 0; i < modelTiles.size(); i++) {
-            OfferTile t = modelTiles.get(i);
-            String nick = t.isAvailable() ? null : t.getPlacedPlayer().getNickname();
-
-            tiles.add(new OfferTileDTO(
-                    i,
-                    t.getFoodBonus(),
-                    t.getTopRowDraws(),
-                    t.getBottomRowDraws(),
-                    nick
-            ));
-        }
         for (GameEventListener l : listeners) {
-            l.onTotemPlacementTurnChanged(this.getCurrentActivePlayer().getNickname(), tiles);
+            l.onTotemPlacementTurnChanged(this.getCurrentActivePlayer().getNickname());
         }
     }
 
@@ -201,6 +186,36 @@ public class Game {
         for (GameEventListener l : listeners) {
             l.onTotemPlaced(this.getCurrentActivePlayer().getNickname(), tileIndex);
         }
+    }
+
+    public void notifyOnShowOfferTrack() {
+        List<OfferTile> modelTiles = offerTrack.getTiles();
+        List<OfferTileDTO> tiles = new ArrayList<>();
+
+        for (int i = 0; i < modelTiles.size(); i++) {
+            OfferTile t = modelTiles.get(i);
+            String nick = t.isAvailable() ? null : t.getPlacedPlayer().getNickname();
+
+            tiles.add(new OfferTileDTO(
+                    i,
+                    t.getFoodBonus(),
+                    t.getTopRowDraws(),
+                    t.getBottomRowDraws(),
+                    nick
+            ));
+        }
+
+        for (GameEventListener l : listeners) {
+            l.onShowOfferTrack(tiles);
+        }
+    }
+
+    public void notifyOnCardChosen() {
+
+    }
+
+    public void notifyChooseOtherCards() {
+
     }
     //endregion
 
