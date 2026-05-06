@@ -10,7 +10,7 @@
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="it.polimi.ingsw.view.GUI.LobbyController">
     <children>
-        <Label text="LOBBY DI ATTESA">
+        <Label text="WAITING LOBBY">
             <font>
                 <Font name="System Bold" size="24.0" />
             </font>
@@ -18,7 +18,7 @@
 
         <ProgressIndicator prefHeight="80.0" prefWidth="80.0" />
 
-        <Label fx:id="lobbyStatusLabel" text="In attesa di altri giocatori..." textFill="#727272">
+        <Label fx:id="lobbyStatusLabel" text="Waiting for other players..." textFill="#727272">
             <font>
                 <Font size="16.0" />
             </font>

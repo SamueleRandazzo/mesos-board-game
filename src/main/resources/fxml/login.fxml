@@ -20,13 +20,13 @@
                 <Insets top="20" right="20" bottom="20" left="20"/>
             </padding>
 
-            <Label text="Benvenuto in MESOS">
+            <Label text="Welcome to MESOS">
                 <font>
                     <Font name="System Bold" size="28.0" />
                 </font>
             </Label>
 
-            <Label text="Inserisci il tuo nickname per iniziare" style="-fx-text-fill: #555555;" />
+            <Label text="Enter your nickname to start" style="-fx-text-fill: #555555;" />
 
             <TextField fx:id="nicknameField"
                        promptText="Nickname..."
@@ -34,9 +34,9 @@
                        style="-fx-padding: 8px;" />
 
             <VBox alignment="CENTER" spacing="5.0">
-                <Label text="Scegli il tuo colore:" style="-fx-text-fill: #555555;" />
+                <Label text="Choose your color:" style="-fx-text-fill: #555555;" />
                 <ComboBox fx:id="colorComboBox"
-                          promptText="Seleziona..."
+                          promptText="Select..."
                           prefWidth="250.0"
                           style="-fx-padding: 5px;" />
             </VBox>
@@ -51,7 +51,7 @@
             </Label>
 
             <Button fx:id="loginButton"
-                    text="ENTRA"
+                    text="JOIN"
                     onAction="#handleLogin"
                     prefWidth="100.0"
                     style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" />

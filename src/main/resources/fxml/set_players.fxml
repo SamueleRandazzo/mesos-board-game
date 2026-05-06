@@ -14,19 +14,19 @@
       fx:controller="it.polimi.ingsw.view.GUI.SetPlayersController">
 
     <children>
-        <Label text="Configurazione Partita">
+        <Label text="Game Configuration">
             <font>
                 <Font name="System Bold" size="24.0" />
             </font>
         </Label>
 
-        <Label text="Sei il primo giocatore. Scegli quanti sfidanti attendere:" textFill="#616161" />
+        <Label text="You are the first player. Choose how many opponents to wait for:" textFill="#616161" />
 
-        <ComboBox fx:id="numPlayersCombo" prefWidth="150.0" promptText="Seleziona..." />
+        <ComboBox fx:id="numPlayersCombo" prefWidth="150.0" promptText="Select..." />
 
         <Button mnemonicParsing="false" onAction="#handleConfirm" prefWidth="120.0"
                 style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"
-                text="CREA LOBBY" />
+                text="CREATE LOBBY" />
     </children>
 
     <padding>

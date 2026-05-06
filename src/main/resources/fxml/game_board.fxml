@@ -1,14 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller=""
-            prefHeight="400.0" prefWidth="600.0">
+<BorderPane prefHeight="600.0" prefWidth="900.0"
+            style="-fx-background-color: #e0e0e0;"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="it.polimi.ingsw.view.GUI.GameBoardController">
 
-</AnchorPane>
+    <!-- TOP: Notifiche e Turno -->
+    <top>
+        <VBox alignment="CENTER" prefHeight="60.0" style="-fx-background-color: #34495e;">
+            <Label fx:id="gameNotificationLabel" text="Waiting for the game to start..." textFill="WHITE">
+                <font>
+                    <Font name="System Bold" size="18.0" />
+                </font>
+            </Label>
+        </VBox>
+    </top>
+
+    <!-- RIGHT: Lista Giocatori -->
+    <right>
+        <VBox prefWidth="200.0" spacing="10.0" style="-fx-background-color: #bdc3c7;" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </padding>
+            <Label text="PLAYERS">
+                <font>
+                    <Font name="System Bold" size="16.0" />
+                </font>
+            </Label>
+            <!-- Questo VBox conterrà dinamicamente i nomi dei giocatori -->
+            <VBox fx:id="playersContainer" spacing="5.0" />
+        </VBox>
+    </right>
+
+    <!-- CENTER: Tabellone Centrale (Tessere) -->
+    <center>
+        <VBox alignment="CENTER" spacing="30.0" BorderPane.alignment="CENTER">
+            <Label text="OFFER TRACK" textFill="#2c3e50">
+                <font>
+                    <Font name="System Bold" size="24.0" />
+                </font>
+            </Label>
+
+            <!-- Usiamo uno ScrollPane in caso le tessere siano tante -->
+            <ScrollPane fitToHeight="true" fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;">
+                <!-- HBox: Dispone le tessere orizzontalmente -->
+                <HBox fx:id="offerTrackContainer" alignment="CENTER" spacing="15.0" />
+            </ScrollPane>
+        </VBox>
+    </center>
+</BorderPane>

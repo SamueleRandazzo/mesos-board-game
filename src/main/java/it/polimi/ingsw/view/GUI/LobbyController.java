@@ -13,7 +13,7 @@ public class LobbyController extends SceneController {
     public void initialize() {
 
         if (lobbyStatusLabel != null) {
-            lobbyStatusLabel.setText("In attesa di connessione...");
+            lobbyStatusLabel.setText("Waiting for connection...");
         }
     }
 
@@ -21,7 +21,7 @@ public class LobbyController extends SceneController {
     public void updateLobby(int current, int total) {
         Platform.runLater(() -> {
             if (lobbyStatusLabel != null) {
-                lobbyStatusLabel.setText("In attesa degli altri giocatori...\n(" + current + " di " + total + " connessi)");
+                lobbyStatusLabel.setText("Waiting for other players...\n(" + current + " of " + total + " connected)");
             }
         });
     }
