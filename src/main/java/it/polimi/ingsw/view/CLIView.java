@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.rmi.RemoteException;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -99,7 +100,7 @@ public class CLIView implements View {
      * * @param controller the remote controller provided by the server to handle game actions.
      */
     @Override
-    public void startGame(RemoteController controller) {
+    public void startGame(RemoteController controller, int totalPlayers) {
         network.setController(controller);
         System.out.println("THE GAME HAS STARTED!");
     }
@@ -233,4 +234,10 @@ public class CLIView implements View {
 
         System.out.println(finalMessage);
     }
+
+    @Override
+    public void showPlayersInfo(Map<String,Color> playersInfo) {
+        //CLI does not need to know player color
+    }
+
 }

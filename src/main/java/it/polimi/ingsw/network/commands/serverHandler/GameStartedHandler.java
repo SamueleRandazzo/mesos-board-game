@@ -7,6 +7,7 @@ import it.polimi.ingsw.view.View;
 public class GameStartedHandler implements ServerCommandHandler {
     @Override
     public void handle(String[] args, View view, ObjectMapper mapper) {
-        view.startGame(null);
+        int totalPlayers = Integer.parseInt(args[0]);
+        view.startGame(null, totalPlayers);
     }
 }

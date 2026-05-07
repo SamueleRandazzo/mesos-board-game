@@ -1,5 +1,6 @@
 package it.polimi.ingsw.view;
 
+import it.polimi.ingsw.model.Enum.Color;
 import it.polimi.ingsw.network.DTO.OfferTileDTO;
 import it.polimi.ingsw.network.NetworkManager;
 import it.polimi.ingsw.network.RemoteController;
@@ -10,13 +11,17 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GUIView implements View {
     private final NetworkManager network;
     private Stage stage;
     private SceneController currentController;
     private List<OfferTileDTO> lastTiles;
+    private int totalPlayers;
+    private final Map<String, Color> playersInfo = new LinkedHashMap<>();
 
     public GUIView(NetworkManager network, Stage stage) {
         this.network = network;
@@ -54,6 +59,17 @@ public class GUIView implements View {
         }
     }
 
+    public void showPlayersInfo(Map<String, Color> playersInfo) {
+        this.playersInfo.clear();
+        this.playersInfo.putAll(playersInfo);
+
+        Platform.runLater(() -> {
+            if (currentController != null) {
+                currentController.setPlayersInfo(playersInfo);
+            }
+        });
+    }
+
     @Override
     public void showLogin() {
         loadScene("login.fxml");
@@ -61,6 +77,7 @@ public class GUIView implements View {
 
     @Override
     public void showLobby(int current, int total) {
+        this.totalPlayers = total;
 
         loadScene("lobby.fxml");
 
@@ -72,9 +89,19 @@ public class GUIView implements View {
     }
 
     @Override
-    public void startGame(RemoteController controller) {
+    public void startGame(RemoteController controller, int totalPlayers) {
+
+        this.totalPlayers = totalPlayers;
+
         network.setController(controller);
-        loadScene("game_board.fxml");
+
+        SceneController controllerScene = loadScene("game_board.fxml");
+
+        Platform.runLater(() -> {
+            if (controllerScene != null) {
+                controllerScene.setTotalPlayers(totalPlayers);
+            }
+        });
     }
 
     @Override
@@ -93,7 +120,7 @@ public class GUIView implements View {
     public void displayOfferTrack(List<OfferTileDTO> tiles) {
         this.lastTiles = tiles;
         Platform.runLater(() -> {
-            currentController.displayOfferTrack(tiles);
+            currentController.displayOfferTrack(tiles, totalPlayers);
         });
     }
 

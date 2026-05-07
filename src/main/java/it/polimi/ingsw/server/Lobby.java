@@ -26,6 +26,7 @@ public class Lobby {
     private final List<String> nicknames = new ArrayList<>();
     private final List<Color> colors = new ArrayList<>();
     private final Map<String, GameObserver> playerObservers = new HashMap<>();
+    private final Map<String, Color> playersInfo = new LinkedHashMap<>();
 
     /**
      * Handles player login requests. Adds players to the lobby and manages
@@ -118,8 +119,9 @@ public class Lobby {
             List<String> playerOrders = players.stream().map(Player::getNickname).collect(Collectors.toList());
 
             for (GameObserver o : remoteObservers) {
-                o.onGameStarted(gameController);
+                o.onGameStarted(gameController, targetPlayers);
                 o.onShowPlayersOrder(playerOrders);
+                o.onShowPlayersInfo(playersInfo);
             }
 
             ModelToRemoteViewAdapter adapter = new ModelToRemoteViewAdapter(this.playerObservers);

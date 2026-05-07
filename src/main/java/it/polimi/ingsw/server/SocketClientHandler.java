@@ -1,18 +1,21 @@
 package it.polimi.ingsw.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.polimi.ingsw.model.Enum.Color;
 import it.polimi.ingsw.network.DTO.OfferTileDTO;
 import it.polimi.ingsw.network.GameObserver;
 import it.polimi.ingsw.network.RemoteController;
 import it.polimi.ingsw.network.commands.ClientCommandFactory;
 import it.polimi.ingsw.network.commands.ClientCommandHandler;
+import it.polimi.ingsw.model.Enum.Color;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.rmi.RemoteException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class SocketClientHandler extends Thread {
     private final Socket socket;
@@ -91,9 +94,9 @@ class SocketVirtualView implements GameObserver {
     }
 
     @Override
-    public void onGameStarted(RemoteController controller) throws RemoteException {
+    public void onGameStarted(RemoteController controller, int totalPlayers) throws RemoteException {
         this.handler.setController(controller);
-        out.println("GAME_STARTED");
+        out.println("GAME_STARTED " + totalPlayers);
     }
 
     @Override
@@ -160,5 +163,14 @@ class SocketVirtualView implements GameObserver {
         } catch (Exception e) {
             System.err.println("Serialization error: " + e.getMessage());
         }
+    }
+
+    @Override
+    public void onShowPlayersInfo(Map<String, Color> playersInfo) throws RemoteException {
+        String payload = playersInfo.entrySet().stream()
+                .map(entry -> entry.getKey() + ":" + entry.getValue().name())
+                .collect(Collectors.joining(","));
+
+        out.println("PLAYERS_INFO " + payload);
     }
 }

@@ -1,10 +1,13 @@
 package it.polimi.ingsw.view.GUI;
 
+import it.polimi.ingsw.model.Enum.Color;
 import it.polimi.ingsw.network.DTO.OfferTileDTO;
 import it.polimi.ingsw.network.NetworkManager;
 import it.polimi.ingsw.view.GUIView;
 import java.rmi.RemoteException;
 import java.util.List;
+import java.util.Map;
+
 import static it.polimi.ingsw.exception.CustomException.cleanRemoteException;
 
 public abstract class SceneController {
@@ -14,12 +17,14 @@ public abstract class SceneController {
     public void setNetwork(NetworkManager network) { this.network = network; }
     public void setView(GUIView view) { this.view = view; }
     public void updateLobby(int current, int total) {}
-    public void displayOfferTrack(List<OfferTileDTO> tiles) {}
+    public void displayOfferTrack(List<OfferTileDTO> tiles, int total) {}
     public void askTotemPlacement() {};
     public void displayChoosableCards() {}
     public void showErrorMessage(String msg) {}
     public void showNotification(String msg) {}
     public void updatePlayersOrder(List<String> order) {}
+    public void setTotalPlayers(int totalPlayers) {}
+    public void setPlayersInfo(Map<String, Color> playersInfo) {}
 
     String handleNetworkError(Exception e) {
         if (e instanceof RemoteException) {
