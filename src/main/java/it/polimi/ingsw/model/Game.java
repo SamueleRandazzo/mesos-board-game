@@ -9,6 +9,8 @@ import it.polimi.ingsw.model.states.GameState;
 import it.polimi.ingsw.model.states.SetupGameState;
 import it.polimi.ingsw.model.states.TotemPlacementState;
 import it.polimi.ingsw.network.DTO.OfferTileDTO;
+import it.polimi.ingsw.network.DTO.TribeStatusDTO;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -216,6 +218,14 @@ public class Game {
 
     public void notifyChooseOtherCards() {
 
+    }
+
+    public void notifyShowTribe() {
+        TribeStatusDTO tribeDTO = this.getCurrentActivePlayer().getTribe().toDTO();
+
+        for (GameEventListener l : listeners) {
+            l.onShowTribe(this.getCurrentActivePlayer().getNickname(), tribeDTO);
+        }
     }
     //endregion
 

@@ -2,6 +2,7 @@ package it.polimi.ingsw.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.ingsw.network.DTO.OfferTileDTO;
+import it.polimi.ingsw.network.DTO.TribeStatusDTO;
 import it.polimi.ingsw.network.GameObserver;
 import it.polimi.ingsw.network.RemoteController;
 import it.polimi.ingsw.network.commands.ClientCommandFactory;
@@ -170,5 +171,20 @@ class SocketVirtualView implements GameObserver {
                 .collect(Collectors.joining(","));
 
         out.println("PLAYERS_INFO " + payload);
+    }
+
+    @Override
+    public void onShowTribe(TribeStatusDTO tribe) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String json = mapper.writeValueAsString(tribe);
+
+            String cleanedJson = json.replace(" ", "").replace("\n", "").replace("\r", "");
+
+            out.println("SHOW_TRIBE " + cleanedJson);
+        } catch (Exception e) {
+            System.err.println("Serialization error: " + e.getMessage());
+        }
+
     }
 }
