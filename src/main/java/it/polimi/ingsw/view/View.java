@@ -1,6 +1,7 @@
 package it.polimi.ingsw.view;
 
 import it.polimi.ingsw.model.Enum.Color;
+import it.polimi.ingsw.network.DTO.BoardDTO;
 import it.polimi.ingsw.network.DTO.OfferTileDTO;
 import it.polimi.ingsw.network.RemoteController;
 
@@ -20,4 +21,5 @@ public interface View {
     void retryTotemPlacement();
     void displayOfferTrack(List<OfferTileDTO> tiles);
     void showPlayersInfo(Map<String, Color> playersInfo);
+    void displayBoard(BoardDTO board);
 }

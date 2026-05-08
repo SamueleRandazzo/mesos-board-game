@@ -1,6 +1,7 @@
 package it.polimi.ingsw.view;
 
 import it.polimi.ingsw.model.Enum.Color;
+import it.polimi.ingsw.network.DTO.BoardDTO;
 import it.polimi.ingsw.network.DTO.OfferTileDTO;
 import it.polimi.ingsw.network.NetworkManager;
 import it.polimi.ingsw.network.RemoteController;
@@ -156,5 +157,10 @@ public class GUIView implements View {
         Platform.runLater(() -> {
             currentController.updatePlayersOrder(playersOrder);
         });
+    }
+
+    //TODO: implement abstract method displayBoard(it.polimi.ingsw.network.DTO.BoardDTO)
+    public void displayBoard(BoardDTO board) {
+        Platform.runLater(() -> {});
     }
 }

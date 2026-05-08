@@ -1,6 +1,7 @@
 package it.polimi.ingsw.network;
 
 import it.polimi.ingsw.model.Enum.Color;
+import it.polimi.ingsw.network.DTO.BoardDTO;
 import it.polimi.ingsw.network.DTO.OfferTileDTO;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -18,4 +19,5 @@ public interface GameObserver extends Remote {
     void onShowPlayersOrder(List<String> playersOrder) throws RemoteException;
     void onDisplayOfferTrack(List<OfferTileDTO> tiles) throws RemoteException;
     void onShowPlayersInfo(Map<String, Color> playersInfo) throws RemoteException;
+    void onDisplayBoard(BoardDTO board) throws RemoteException;
 }

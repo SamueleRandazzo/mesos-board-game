@@ -1,6 +1,8 @@
 package it.polimi.ingsw.view;
 
 import it.polimi.ingsw.model.Enum.Color;
+import it.polimi.ingsw.network.DTO.BoardDTO;
+import it.polimi.ingsw.network.DTO.CardDTO;
 import it.polimi.ingsw.network.DTO.OfferTileDTO;
 import it.polimi.ingsw.network.NetworkManager;
 import it.polimi.ingsw.network.RemoteController;
@@ -26,14 +28,18 @@ public class CLIView implements View {
     private final BufferedReader reader;
     private final NetworkManager network;
     private List<OfferTileDTO> lastTiles;
+    private BoardDTO lastBoard; // Added to store the last received board state
 
     /**
      * Constructs a new CLIView.
-     * * @param network the network manager used to communicate with the server.
+     * @param network the network manager used to communicate with the server.
      */
     public CLIView(NetworkManager network) {
         this.network = network;
         this.reader = new BufferedReader(new InputStreamReader(System.in));
+
+        // Warm up the dictionary at startup to load JSON files
+        LocalCardDictionary.getInstance();
     }
 
     private void clearInputBuffer() {
@@ -87,7 +93,7 @@ public class CLIView implements View {
 
     /**
      * Updates the UI to show the current number of players connected to the lobby.
-     * * @param current the current number of players in the lobby.
+     * @param current the current number of players in the lobby.
      * @param total   the total number of players required to start the game.
      */
     @Override
@@ -97,7 +103,7 @@ public class CLIView implements View {
 
     /**
      * Notifies the user that the game has started.
-     * * @param controller the remote controller provided by the server to handle game actions.
+     * @param controller the remote controller provided by the server to handle game actions.
      */
     @Override
     public void startGame(RemoteController controller, int totalPlayers) {
@@ -107,7 +113,7 @@ public class CLIView implements View {
 
     /**
      * Displays an error message to the user.
-     * * @param error the error message to display.
+     * @param error the error message to display.
      */
     @Override
     public void showError(String error) {
@@ -138,7 +144,6 @@ public class CLIView implements View {
     /**
      * Displays the current offer track and asks the player to choose a tile for totem placement.
      * This is an interactive method that forwards the user's choice to the server.
-     * * @param tiles a list of {@link OfferTileDTO} representing the current state of the offer track.
      */
     @Override
     public void askTotemPlacement() {
@@ -157,7 +162,7 @@ public class CLIView implements View {
     /**
      * Formats and prints the offer track table to the console.
      * It displays indices, bonuses, and the occupancy status of each tile.
-     * * @param tiles the list of data transfer objects containing tile information.
+     * @param tiles the list of data transfer objects containing tile information.
      */
     @Override
     public void displayOfferTrack(List<OfferTileDTO> tiles) {
@@ -190,23 +195,73 @@ public class CLIView implements View {
         }
     }
 
-    @Override
-    public void askCardChoose() {
-        displayChoosableCard();
+    /**
+     * Called by the server when the Board is updated.
+     * Translates CardDTO IDs into readable text using the LocalCardDictionary.
+     */
+    public void displayBoard(BoardDTO board) {
+        this.lastBoard = board;
+        System.out.println("\n======================== BOARD ========================");
 
-        System.out.print("Choose the card to pick: ");
-        String cardPosition = readLine();
-        try {
-            network.cardSelection(cardPosition);
-        } catch (Exception e) {
-            showError(handleNetworkError(e));
-            askCardChoose();
+        printRow("Upper Tribe Row (T)", board.getUpperTribeRow(), "T");
+        printRow("Lower Tribe Row (L)", board.getLowerTribeRow(), "L");
+        System.out.println("---------------------------------------------------------");
+        printRow("Upper Building Row (B)", board.getUpperBuildingRow(), "B");
+        printRow("Lower Building Row (G)", board.getLowerBuildingRow(), "G");
+
+        System.out.println("=========================================================\n");
+    }
+
+    /**
+     * Helper method to format and print a single row of cards.
+     */
+    private void printRow(String label, List<CardDTO> row, String prefix) {
+        System.out.println(label + ":");
+        if (row == null || row.isEmpty()) {
+            System.out.println("  [Empty]");
+            return;
+        }
+        for (int i = 0; i < row.size(); i++) {
+            String id = row.get(i).getId();
+            String description = LocalCardDictionary.getInstance().getCardDetails(id);
+            System.out.printf("  [%s%d] %s%n", prefix, i, description);
         }
     }
 
-    // TODO display choosable card and player pick remained
-    public void displayChoosableCard() {
-        System.out.println("\n====================== CHOOSABLE CARD ======================");
+
+    /**
+     * Prompts the user to choose a card.
+     * It actively reprints the entire board state using the LocalCardDictionary
+     * so the user has all available options directly above the input prompt.
+     */
+    @Override
+    public void askCardChoose() {
+        clearInputBuffer();
+
+        System.out.println("\n====================== CHOOSE YOUR CARD ======================");
+        if (lastBoard != null) {
+            // Actively print all 4 rows using the dictionary parser
+            printRow("Upper Tribe Row (T)", lastBoard.getUpperTribeRow(), "T");
+            printRow("Lower Tribe Row (L)", lastBoard.getLowerTribeRow(), "L");
+            System.out.println("--------------------------------------------------------------");
+            printRow("Upper Building Row (B)", lastBoard.getUpperBuildingRow(), "B");
+            printRow("Lower Building Row (G)", lastBoard.getLowerBuildingRow(), "G");
+        } else {
+            System.out.println("  [!] Board state not received yet. Cannot display cards.");
+        }
+        System.out.println("==============================================================\n");
+
+        System.out.println("Format: [Row Prefix][Index] (e.g., T0 for first Upper Tribe, G2 for third Lower Building)");
+        System.out.print("Enter your choice: ");
+        String cardPosition = readLine().trim().toUpperCase();
+
+        try {
+            // Forwards the input (e.g., "T0") to the NetworkManager regex parser
+            network.cardSelection(cardPosition);
+        } catch (Exception e) {
+            showError(handleNetworkError(e));
+            askCardChoose(); // Retry on failure
+        }
     }
 
     private String handleNetworkError(Exception e) {
@@ -239,5 +294,4 @@ public class CLIView implements View {
     public void showPlayersInfo(Map<String,Color> playersInfo) {
         //CLI does not need to know player color
     }
-
 }

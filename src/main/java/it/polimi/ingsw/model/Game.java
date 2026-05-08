@@ -572,4 +572,13 @@ public class Game {
     public void resolveEndTurn() {
         this.currentState.endTurn(this, this.getCurrentActivePlayer());
     }
+
+    /**
+     * This method sends the updated board to all connected clients
+     */
+    public void notifyOnShowBoard() {
+        for (GameEventListener l : listeners) {
+            l.onShowBoard(this.board.toDTO());
+        }
+    }
 }
