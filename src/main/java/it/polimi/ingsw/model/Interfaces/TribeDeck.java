@@ -11,6 +11,7 @@ import it.polimi.ingsw.model.Player;
  *  - EventCard
  */
 public interface TribeDeck {
+    public String getId();
     public int getEra();
     public boolean getIsObtainable();
     public void applyTo(Player p);

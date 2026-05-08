@@ -9,9 +9,9 @@ public class CavePaintingBuilding extends BuildingCard {
     private final int extraFood;
     private final CharacterTypeCount typeCount;
 
-    public CavePaintingBuilding(int era, int minPlayer, boolean isObtainable, int foodCost, int prestigePoints,
+    public CavePaintingBuilding(String id, int era, int minPlayer, boolean isObtainable, int foodCost, int prestigePoints,
                                 int extraFood, CharacterTypeCount typeCount) {
-        super(era, minPlayer, isObtainable, foodCost, prestigePoints);
+        super(id, era, minPlayer, isObtainable, foodCost, prestigePoints);
         this.extraFood = extraFood;
         this.typeCount = typeCount;
     }

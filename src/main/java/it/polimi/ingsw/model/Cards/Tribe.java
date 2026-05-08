@@ -1,12 +1,22 @@
 package it.polimi.ingsw.model.Cards;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import it.polimi.ingsw.model.BuildingCards.*;
 import it.polimi.ingsw.model.CharacterCards.*;
 import it.polimi.ingsw.model.Player;
 import it.polimi.ingsw.model.Utility.*;
+import it.polimi.ingsw.network.DTO.CardDTO;
 import it.polimi.ingsw.network.DTO.TribeStatusDTO;
 
+/**
+ * Represents the collection of characters, buildings, and attributes owned by a specific player.
+ * <p>
+ * This class acts as the central hub for a player's tableau. It handles the logic for adding cards,
+ * calculating tribe-wide bonuses, resolving set mechanics, and generating a data transfer object (DTO)
+ * for network transmission using lightweight identifiers.
+ * </p>
+ */
 public class Tribe {
     private final Player owner;
 
@@ -30,7 +40,9 @@ public class Tribe {
     private boolean extraFoodFromBonus;
 
     /**
-     * Creates an empty tribe with no cards
+     * Creates an empty tribe with no cards for the specified player.
+     * * @param p The player who owns this tribe. Must not be null.
+     * @throws IllegalArgumentException if the player is null.
      */
     public Tribe(Player p) {
         if (p == null)
@@ -59,6 +71,9 @@ public class Tribe {
         extraFoodFromBonus = false;
     }
 
+    /**
+     * Initializes the map that binds character category strings to their respective lists.
+     */
     public void initializeMap() {
         allCharacterCardsMap = new HashMap<>();
 
@@ -71,7 +86,8 @@ public class Tribe {
     }
 
     /**
-     * @return total number of character cards in the tribe
+     * Calculates the total number of character cards in the tribe.
+     * * @return The total number of character cards.
      */
     public int numberOfCharacterCards() {
         return allCharacterCardsMap.values().stream().mapToInt(List::size).sum();
@@ -127,12 +143,17 @@ public class Tribe {
     }
 
     /**
-     * @return the shamanic attributes associated with this tribe
+     * Retrieves the shamanic attributes associated with this tribe.
+     * * @return The shamanic attributes object.
      */
     public ShamanicAttributes getShamanicAttr() {
         return shamanicAttr;
     }
 
+    /**
+     * Retrieves an unmodifiable view of the map containing all character cards.
+     * * @return An unmodifiable map of character cards categorized by type.
+     */
     public Map<String, List<? extends Card>> getAllCharacterCardsMap() {
         return Collections.unmodifiableMap(this.allCharacterCardsMap);
     }
@@ -140,7 +161,7 @@ public class Tribe {
 
     //region Card Adder
     /**
-     * Adds an Artist card to the corresponding list.
+     * Adds an Artist card to the corresponding list and checks for set bonuses.
      * @param card The Artist card to be added. Must not be null.
      * @throws IllegalArgumentException if the card is null.
      */
@@ -154,7 +175,7 @@ public class Tribe {
     }
 
     /**
-     * Adds a Gatherer card to the corresponding list.
+     * Adds a Gatherer card to the corresponding list and checks for set bonuses.
      * @param card The Gatherer card to be added. Must not be null.
      * @throws IllegalArgumentException if the card is null.
      */
@@ -168,7 +189,7 @@ public class Tribe {
     }
 
     /**
-     * Adds a Builder card to the corresponding list.
+     * Adds a Builder card to the corresponding list and checks for set bonuses.
      * @param card The Builder card to be added. Must not be null.
      * @throws IllegalArgumentException if the card is null.
      */
@@ -182,7 +203,7 @@ public class Tribe {
     }
 
     /**
-     * Adds a Hunter card to the corresponding list.
+     * Adds a Hunter card to the corresponding list. Grants immediate food if the card has a food icon.
      * @param card The Hunter card to be added. Must not be null.
      * @throws IllegalArgumentException if the card is null.
      */
@@ -200,7 +221,7 @@ public class Tribe {
     }
 
     /**
-     * Adds an Inventor card to the corresponding list.
+     * Adds an Inventor card to the corresponding list and triggers specific building bonuses.
      * @param card The Inventor card to be added. Must not be null.
      * @throws IllegalArgumentException if the card is null.
      */
@@ -226,7 +247,7 @@ public class Tribe {
     }
 
     /**
-     * Adds a Shaman card to the corresponding list and update tribe shaman stars.
+     * Adds a Shaman card to the corresponding list and updates tribe shaman stars.
      * @param card The Shaman card to be added. Must not be null.
      * @throws IllegalArgumentException if the card is null.
      */
@@ -238,6 +259,11 @@ public class Tribe {
         shamanicAttr.addStars(card.getShamanStars());
     }
 
+    /**
+     * Adds an Instant Effect Building to the tribe and updates persistent attributes.
+     * @param card The InstantEffectBuilding card to add. Must not be null.
+     * @throws IllegalArgumentException if the card is null.
+     */
     public void addCard(InstantEffectBuilding card) {
         if (card == null)
             throw new IllegalArgumentException("BuildingCard cannot be null");
@@ -248,6 +274,11 @@ public class Tribe {
         extraFoodFromBonus = extraFoodFromBonus || card.isExtraFoodFromBonus();
     }
 
+    /**
+     * Adds a Scoring Building to the tribe.
+     * @param card The ScoringBuilding card to add. Must not be null.
+     * @throws IllegalArgumentException if the card is null.
+     */
     public void addCard(ScoringBuilding card) {
         if (card == null)
             throw new IllegalArgumentException("BuildingCard cannot be null");
@@ -255,6 +286,11 @@ public class Tribe {
         scoringBuildings.add(card);
     }
 
+    /**
+     * Adds a Sustenance Building to the tribe.
+     * @param card The SustenanceBuilding card to add. Must not be null.
+     * @throws IllegalArgumentException if the card is null.
+     */
     public void addCard(SustenanceBuilding card) {
         if (card == null)
             throw new IllegalArgumentException("BuildingCard cannot be null");
@@ -262,6 +298,11 @@ public class Tribe {
         sustenanceBuildings.add(card);
     }
 
+    /**
+     * Adds a Cave Painting Building to the tribe.
+     * @param card The CavePaintingBuilding card to add. Must not be null.
+     * @throws IllegalArgumentException if the card is null.
+     */
     public void addCard(CavePaintingBuilding card) {
         if (card == null)
             throw new IllegalArgumentException("BuildingCard cannot be null");
@@ -269,6 +310,11 @@ public class Tribe {
         cavePaintingBuildings.add(card);
     }
 
+    /**
+     * Adds a Hunt Building to the tribe.
+     * @param card The HuntBuilding card to add. Must not be null.
+     * @throws IllegalArgumentException if the card is null.
+     */
     public void addCard(HuntBuilding card) {
         if (card == null)
             throw new IllegalArgumentException("BuildingCard cannot be null");
@@ -276,6 +322,11 @@ public class Tribe {
         huntBuildings.add(card);
     }
 
+    /**
+     * Adds a Card Added Building to the tribe and sets its initial requirement counts.
+     * @param card The CardAddedBuilding card to add. Must not be null.
+     * @throws IllegalArgumentException if the card is null.
+     */
     public void addCard(CardAddedBuilding card) {
         if (card == null)
             throw new IllegalArgumentException("BuildingCard cannot be null");
@@ -289,6 +340,7 @@ public class Tribe {
     //endregion
 
     /**
+     * Calculates the total points granted by all scoring buildings.
      * @return total extra points by scoring buildings
      */
     public int getTotalScoringBuildingsPoints() {
@@ -316,6 +368,7 @@ public class Tribe {
     }
 
     /**
+     * Calculates the total food discount provided by sustenance buildings.
      * @return total food discount by sustenance buildings
      */
     public int totalSustenanceDiscount() {
@@ -323,6 +376,7 @@ public class Tribe {
     }
 
     /**
+     * Calculates the total prestige points provided directly by builder cards.
      * @return total points of builder cards
      */
     public int totalBuildersPoints() {
@@ -330,6 +384,7 @@ public class Tribe {
     }
 
     /**
+     * Calculates the total food discount for buildings provided by builder cards.
      * @return total food discount of builder cards
      */
     public int totalBuildersFoodDiscount() {
@@ -337,28 +392,32 @@ public class Tribe {
     }
 
     /**
-     * @return total points from cave paintings buildings
+     * Calculates the total food bonus provided by cave painting buildings.
+     * @return total food from cave paintings buildings
      */
     public int totalFoodByCavePaintingBuildings() {
         return cavePaintingBuildings.stream().mapToInt(x -> x.getBonusFood(this)).sum();
     }
 
     /**
-     * @return total food from hunt paintings buildings
+     * Calculates the total food bonus provided by hunt buildings.
+     * @return total food from hunt buildings
      */
     public int totalFoodByHuntBuildings() {
         return huntBuildings.stream().mapToInt(x -> x.getBonusFood(this)).sum();
     }
 
     /**
-     * @return total points from hunt paintings buildings
+     * Calculates the total prestige points provided by hunt buildings.
+     * @return total points from hunt buildings
      */
     public int totalPointsByHuntBuildings() {
         return huntBuildings.stream().mapToInt(x -> x.getExtraPoints(this)).sum();
     }
 
     /**
-     * @return total number of different inventor icon
+     * Calculates the total number of distinct inventor icons owned by the tribe.
+     * @return total number of different inventor icons
      */
     public int totalDifferentInventorIcon() {
         return Math.toIntExact(inventors.stream().map(Inventor::getInventionIcon).distinct().count());
@@ -397,7 +456,7 @@ public class Tribe {
      */
     public TribeStatusDTO toDTO() {
         // We use LinkedHashMap to ensure the View receives the columns in a specific, consistent order
-        LinkedHashMap<String, List<String>> charColumns = new LinkedHashMap<>();
+        LinkedHashMap<String, List<CardDTO>> charColumns = new LinkedHashMap<>();
 
         // Mapping character cards to their IDs, column by column
         charColumns.put("ARTISTS", getIdsFromList(this.artists));
@@ -408,7 +467,7 @@ public class Tribe {
         charColumns.put("SHAMANS", getIdsFromList(this.shamans));
 
         // Consolidating all building types into a single flat list of IDs
-        List<String> allBuildingIds = new ArrayList<>();
+        List<CardDTO> allBuildingIds = new ArrayList<>();
         allBuildingIds.addAll(getIdsFromList(this.instantEffectBuildings));
         allBuildingIds.addAll(getIdsFromList(this.scoringBuildings));
         allBuildingIds.addAll(getIdsFromList(this.sustenanceBuildings));
@@ -435,15 +494,14 @@ public class Tribe {
     }
 
     /**
-     * Helper method to extract IDs from a list of cards.
+     * Helper method to extract CardDTOs from a list of cards.
      *
      * @param cards The list of cards.
-     * @return A list of strings representing the unique IDs of the cards.
+     * @return A list of CardDTOs representing the unique IDs of the cards.
      */
-    private List<String> getIdsFromList(List<? extends Card> cards) {
-        // return cards.stream()
-        //       .map(Card::getCardId)
-        //       .toList();
-        return new ArrayList<>();
+    private List<CardDTO> getIdsFromList(List<? extends Card> cards) {
+        return cards.stream()
+                .map(card -> new CardDTO(card.getId()))
+                .collect(Collectors.toList());
     }
 }

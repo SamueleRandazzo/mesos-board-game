@@ -15,9 +15,9 @@ public class ScoringBuilding extends BuildingCard {
     @Nullable
     private final CharacterTypeCount countType;
 
-    public ScoringBuilding(int era, int minPlayer, boolean isObtainable, int foodCost, int prestigePoints,
+    public ScoringBuilding(String id, int era, int minPlayer, boolean isObtainable, int foodCost, int prestigePoints,
                            int fixedPoints, int multiplier, int pointsPerUnit, int setDim, @Nullable CharacterTypeCount countType) {
-        super(era, minPlayer, isObtainable, foodCost, prestigePoints);
+        super(id, era, minPlayer, isObtainable, foodCost, prestigePoints);
         this.fixedPoints = fixedPoints;
         this.multiplier = multiplier;
         this.pointsPerUnit = pointsPerUnit;

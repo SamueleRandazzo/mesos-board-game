@@ -7,8 +7,8 @@ import it.polimi.ingsw.model.Player;
 public class Shaman extends Card implements TribeDeck {
     private final int shamanStars;
 
-    public Shaman(int era, int minPlayer, boolean isObtainable, int shamanStars){
-        super(era, minPlayer, isObtainable);
+    public Shaman(String id, int era, int minPlayer, boolean isObtainable, int shamanStars){
+        super(id, era, minPlayer, isObtainable);
         this.shamanStars = shamanStars;
     }
 

@@ -29,8 +29,23 @@ import it.polimi.ingsw.model.Interfaces.CharacterTypeCount;
 import it.polimi.ingsw.model.Interfaces.EventEffect;
 import it.polimi.ingsw.model.Interfaces.TribeDeck;
 
+/**
+ * Factory class responsible for creating concrete Card objects from raw JSON data.
+ * <p>
+ * This class translates the primitive data structures (RawData) parsed from configuration
+ * files into fully instantiated game objects (Characters, Buildings, Events), injecting
+ * the unique card ID necessary for the DTO and View layers.
+ * </p>
+ */
 public class CardFactory {
 
+    /**
+     * Creates a TribeDeck card (typically a Character card) from raw data.
+     *
+     * @param data The raw data containing the properties of the tribe card.
+     * @return A concrete instance of a card implementing the TribeDeck interface.
+     * @throws IllegalArgumentException if the provided data or its subtype is null, or if the subtype is unknown.
+     */
     public TribeDeck createTribeCard(RawTribeCardData data) {
         if (data == null) {
             throw new IllegalArgumentException("RawTribeCardData cannot be null.");
@@ -46,6 +61,7 @@ public class CardFactory {
             case "hunter":
                 boolean hasFoodIcon = data.immediateFood != null && data.immediateFood > 0;
                 return new Hunter(
+                        data.id,
                         data.era,
                         data.minPlayers,
                         isObtainable,
@@ -57,6 +73,7 @@ public class CardFactory {
                 int prestigePoints = data.prestigePoints;
 
                 return new Builder(
+                        data.id,
                         data.era,
                         data.minPlayers,
                         isObtainable,
@@ -66,6 +83,7 @@ public class CardFactory {
 
             case "gatherer":
                 return new Gatherer(
+                        data.id,
                         data.era,
                         data.minPlayers,
                         isObtainable
@@ -85,6 +103,7 @@ public class CardFactory {
                 }
 
                 return new Inventor(
+                        data.id,
                         data.era,
                         data.minPlayers,
                         isObtainable,
@@ -95,6 +114,7 @@ public class CardFactory {
                 int symbols = data.shamanStars != null ? data.shamanStars : 1;
 
                 return new Shaman(
+                        data.id,
                         data.era,
                         data.minPlayers,
                         isObtainable,
@@ -106,6 +126,13 @@ public class CardFactory {
         }
     }
 
+    /**
+     * Creates an EventCard from raw data.
+     *
+     * @param data The raw data containing the properties of the event card.
+     * @return A concrete instance of an EventCard.
+     * @throws IllegalArgumentException if the provided data or effect type is null, or if required parameters for an effect are missing.
+     */
     public EventCard createEventCard(RawEventCardData data) {
         if (data == null) {
             throw new IllegalArgumentException("RawEventCardData cannot be null.");
@@ -158,6 +185,7 @@ public class CardFactory {
         }
 
         return new EventCard(
+                data.id,
                 data.era,
                 data.minPlayers,
                 data.isFinal,
@@ -165,6 +193,13 @@ public class CardFactory {
         );
     }
 
+    /**
+     * Creates a BuildingCard from raw data.
+     *
+     * @param data The raw data containing the properties of the building card.
+     * @return A concrete instance of a BuildingCard.
+     * @throws IllegalArgumentException if the provided data or subtype is null, or if the subtype is unknown.
+     */
     public BuildingCard createBuildingCard(RawBuildingCardData data) {
         if (data == null) {
             throw new IllegalArgumentException("RawBuildingCardData cannot be null.");
@@ -181,6 +216,7 @@ public class CardFactory {
         switch (data.subtype.toLowerCase()) {
             case "hunt":
                 return new HuntBuilding(
+                        data.id,
                         data.era,
                         data.minPlayers,
                         isObtainable,
@@ -193,6 +229,7 @@ public class CardFactory {
 
             case "sustenance":
                 return new SustenanceBuilding(
+                        data.id,
                         data.era,
                         data.minPlayers,
                         isObtainable,
@@ -204,6 +241,7 @@ public class CardFactory {
 
             case "scoring":
                 return new ScoringBuilding(
+                        data.id,
                         data.era,
                         data.minPlayers,
                         isObtainable,
@@ -218,6 +256,7 @@ public class CardFactory {
 
             case "cave_painting":
                 return new CavePaintingBuilding(
+                        data.id,
                         data.era,
                         data.minPlayers,
                         isObtainable,
@@ -229,6 +268,7 @@ public class CardFactory {
 
             case "instant":
                 return new InstantEffectBuilding(
+                        data.id,
                         data.era,
                         data.minPlayers,
                         isObtainable,
@@ -243,6 +283,7 @@ public class CardFactory {
 
             case "card_added":
                 return new CardAddedBuilding(
+                        data.id,
                         data.era,
                         data.minPlayers,
                         isObtainable,
@@ -259,6 +300,13 @@ public class CardFactory {
         }
     }
 
+    /**
+     * Resolves the string representation of a counting strategy into its corresponding CharacterTypeCount object.
+     *
+     * @param countType The string identifier for the count type (e.g., "BUILDERS_COUNT").
+     * @return The corresponding CharacterTypeCount implementation, or null if the input is null.
+     * @throws IllegalArgumentException if the countType is unrecognized.
+     */
     private CharacterTypeCount resolveCountType(String countType) {
         if (countType == null) {
             return null;

@@ -5,8 +5,8 @@ import it.polimi.ingsw.model.Interfaces.TribeDeck;
 import it.polimi.ingsw.model.Player;
 
 public class Gatherer extends Card implements TribeDeck {
-    public Gatherer(int era, int minPlayer, boolean isObtainable){
-        super(era, minPlayer, isObtainable);
+    public Gatherer(String id, int era, int minPlayer, boolean isObtainable){
+        super(id, era, minPlayer, isObtainable);
     }
 
     public void applyTo(Player p) {

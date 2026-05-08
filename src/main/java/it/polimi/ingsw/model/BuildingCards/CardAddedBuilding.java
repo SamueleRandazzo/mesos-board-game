@@ -12,9 +12,9 @@ public class CardAddedBuilding extends BuildingCard {
     private int rewardedSetCount;
     private int setDim;
 
-    public CardAddedBuilding(int era, int minPlayer, boolean isObtainable, int foodCost, int prestigePoints,
+    public CardAddedBuilding(String id, int era, int minPlayer, boolean isObtainable, int foodCost, int prestigePoints,
                              boolean bonusOnDuplicateInventor, boolean bonusOnSetCharacters, int foodBonus, int setDim) {
-        super(era, minPlayer, isObtainable, foodCost, prestigePoints);
+        super(id, era, minPlayer, isObtainable, foodCost, prestigePoints);
         this.bonusOnDuplicateInventor = bonusOnDuplicateInventor;
         this.bonusOnSetCharacters = bonusOnSetCharacters;
         this.foodBonus = foodBonus;
