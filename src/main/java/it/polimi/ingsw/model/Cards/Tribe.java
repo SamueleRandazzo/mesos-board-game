@@ -5,6 +5,7 @@ import it.polimi.ingsw.model.BuildingCards.*;
 import it.polimi.ingsw.model.CharacterCards.*;
 import it.polimi.ingsw.model.Player;
 import it.polimi.ingsw.model.Utility.*;
+import it.polimi.ingsw.network.DTO.TribeStatusDTO;
 
 public class Tribe {
     private final Player owner;
@@ -385,5 +386,64 @@ public class Tribe {
                 }
             }
         }
+    }
+
+    /**
+     * Converts the current state of the Tribe into a TribeStatusDTO for the View.
+     * This method aggregates all character cards into columns and summarizes
+     * all building cards into a single list, while pre-calculating game totals.
+     *
+     * @return A new TribeStatusDTO representing the current tribe state.
+     */
+    public TribeStatusDTO toDTO() {
+        // We use LinkedHashMap to ensure the View receives the columns in a specific, consistent order
+        LinkedHashMap<String, List<String>> charColumns = new LinkedHashMap<>();
+
+        // Mapping character cards to their IDs, column by column
+        charColumns.put("ARTISTS", getIdsFromList(this.artists));
+        charColumns.put("GATHERERS", getIdsFromList(this.gatherers));
+        charColumns.put("BUILDERS", getIdsFromList(this.builders));
+        charColumns.put("HUNTERS", getIdsFromList(this.hunters));
+        charColumns.put("INVENTORS", getIdsFromList(this.inventors));
+        charColumns.put("SHAMANS", getIdsFromList(this.shamans));
+
+        // Consolidating all building types into a single flat list of IDs
+        List<String> allBuildingIds = new ArrayList<>();
+        allBuildingIds.addAll(getIdsFromList(this.instantEffectBuildings));
+        allBuildingIds.addAll(getIdsFromList(this.scoringBuildings));
+        allBuildingIds.addAll(getIdsFromList(this.sustenanceBuildings));
+        allBuildingIds.addAll(getIdsFromList(this.cavePaintingBuildings));
+        allBuildingIds.addAll(getIdsFromList(this.huntBuildings));
+        allBuildingIds.addAll(getIdsFromList(this.cardAddedBuildings));
+
+        // Pre-calculating totals for the View
+        int totalPrestige = totalBuildersPoints() + getTotalScoringBuildingsPoints();
+        int currentFood = owner.getFoodAmount();
+        int totalSustenanceFoodDiscount = totalSustenanceDiscount();
+        int totalBuildingDiscount = totalBuildersFoodDiscount();
+        int stars = shamanicAttr.getStars();
+
+        return new TribeStatusDTO(
+                charColumns,
+                allBuildingIds,
+                totalPrestige,
+                currentFood,
+                totalSustenanceFoodDiscount,
+                totalBuildingDiscount,
+                stars
+        );
+    }
+
+    /**
+     * Helper method to extract IDs from a list of cards.
+     *
+     * @param cards The list of cards.
+     * @return A list of strings representing the unique IDs of the cards.
+     */
+    private List<String> getIdsFromList(List<? extends Card> cards) {
+        // return cards.stream()
+        //       .map(Card::getCardId)
+        //       .toList();
+        return new ArrayList<>();
     }
 }
