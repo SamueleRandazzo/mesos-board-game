@@ -76,6 +76,8 @@ public class ActionResolutionState extends GameState {
 
         if (lowerPicksLeft == 0 && upperPicksLeft == 0)
             context.resolveEndTurn();
+        else
+            context.notifyActionResultTurnChanged();
     }
 
     @Override
@@ -96,6 +98,8 @@ public class ActionResolutionState extends GameState {
 
         if (lowerPicksLeft == 0 && upperPicksLeft == 0)
             context.resolveEndTurn();
+        else
+            context.notifyActionResultTurnChanged();
     }
 
     @Override
@@ -124,6 +128,8 @@ public class ActionResolutionState extends GameState {
 
         if (lowerPicksLeft == 0 && upperPicksLeft == 0)
             context.resolveEndTurn();
+        else
+            context.notifyActionResultTurnChanged();
     }
 
     @Override
@@ -152,6 +158,8 @@ public class ActionResolutionState extends GameState {
 
         if (lowerPicksLeft == 0 && upperPicksLeft == 0)
             context.resolveEndTurn();
+        else
+            context.notifyActionResultTurnChanged();
     }
 
     @Override
@@ -183,7 +191,7 @@ public class ActionResolutionState extends GameState {
         context.advanceTurn();
 
         //check if the Phase (and round) is over
-        if(context.getCurrentPlayerIndex() == (context.getNumPlayers() - 1)) {
+        if(context.getCurrentPlayerIndex() == 0) {
             List<Player> nextRoundOrder = context.getTurnOrderTile().getNextRoundOrder();
 
             context.setTurnOrder(nextRoundOrder);
@@ -191,6 +199,7 @@ public class ActionResolutionState extends GameState {
             context.nextRound();
 
             context.setState(new TotemPlacementState());
+            context.notifyOnShowOfferTrack();
             context.notifyTotemPlacementTurnChanged();
         } else {
             context.notifyActionResultTurnChanged();

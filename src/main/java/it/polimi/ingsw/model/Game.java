@@ -272,7 +272,7 @@ public class Game {
         events.sort(Comparator.comparingInt(EventCard::getEra));
 
         for (EventCard event : events) {
-            event.raiseEvent(getPlayers()); // NOTE: raiseEvent() still uses Game.game() singleton — to fix later.
+            event.raiseEvent(getPlayers());
         }
     }
 

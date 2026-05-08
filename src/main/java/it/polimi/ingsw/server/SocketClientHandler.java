@@ -9,13 +9,11 @@ import it.polimi.ingsw.network.commands.ClientCommandHandler;
 import it.polimi.ingsw.model.Enum.Color;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.rmi.RemoteException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class SocketClientHandler extends Thread {
     private final Socket socket;
