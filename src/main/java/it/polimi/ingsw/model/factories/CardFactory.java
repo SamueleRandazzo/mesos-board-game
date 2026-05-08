@@ -91,6 +91,7 @@ public class CardFactory {
 
             case "artist":
                 return new Artist(
+                        data.id,
                         data.era,
                         data.minPlayers,
                         isObtainable
