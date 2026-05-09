@@ -9,7 +9,6 @@ public interface GameEventListener {
     void onActionResultTurnChanged(String playerNickname);
     void onShowOfferTrack(List<OfferTileDTO> tiles);
     void onCardChosen();
-    void onChooseOtherCards();
     void onShowTribe(String playerNickname, TribeStatusDTO tribe);
     void onShowBoard(BoardDTO board);
 }

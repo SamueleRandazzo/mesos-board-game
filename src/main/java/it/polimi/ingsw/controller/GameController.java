@@ -38,11 +38,7 @@ public class GameController extends UnicastRemoteObject implements RemoteControl
         super();
         this.game = game;
 
-        // MAP THE PREFIXES TO THE GAME ACTIONS
-        this.cardActions.put("T", this::handleUpperCardSelection);
-        this.cardActions.put("L", this::handleLowerCardSelection);
-        this.cardActions.put("B", this::handleUpperBuildingSelection);
-        this.cardActions.put("G", this::handleLowerBuildingSelection);
+        initializeCardActions();
     }
 
     /**
@@ -51,10 +47,10 @@ public class GameController extends UnicastRemoteObject implements RemoteControl
      * allowing both RMI and Socket clients to use a unified command protocol.
      */
     private void initializeCardActions() {
-        cardActions.put("U", this::handleUpperCardSelection);
-        cardActions.put("B", this::handleLowerCardSelection);
-        cardActions.put("BU", this::handleUpperBuildingSelection);
-        cardActions.put("BB", this::handleLowerBuildingSelection);
+        this.cardActions.put("T", this::handleUpperCardSelection);
+        this.cardActions.put("L", this::handleLowerCardSelection);
+        this.cardActions.put("B", this::handleUpperBuildingSelection);
+        this.cardActions.put("G", this::handleLowerBuildingSelection);
     }
 
     /**

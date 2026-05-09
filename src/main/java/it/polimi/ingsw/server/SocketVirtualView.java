@@ -8,7 +8,6 @@ import it.polimi.ingsw.network.DTO.OfferTileDTO;
 import it.polimi.ingsw.network.DTO.TribeStatusDTO;
 import it.polimi.ingsw.network.GameObserver;
 import it.polimi.ingsw.network.RemoteController;
-
 import java.io.PrintWriter;
 import java.rmi.RemoteException;
 import java.util.List;
@@ -138,10 +137,9 @@ class SocketVirtualView implements GameObserver {
 
             // 2. Send the command over the socket following the protocol: HEADER + SPACE + JSON
             out.println("DISPLAY_BOARD " + cleanedJson);
-            out.flush(); // Crucial to ensure the data is pushed immediately
+            out.flush();
 
         } catch (JsonProcessingException e) {
-            // Log the error on the server if serialization fails
             System.err.println("Error serializing BoardDTO: " + e.getMessage());
         }
     }

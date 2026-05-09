@@ -88,11 +88,6 @@ public class ModelToRemoteViewAdapter implements GameEventListener {
     }
 
     @Override
-    public void onChooseOtherCards() {
-
-    }
-
-    @Override
     public void onShowTribe(String playerNickname, TribeStatusDTO tribe) {
         GameObserver activeObs = playerObservers.get(playerNickname);
         if (activeObs != null) {

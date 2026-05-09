@@ -3,7 +3,6 @@ package it.polimi.ingsw.model.states;
 import it.polimi.ingsw.model.Board.OfferTile;
 import it.polimi.ingsw.model.Game;
 import it.polimi.ingsw.model.Player;
-
 import java.util.List;
 
 /**
@@ -93,13 +92,14 @@ public class ActionResolutionState extends GameState {
         }
 
         context.executeUpperCardPick(player, pos);
+        context.notifyShowTribe();
 
         upperPicksLeft--;
 
         if (lowerPicksLeft == 0 && upperPicksLeft == 0) {
             context.resolveEndTurn();
         } else {
-            // BOARD HAS CHANGED: Send the updated board to all clients
+            context.notifyShowTribe();
             context.notifyOnShowBoard();
             context.notifyActionResultTurnChanged();
         }
@@ -126,13 +126,13 @@ public class ActionResolutionState extends GameState {
         }
 
         context.executeLowerCardPick(player, pos);
+        context.notifyShowTribe();
 
         lowerPicksLeft--;
 
         if (lowerPicksLeft == 0 && upperPicksLeft == 0) {
             context.resolveEndTurn();
         } else {
-            // BOARD HAS CHANGED: Send the updated board to all clients
             context.notifyOnShowBoard();
             context.notifyActionResultTurnChanged();
         }
@@ -165,6 +165,7 @@ public class ActionResolutionState extends GameState {
         }
 
         context.executeUpperBuildingPick(player, pos);
+        context.notifyShowTribe();
 
         hasBoughtBuilding = true;
         upperPicksLeft--;
@@ -172,7 +173,6 @@ public class ActionResolutionState extends GameState {
         if (lowerPicksLeft == 0 && upperPicksLeft == 0) {
             context.resolveEndTurn();
         } else {
-            // BOARD HAS CHANGED: Send the updated board to all clients
             context.notifyOnShowBoard();
             context.notifyActionResultTurnChanged();
         }
@@ -205,6 +205,7 @@ public class ActionResolutionState extends GameState {
         }
 
         context.executeLowerBuildingPick(player, pos);
+        context.notifyShowTribe();
 
         hasBoughtBuilding = true;
         lowerPicksLeft--;
@@ -212,7 +213,6 @@ public class ActionResolutionState extends GameState {
         if (lowerPicksLeft == 0 && upperPicksLeft == 0) {
             context.resolveEndTurn();
         } else {
-            // BOARD HAS CHANGED: Send the updated board to all clients
             context.notifyOnShowBoard();
             context.notifyActionResultTurnChanged();
         }
