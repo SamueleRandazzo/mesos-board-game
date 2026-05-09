@@ -35,8 +35,4 @@ public class CardDTO implements Serializable {
     public String getCardId() {
         return cardId;
     }
-
-    public String getId() {
-        return cardId;
-    }
 }

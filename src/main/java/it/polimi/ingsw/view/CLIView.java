@@ -26,6 +26,7 @@ public class CLIView implements View {
     private final BufferedReader reader;
     private final NetworkManager network;
     private List<OfferTileDTO> lastTiles;
+    private BoardDTO lastBoard;
 
     /**
      * Constructs a new CLIView.
@@ -190,25 +191,6 @@ public class CLIView implements View {
         }
     }
 
-    @Override
-    public void askCardChoose() {
-        displayChoosableCard();
-
-        System.out.print("Choose the card to pick: ");
-        String cardPosition = readLine();
-        try {
-            network.cardSelection(cardPosition);
-        } catch (Exception e) {
-            showError(handleNetworkError(e));
-            askCardChoose();
-        }
-    }
-
-    // TODO display choosable card and player pick remained
-    public void displayChoosableCard() {
-        System.out.println("\n====================== CHOOSABLE CARD ======================");
-    }
-
     private String handleNetworkError(Exception e) {
         if (e instanceof RemoteException) {
             return cleanRemoteException((RemoteException) e);
@@ -261,10 +243,13 @@ public class CLIView implements View {
 
         // 2. Display Character Columns
         System.out.println(" CHARACTERS:");
-        tribe.getCharactersByColumn().forEach((category, ids) -> {
-            if (!ids.isEmpty()) {
-                System.out.printf("  %-12s: %s%n", category, String.join(", ", ids));
-            }
+        tribe.getCharactersByColumn().forEach((category, cardDTOs) -> {
+            if (!cardDTOs.isEmpty()) {
+                String joinedIds = cardDTOs.stream()
+                        .map(CardDTO::getCardId)
+                        .collect(Collectors.joining(", "));
+
+                System.out.printf("  %-12s: %s%n", category, joinedIds);            }
         });
 
         System.out.println("-".repeat(52));
@@ -281,4 +266,70 @@ public class CLIView implements View {
 
         System.out.println("=".repeat(52) + "\n");
     }
+
+    public void displayBoard(BoardDTO board) {
+        this.lastBoard = board;
+        System.out.println("\n======================== BOARD ========================");
+
+        printRow("Upper Tribe Row (T)", board.getUpperTribeRow(), "T");
+        printRow("Lower Tribe Row (L)", board.getLowerTribeRow(), "L");
+        System.out.println("---------------------------------------------------------");
+        printRow("Upper Building Row (B)", board.getUpperBuildingRow(), "B");
+        printRow("Lower Building Row (G)", board.getLowerBuildingRow(), "G");
+
+        System.out.println("=========================================================\n");
+    }
+
+    /**
+     * Helper method to format and print a single row of cards.
+     */
+    private void printRow(String label, List<CardDTO> row, String prefix) {
+        System.out.println(label + ":");
+        if (row == null || row.isEmpty()) {
+            System.out.println("  [Empty]");
+            return;
+        }
+        for (int i = 0; i < row.size(); i++) {
+            String id = row.get(i).getCardId();
+            String description = LocalCardDictionary.getInstance().getCardDetails(id);
+            System.out.printf("  [%s%d] %s%n", prefix, i, description);
+        }
+    }
+
+
+    /**
+     * Prompts the user to choose a card.
+     * It actively reprints the entire board state using the LocalCardDictionary
+     * so the user has all available options directly above the input prompt.
+     */
+    @Override
+    public void askCardChoose() {
+        clearInputBuffer();
+
+        System.out.println("\n====================== CHOOSE YOUR CARD ======================");
+        if (lastBoard != null) {
+            // Actively print all 4 rows using the dictionary parser
+            printRow("Upper Tribe Row (T)", lastBoard.getUpperTribeRow(), "T");
+            printRow("Lower Tribe Row (L)", lastBoard.getLowerTribeRow(), "L");
+            System.out.println("--------------------------------------------------------------");
+            printRow("Upper Building Row (B)", lastBoard.getUpperBuildingRow(), "B");
+            printRow("Lower Building Row (G)", lastBoard.getLowerBuildingRow(), "G");
+        } else {
+            System.out.println("  [!] Board state not received yet. Cannot display cards.");
+        }
+        System.out.println("==============================================================\n");
+
+        System.out.println("Format: [Row Prefix][Index] (e.g., T0 for first Upper Tribe, G2 for third Lower Building)");
+        System.out.print("Enter your choice: ");
+        String cardPosition = readLine().trim().toUpperCase();
+
+        try {
+            // Forwards the input (e.g., "T0") to the NetworkManager regex parser
+            network.cardSelection(cardPosition);
+        } catch (Exception e) {
+            showError(handleNetworkError(e));
+            askCardChoose();
+        }
+    }
+
 }
