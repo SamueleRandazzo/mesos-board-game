@@ -304,19 +304,6 @@ public class CLIView implements View {
     public void askCardChoose() {
         clearInputBuffer();
 
-        System.out.println("\n=================== CHOOSE YOUR CARD ===================");
-        if (lastBoard != null) {
-            // Actively print all 4 rows using the dictionary parser
-            printRow("Upper Tribe Row (T)", lastBoard.getUpperTribeRow(), "T");
-            printRow("Lower Tribe Row (L)", lastBoard.getLowerTribeRow(), "L");
-            System.out.println("--------------------------------------------------------------");
-            printRow("Upper Building Row (B)", lastBoard.getUpperBuildingRow(), "B");
-            printRow("Lower Building Row (G)", lastBoard.getLowerBuildingRow(), "G");
-        } else {
-            System.out.println("  [!] Board state not received yet. Cannot display cards.");
-        }
-        System.out.println("-".repeat(56));
-
         System.out.println("Format: [Row Prefix][Index] (e.g., T0 for first Upper Tribe, G2 for third Lower Building)");
         System.out.print("Enter your choice: ");
         String cardPosition = readLine().trim().toUpperCase();
@@ -326,7 +313,11 @@ public class CLIView implements View {
             network.cardSelection(cardPosition);
         } catch (Exception e) {
             showError(handleNetworkError(e));
-            askCardChoose();
+
+            if (lastBoard != null) {
+                displayBoard(lastBoard);
+                askCardChoose();
+            }
         }
     }
 

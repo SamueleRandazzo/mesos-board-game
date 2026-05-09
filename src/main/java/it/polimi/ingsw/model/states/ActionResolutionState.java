@@ -77,7 +77,7 @@ public class ActionResolutionState extends GameState {
      * @param context the current game context
      * @param player  the player attempting to pick the card
      * @param pos     the position index of the card in the row
-     * @throws IllegalStateException if it's not the player's turn or they have no picks left
+     * @throws IllegalStateException if it's not the player's turn, or they have no picks left
      */
     @Override
     public void resolveUpperCardPick(Game context, Player player, int pos) {
@@ -111,7 +111,7 @@ public class ActionResolutionState extends GameState {
      * @param context the current game context
      * @param player  the player attempting to pick the card
      * @param pos     the position index of the card in the row
-     * @throws IllegalStateException if it's not the player's turn or they have no picks left
+     * @throws IllegalStateException if it's not the player's turn, or they have no picks left
      */
     @Override
     public void resolveLowerCardPick(Game context, Player player, int pos) {
