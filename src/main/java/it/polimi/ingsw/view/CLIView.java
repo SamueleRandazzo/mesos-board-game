@@ -180,7 +180,7 @@ public class CLIView implements View {
                     dto.getBottomRowDraws(),
                     status);
         }
-        System.out.println("=========================================================\n");
+        System.out.println("-".repeat(56));
     }
 
     @Override
@@ -229,8 +229,6 @@ public class CLIView implements View {
      * @param tribe The DTO containing the tribe's data.
      */
     public void showTribe(TribeStatusDTO tribe) {
-        System.out.println("\n" + "=".repeat(20) + " YOUR TRIBE " + "=".repeat(20));
-
         // 1. Display Resources and Totals
         System.out.printf(" [FOOD: %d] | [PRESTIGE: %d] | [STARS: %d] | [SUSTENANCE DISCOUNT: %d] | [BUILDINGS DISCOUNT: %d]%n",
                 tribe.getCurrentFood(),
@@ -239,7 +237,7 @@ public class CLIView implements View {
                 tribe.getTotalSustenanceDiscount(),
                 tribe.getTotalBuildingsFoodDiscount());
 
-        System.out.println("-".repeat(52));
+        System.out.println("\n" + "=".repeat(22) + " YOUR TRIBE " + "=".repeat(22));
 
         // 2. Display Character Columns
         System.out.println(" CHARACTERS:");
@@ -249,10 +247,11 @@ public class CLIView implements View {
                         .map(CardDTO::getCardId)
                         .collect(Collectors.joining(", "));
 
-                System.out.printf("  %-12s: %s%n", category, joinedIds);            }
+                System.out.printf("  %-12s: %s%n", category, joinedIds);
+            }
         });
 
-        System.out.println("-".repeat(52));
+        System.out.println("-".repeat(56));
 
         // 3. Display Buildings Column
         System.out.println(" BUILDINGS:");
@@ -262,9 +261,8 @@ public class CLIView implements View {
             if (i < tribe.getBuildingIds().size() - 1) System.out.print(" | ");
             if ((i + 1) % 4 == 0) System.out.print("\n  ");
         }
-        System.out.println();
 
-        System.out.println("=".repeat(52) + "\n");
+        System.out.println("=".repeat(56) + "\n");
     }
 
     public void displayBoard(BoardDTO board) {
@@ -277,7 +275,7 @@ public class CLIView implements View {
         printRow("Upper Building Row (B)", board.getUpperBuildingRow(), "B");
         printRow("Lower Building Row (G)", board.getLowerBuildingRow(), "G");
 
-        System.out.println("=========================================================\n");
+        System.out.println("-".repeat(56));
     }
 
     /**
@@ -306,7 +304,7 @@ public class CLIView implements View {
     public void askCardChoose() {
         clearInputBuffer();
 
-        System.out.println("\n====================== CHOOSE YOUR CARD ======================");
+        System.out.println("\n=================== CHOOSE YOUR CARD ===================");
         if (lastBoard != null) {
             // Actively print all 4 rows using the dictionary parser
             printRow("Upper Tribe Row (T)", lastBoard.getUpperTribeRow(), "T");
@@ -317,7 +315,7 @@ public class CLIView implements View {
         } else {
             System.out.println("  [!] Board state not received yet. Cannot display cards.");
         }
-        System.out.println("==============================================================\n");
+        System.out.println("-".repeat(56));
 
         System.out.println("Format: [Row Prefix][Index] (e.g., T0 for first Upper Tribe, G2 for third Lower Building)");
         System.out.print("Enter your choice: ");

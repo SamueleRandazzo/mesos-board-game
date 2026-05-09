@@ -136,8 +136,14 @@ public class Game {
     }
 
     public void initializeGame() {
+        for (int i = 1; i <= players.size(); i++) {
+            int initFoodModifier = i / 2 + 1;
+            players.get(i - 1).changeFoodAmount(initFoodModifier);
+        }
+
         setupInitialRows();
         createTurnOrderTile(numPlayers);
+
         this.currentRound = 1;
         this.currentPlayerIndex = 0;
 
