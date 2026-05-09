@@ -99,7 +99,6 @@ public class ActionResolutionState extends GameState {
         if (lowerPicksLeft == 0 && upperPicksLeft == 0) {
             context.resolveEndTurn();
         } else {
-            context.notifyShowTribe();
             context.notifyOnShowBoard();
             context.notifyActionResultTurnChanged();
         }
@@ -251,10 +250,17 @@ public class ActionResolutionState extends GameState {
             }
         }
 
+        context.notifyShowTribe();
         context.advanceTurn();
 
+        // BOARD HAS CHANGED: Send the updated board before asking the next player to pick
+        context.notifyOnShowBoard();
+
+        boolean phaseFinished = context.getOfferTrack().getTiles()
+                .stream().noneMatch(t -> t.getPlacedPlayer() != null);
+
         // Check if the Phase (and round) is over
-        if (context.getCurrentPlayerIndex() == 0) {
+        if (phaseFinished) {
             List<Player> nextRoundOrder = context.getTurnOrderTile().getNextRoundOrder();
 
             context.setTurnOrder(nextRoundOrder);
@@ -263,12 +269,9 @@ public class ActionResolutionState extends GameState {
             context.setState(new TotemPlacementState());
 
             // At the start of a new round, update the board state and offer track
-            context.notifyOnShowBoard();
             context.notifyOnShowOfferTrack();
             context.notifyTotemPlacementTurnChanged();
         } else {
-            // BOARD HAS CHANGED: Send the updated board before asking the next player to pick
-            context.notifyOnShowBoard();
             context.notifyActionResultTurnChanged();
         }
     }

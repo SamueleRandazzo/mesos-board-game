@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -16,6 +17,23 @@ public class LocalCardDictionary {
 
     private static LocalCardDictionary instance;
     private final Map<String, String> cardDescriptions;
+
+    private static final Map<String, String> DESCRIPTION_TEMPLATE = new LinkedHashMap<>();
+    static {
+        DESCRIPTION_TEMPLATE.put("prestigePoints", " (VP: %s)");
+        DESCRIPTION_TEMPLATE.put("foodCost", " [Cost: %s Food]");
+        DESCRIPTION_TEMPLATE.put("effectType", " [Effect: %s]");
+        DESCRIPTION_TEMPLATE.put("buildingDiscount", " [Building Discount: %s]");
+        DESCRIPTION_TEMPLATE.put("inventionIcon", " [Icon: %s]");
+        DESCRIPTION_TEMPLATE.put("shamanStars", " [Stars: %s]");
+        DESCRIPTION_TEMPLATE.put("prestigePerHunter", " [VP per Hunter: %s]");
+        DESCRIPTION_TEMPLATE.put("prestigeLossPerUnfed", " [VP loss per Unfed: %s]");
+        DESCRIPTION_TEMPLATE.put("majorityPrestigeGain", " [Majority VP gain: %s]");
+        DESCRIPTION_TEMPLATE.put("minorityPrestigeLoss", " [Minority VP gain: %s]");
+        DESCRIPTION_TEMPLATE.put("minArtists", " [Min artists for bonus: %s]");
+        DESCRIPTION_TEMPLATE.put("prestigeLossIfBelow", " [VP loss if below: %s]");
+        DESCRIPTION_TEMPLATE.put("prestigePerArtistIfAbove", " [VP gain per artists: %s]");
+    }
 
     private LocalCardDictionary() {
         cardDescriptions = new HashMap<>();
@@ -36,11 +54,11 @@ public class LocalCardDictionary {
         ObjectMapper mapper = new ObjectMapper();
         // These paths must match the location of your JSON files in the resources folder
         String[] jsonFiles = {
-                "/tribe_cards.json",
-                "/buildings_era1.json",
-                "/buildings_era2.json",
-                "/buildings_era3.json",
-                "/event_cards.json"
+                "/cards/tribe_cards.json",
+                "/cards/buildings_era1.json",
+                "/cards/buildings_era2.json",
+                "/cards/buildings_era3.json",
+                "/cards/event_cards.json"
         };
 
         for (String filePath : jsonFiles) {
@@ -69,17 +87,17 @@ public class LocalCardDictionary {
         String subtype = node.has("subtype") ? node.get("subtype").asText().toUpperCase() : "EVENT";
         StringBuilder desc = new StringBuilder(subtype);
 
-        if (node.has("prestigePoints")) {
-            desc.append(" (VP: ").append(node.get("prestigePoints").asText()).append(")");
-        }
-        if (node.has("foodCost")) {
-            desc.append(" [Cost: ").append(node.get("foodCost").asText()).append(" Food]");
-        }
-        if (node.has("effectType")) {
-            desc.append(" [Effect: ").append(node.get("effectType").asText()).append("]");
+        DESCRIPTION_TEMPLATE.forEach((key, format) -> {
+            if (node.has(key)) {
+                desc.append(String.format(format, node.get(key).asText()));
+            }
+        });
+
+        if (node.has("immediateFood") && node.get("immediateFood").asInt() == 1) {
+            desc.append(" [Food Icon]");
         }
 
-        return desc.toString();
+        return desc.toString().trim();
     }
 
     /**

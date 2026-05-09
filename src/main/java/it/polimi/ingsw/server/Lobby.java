@@ -132,6 +132,7 @@ public class Lobby {
             ModelToRemoteViewAdapter adapter = new ModelToRemoteViewAdapter(this.playerObservers);
             game.addListener(adapter);
 
+            game.notifyOnShowBoard();
             game.notifyOnShowOfferTrack();
             game.notifyTotemPlacementTurnChanged();
         } else {

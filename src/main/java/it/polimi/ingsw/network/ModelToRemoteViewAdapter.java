@@ -92,7 +92,7 @@ public class ModelToRemoteViewAdapter implements GameEventListener {
         GameObserver activeObs = playerObservers.get(playerNickname);
         if (activeObs != null) {
             try {
-                activeObs.askTotemPlacement();
+                activeObs.onShowTribe(tribe);
             } catch (RemoteException e) {
                 System.err.println("Network error with: " + playerNickname);
             }

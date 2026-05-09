@@ -73,7 +73,7 @@ public class CLIView implements View {
             try {
                 selectedColor = Color.valueOf(readLine().toUpperCase());
             } catch (IllegalArgumentException e) {
-                System.out.println("Invalid color. Please try again.");
+                showError("Invalid color. Please try again.");
             }
         }
 
@@ -247,7 +247,7 @@ public class CLIView implements View {
         tribe.getCharactersByColumn().forEach((category, cardDTOs) -> {
             if (!cardDTOs.isEmpty()) {
                 String joinedIds = cardDTOs.stream()
-                        .map(CardDTO::getCardId)
+                        .map(dto -> LocalCardDictionary.getInstance().getCardDetails(dto.getCardId()))
                         .collect(Collectors.joining(", "));
 
                 System.out.printf("  %-12s: %s%n", category, joinedIds);
