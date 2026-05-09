@@ -15,12 +15,12 @@ public class SetPlayersHandler implements ClientCommandHandler {
         } catch (NumberFormatException e) {
             System.err.println("Invalid move attempted: " + e.getMessage());
 
-            out.println("SET_PLAYERS_ERROR Insert_a_valid_number!");
+            out.println("ERROR Insert_a_valid_number!");
             out.println("ASK_MAX_PLAYERS");
         } catch (Exception e) {
             System.err.println("Invalid move attempted: " + e.getMessage());
 
-            out.println("SET_PLAYERS_ERROR " + e.getMessage().replace(" ", "_"));
+            out.println("ERROR " + e.getMessage().replace(" ", "_"));
             out.println("ASK_MAX_PLAYERS");
         }
     }
