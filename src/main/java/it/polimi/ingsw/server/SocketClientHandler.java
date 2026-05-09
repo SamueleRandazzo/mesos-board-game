@@ -62,10 +62,11 @@ public class SocketClientHandler extends Thread {
                     lobby.addPlayer(nick, chosenColor, vView);
                     return true;
                 } catch (Exception e) {
-                    out.println("LOGIN_ERROR " + e.getMessage());
+                    out.println("ERROR " + e.getMessage());
+                    out.println("LOGIN");
                 }
             } else {
-                out.println("LOGIN_ERROR login first");
+                out.println("ERROR login first");
             }
         }
         return false;

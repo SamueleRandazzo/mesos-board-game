@@ -22,18 +22,24 @@ public class TribeStatusDTO implements Serializable {
      * and the value is a list of CardDTOs belonging to that category.
      * Uses LinkedHashMap to preserve the specific UI column order.
      */
-    private final LinkedHashMap<String, List<CardDTO>> charactersByColumn;
+    private LinkedHashMap<String, List<CardDTO>> charactersByColumn;
 
     /**
      * A flat list of all building cards owned by the tribe represented as CardDTOs.
      */
-    private final List<CardDTO> buildingIds;
+    private List<CardDTO> buildingIds;
 
-    private final int totalPrestigePoints;
-    private final int currentFood;
-    private final int totalSustenanceDiscount;
-    private final int totalBuildingsFoodDiscount;
-    private final int shamanStars;
+    private int totalPrestigePoints;
+    private int currentFood;
+    private int totalSustenanceDiscount;
+    private int totalBuildingsFoodDiscount;
+    private int shamanStars;
+
+    /**
+     * Default constructor for serialization frameworks.
+     */
+    protected TribeStatusDTO() {
+    }
 
     /**
      * Constructs a new TribeStatusDTO.

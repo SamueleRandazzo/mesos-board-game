@@ -1,4 +1,4 @@
-package it.polimi.ingsw.network.commands.clientHandler;
+package it.polimi.ingsw.network.commands.serverHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.ingsw.network.DTO.BoardDTO;

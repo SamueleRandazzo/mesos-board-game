@@ -16,7 +16,14 @@ public class CardDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /** The unique identifier of the card. */
-    private final String cardId;
+    private String cardId;
+
+    /**
+     * Default constructor for serialization frameworks.
+     */
+    protected CardDTO() {
+
+    }
 
     /**
      * Constructs a new {@code CardDTO} with the specified card ID.

@@ -146,9 +146,12 @@ public class CLIView implements View {
         clearInputBuffer();
 
         System.out.print("Choose the offer tile: ");
-        int tileIndex = Integer.parseInt(readLine());
         try {
+            int tileIndex = Integer.parseInt(readLine());
             network.tileSelection(tileIndex);
+        } catch (NumberFormatException e) {
+            showError("Insert a valid number!");
+            askTotemPlacement();
         } catch (Exception e) {
             showError(handleNetworkError(e));
             askTotemPlacement();
@@ -230,7 +233,7 @@ public class CLIView implements View {
      */
     public void showTribe(TribeStatusDTO tribe) {
         // 1. Display Resources and Totals
-        System.out.printf(" [FOOD: %d] | [PRESTIGE: %d] | [STARS: %d] | [SUSTENANCE DISCOUNT: %d] | [BUILDINGS DISCOUNT: %d]%n",
+        System.out.printf("\n[FOOD: %d] | [PRESTIGE: %d] | [STARS: %d] | [SUSTENANCE DISCOUNT: %d] | [BUILDINGS DISCOUNT: %d]%n",
                 tribe.getCurrentFood(),
                 tribe.getTotalPrestigePoints(),
                 tribe.getShamanStars(),
@@ -255,7 +258,6 @@ public class CLIView implements View {
 
         // 3. Display Buildings Column
         System.out.println(" BUILDINGS:");
-        System.out.print("  ");
         for (int i = 0; i < tribe.getBuildingIds().size(); i++) {
             System.out.print(tribe.getBuildingIds().get(i));
             if (i < tribe.getBuildingIds().size() - 1) System.out.print(" | ");

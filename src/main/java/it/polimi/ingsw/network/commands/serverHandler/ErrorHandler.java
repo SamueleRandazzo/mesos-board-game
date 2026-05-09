@@ -7,6 +7,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class ErrorHandler implements ServerCommandHandler {
     @Override
     public void handle(String[] args, View view, ObjectMapper mapper) {
-        view.showError(String.join(" ", args));
+        String errorMessage = args[0].replace("_", " ");
+        String message = errorMessage.contains(": ")
+                ? errorMessage.substring(errorMessage.lastIndexOf(": ") + 2)
+                : errorMessage;
+
+        view.showError(message);
     }
 }

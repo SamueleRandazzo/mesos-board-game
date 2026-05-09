@@ -16,10 +16,16 @@ public class BoardDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private final List<CardDTO> upperTribeRow;
-    private final List<CardDTO> lowerTribeRow;
-    private final List<CardDTO> upperBuildingRow;
-    private final List<CardDTO> lowerBuildingRow;
+    private List<CardDTO> upperTribeRow;
+    private List<CardDTO> lowerTribeRow;
+    private List<CardDTO> upperBuildingRow;
+    private List<CardDTO> lowerBuildingRow;
+
+    /**
+     * Default constructor for serialization frameworks.
+     */
+    protected BoardDTO() {
+    }
 
     /**
      * Constructs a new BoardDTO with the specified card rows.
