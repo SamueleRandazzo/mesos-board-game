@@ -64,7 +64,7 @@ public class Board {
         this.buildingDeck       = new ArrayList<>(buildingDeck);
         this.upperTribeCards    = new ArrayList<>();
         this.lowerTribeCards    = new ArrayList<>();
-        this.upperBuildingCards = new ArrayList<>();
+        this.upperBuildingCards = new ArrayList<>(buildingDeck);
         this.lowerBuildingCards = new ArrayList<>();
     }
 

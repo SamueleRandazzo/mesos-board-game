@@ -259,7 +259,7 @@ public class CLIView implements View {
         for (int i = 0; i < tribe.getBuildingIds().size(); i++) {
             System.out.print(tribe.getBuildingIds().get(i));
             if (i < tribe.getBuildingIds().size() - 1) System.out.print(" | ");
-            if ((i + 1) % 4 == 0) System.out.print("\n  ");
+            if ((i + 1) % 4 == 0) System.out.print("\n");
         }
 
         System.out.println("=".repeat(56) + "\n");

@@ -222,15 +222,20 @@ public class Game {
 
     }
 
-    public void notifyChooseOtherCards() {
-
-    }
-
     public void notifyShowTribe() {
         TribeStatusDTO tribeDTO = this.getCurrentActivePlayer().getTribe().toDTO();
 
         for (GameEventListener l : listeners) {
             l.onShowTribe(this.getCurrentActivePlayer().getNickname(), tribeDTO);
+        }
+    }
+
+    /**
+     * This method sends the updated board to all connected clients
+     */
+    public void notifyOnShowBoard() {
+        for (GameEventListener l : listeners) {
+            l.onShowBoard(this.board.toDTO());
         }
     }
     //endregion
@@ -587,14 +592,5 @@ public class Game {
 
     public void resolveEndTurn() {
         this.currentState.endTurn(this, this.getCurrentActivePlayer());
-    }
-
-    /**
-     * This method sends the updated board to all connected clients
-     */
-    public void notifyOnShowBoard() {
-        for (GameEventListener l : listeners) {
-            l.onShowBoard(this.board.toDTO());
-        }
     }
 }
