@@ -1,7 +1,6 @@
 package it.polimi.ingsw.model.Interfaces;
 
-import it.polimi.ingsw.network.DTO.BoardDTO;
-import it.polimi.ingsw.network.DTO.OfferTileDTO;
+import it.polimi.ingsw.network.DTO.*;
 import java.util.List;
 
 public interface GameEventListener {
@@ -11,5 +10,6 @@ public interface GameEventListener {
     void onShowOfferTrack(List<OfferTileDTO> tiles);
     void onCardChosen();
     void onChooseOtherCards();
+    void onShowTribe(String playerNickname, TribeStatusDTO tribe);
     void onShowBoard(BoardDTO board);
 }

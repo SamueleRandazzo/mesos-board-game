@@ -1,13 +1,18 @@
 package it.polimi.ingsw.server;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import it.polimi.ingsw.network.DTO.*;
+import it.polimi.ingsw.network.GameObserver;
 import it.polimi.ingsw.network.RemoteController;
 import it.polimi.ingsw.network.commands.ClientCommandFactory;
 import it.polimi.ingsw.network.commands.ClientCommandHandler;
 import it.polimi.ingsw.model.Enum.Color;
-
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.rmi.RemoteException;
 import java.util.*;
 
 public class SocketClientHandler extends Thread {
@@ -72,3 +77,113 @@ public class SocketClientHandler extends Thread {
     }
 }
 
+class SocketVirtualView implements GameObserver {
+    private PrintWriter out;
+    private SocketClientHandler handler;
+
+    public SocketVirtualView(PrintWriter out, SocketClientHandler handler) {
+        this.out = out;
+        this.handler = handler;
+    }
+
+    @Override
+    public void onPlayerJoined(int current, int target) throws RemoteException {
+        out.println("PLAYER_JOINED " + current + "/" + target);
+    }
+
+    @Override
+    public void onGameStarted(RemoteController controller, int totalPlayers) throws RemoteException {
+        this.handler.setController(controller);
+        out.println("GAME_STARTED " + totalPlayers);
+    }
+
+    @Override
+    public void askMaxPlayers() throws RemoteException {
+        out.println("ASK_MAX_PLAYERS");
+    }
+
+    @Override
+    public void askTotemPlacement() throws RemoteException {
+        try {
+            out.println("ASK_TOTEM_PLACEMENT");
+        } catch (Exception e) {
+            System.err.println("Serialization error: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void onDisplayOfferTrack(List<OfferTileDTO> tiles) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String json = mapper.writeValueAsString(tiles);
+
+            String cleanedJson = json.replace(" ", "").replace("\n", "").replace("\r", "");
+
+            out.println("DISPLAY_OFFER_TRACK " + cleanedJson);
+        } catch (Exception e) {
+            System.err.println("Serialization error: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void onShowError(String error) throws RemoteException {
+        try {
+            out.println("ERROR " + error);
+        } catch (Exception e) {
+            System.err.println("Serialization error: " + e.getMessage());
+        }
+    }
+
+    //TODO
+    @Override
+    public void askCardChoose() throws RemoteException {
+        try {
+            out.println("ASK_CARD_CHOOSE");
+        } catch (Exception e) {
+            System.err.println("Serialization error: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void onShowMessage(String message) throws RemoteException {
+        try {
+            out.println("MESSAGE " + message);
+        } catch (Exception e) {
+            System.err.println("Serialization error: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void onShowPlayersOrder(List<String> playersOrder) throws RemoteException {
+        try {
+            String joinedNames = String.join(",", playersOrder);
+            out.println("PLAYERS_ORDER " + joinedNames);
+        } catch (Exception e) {
+            System.err.println("Serialization error: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void onShowPlayersInfo(Map<String, Color> playersInfo) throws RemoteException {
+        String payload = playersInfo.entrySet().stream()
+                .map(entry -> entry.getKey() + ":" + entry.getValue().name())
+                .collect(Collectors.joining(","));
+
+        out.println("PLAYERS_INFO " + payload);
+    }
+
+    @Override
+    public void onShowTribe(TribeStatusDTO tribe) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String json = mapper.writeValueAsString(tribe);
+
+            String cleanedJson = json.replace(" ", "").replace("\n", "").replace("\r", "");
+
+            out.println("SHOW_TRIBE " + cleanedJson);
+        } catch (Exception e) {
+            System.err.println("Serialization error: " + e.getMessage());
+        }
+
+    }
+}

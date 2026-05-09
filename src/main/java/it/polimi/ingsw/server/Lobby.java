@@ -124,6 +124,11 @@ public class Lobby {
                 o.onShowPlayersInfo(playersInfo);
             }
 
+            for (Player p : players) {
+                GameObserver o = playerObservers.get(p.getNickname());
+                o.onShowTribe(p.getTribe().toDTO());
+            }
+
             ModelToRemoteViewAdapter adapter = new ModelToRemoteViewAdapter(this.playerObservers);
             game.addListener(adapter);
 

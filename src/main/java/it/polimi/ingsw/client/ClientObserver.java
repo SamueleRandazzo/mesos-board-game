@@ -1,8 +1,7 @@
 package it.polimi.ingsw.client;
 
 import it.polimi.ingsw.model.Enum.Color;
-import it.polimi.ingsw.network.DTO.BoardDTO;
-import it.polimi.ingsw.network.DTO.OfferTileDTO;
+import it.polimi.ingsw.network.DTO.*;
 import it.polimi.ingsw.network.GameObserver;
 import it.polimi.ingsw.network.RemoteController;
 import it.polimi.ingsw.view.View;
@@ -65,6 +64,11 @@ public class ClientObserver implements GameObserver {
     @Override
     public void onShowPlayersInfo(Map<String, Color> playersInfo) throws RemoteException {
         view.showPlayersInfo(playersInfo);
+    }
+
+    @Override
+    public void onShowTribe(TribeStatusDTO tribe) throws RemoteException  {
+        view.showTribe(tribe);
     }
 
     @Override

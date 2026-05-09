@@ -1,8 +1,7 @@
 package it.polimi.ingsw.view;
 
 import it.polimi.ingsw.model.Enum.Color;
-import it.polimi.ingsw.network.DTO.BoardDTO;
-import it.polimi.ingsw.network.DTO.OfferTileDTO;
+import it.polimi.ingsw.network.DTO.*;
 import it.polimi.ingsw.network.NetworkManager;
 import it.polimi.ingsw.network.RemoteController;
 import it.polimi.ingsw.view.GUI.SceneController;
@@ -157,6 +156,11 @@ public class GUIView implements View {
         Platform.runLater(() -> {
             currentController.updatePlayersOrder(playersOrder);
         });
+    }
+
+    @Override
+    public void showTribe(TribeStatusDTO tribe) {
+
     }
 
     //TODO: implement abstract method displayBoard(it.polimi.ingsw.network.DTO.BoardDTO)
