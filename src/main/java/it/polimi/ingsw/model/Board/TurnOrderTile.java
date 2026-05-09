@@ -44,5 +44,13 @@ public class TurnOrderTile {
                 .collect(Collectors.toList());
     }
 
-
+    /** Clean the turn order tile occupied by a specific player
+     */
+    public void cleanTurnOrderSlot(Player player) {
+        for (TurnOrderSlot slot : slots) {
+            slot.getOccupyingPlayer()
+                    .filter(p -> p.equals(player)) // Se p è presente ma player è null -> NPE
+                    .ifPresent(p -> slot.clean());
+        }
+    }
 }

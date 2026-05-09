@@ -478,12 +478,11 @@ public class Game {
     //endregion
 
     //create the TurnOrderTile using the TurnOrderFactory
-    public boolean createTurnOrderTile(int numPlayers){
+    public void createTurnOrderTile(int numPlayers){
 
         this.turnOrderTile = TurnOrderFactory.createTrack(numPlayers);
-
-        return true;
-        //the exception about player's number is already managed
+        for (Player p: players)
+            this.turnOrderTile.placeTotem(p);
     }
 
     public void advanceTurn() {
@@ -495,10 +494,6 @@ public class Game {
      */
     public void placePlayerTotem(int tileIndex) {
         currentState.placeTotem(this, getCurrentActivePlayer(), tileIndex);
-    }
-
-    public List<OfferTile> getTilesToResolve() {
-        return offerTrack.getTiles();
     }
 
     public void nextRound() {
@@ -541,6 +536,7 @@ public class Game {
     public void executeTotemPlacement(Player player, int tileIndex) {
         OfferTile chosen = offerTrack.getTiles().get(tileIndex);
         chosen.placeTotem(player);
+        turnOrderTile.cleanTurnOrderSlot(player);
     }
 
     /**

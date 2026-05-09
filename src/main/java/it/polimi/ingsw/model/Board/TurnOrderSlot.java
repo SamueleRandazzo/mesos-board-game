@@ -31,14 +31,7 @@ public class TurnOrderSlot {
      * returns the player that occupied this slot
      */
     public Optional<Player> getOccupyingPlayer() {
-
-        if(this.occupyingPlayer != null){
-            return Optional.of(this.occupyingPlayer);
-        }
-
-        else{
-            throw new IllegalStateException("Attempted to access on an empty slot.");
-        }
+        return Optional.ofNullable(this.occupyingPlayer);
     }
 
     /** make this slot occupied, returns an IllegalStateException if this slot was already occupied*/
@@ -52,5 +45,10 @@ public class TurnOrderSlot {
 
         this.occupyingPlayer = player;
 
+    }
+
+    /** make this slot free*/
+    public void clean() {
+        this.occupyingPlayer = null;
     }
 }
