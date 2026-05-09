@@ -7,8 +7,8 @@ import it.polimi.ingsw.model.Player;
 public class Inventor extends Card implements TribeDeck {
     private final InventionIcon inventionIcon;
 
-    public Inventor(int era, int minPlayer, boolean isObtainable, InventionIcon inventionIcon){
-        super(era, minPlayer, isObtainable);
+    public Inventor(String id, int era, int minPlayer, boolean isObtainable, InventionIcon inventionIcon){
+        super(id, era, minPlayer, isObtainable);
         this.inventionIcon = inventionIcon;
     }
 

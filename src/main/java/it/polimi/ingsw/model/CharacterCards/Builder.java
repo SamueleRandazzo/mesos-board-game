@@ -8,8 +8,8 @@ public class Builder extends Card implements TribeDeck {
     private final int foodDiscount;
     private final int prestigePoints;
 
-    public Builder(int era, int minPlayer, boolean isObtainable, int foodDiscount, int prestigePoints) {
-        super(era, minPlayer, isObtainable);
+    public Builder(String id, int era, int minPlayer, boolean isObtainable, int foodDiscount, int prestigePoints) {
+        super(id, era, minPlayer, isObtainable);
         this.foodDiscount = foodDiscount;
         this.prestigePoints = prestigePoints;
     }

@@ -1,9 +1,7 @@
 package it.polimi.ingsw.network;
 
 import it.polimi.ingsw.model.Interfaces.GameEventListener;
-import it.polimi.ingsw.network.DTO.OfferTileDTO;
-import it.polimi.ingsw.network.DTO.TribeStatusDTO;
-
+import it.polimi.ingsw.network.DTO.*;
 import java.rmi.RemoteException;
 import java.util.*;
 
@@ -90,11 +88,6 @@ public class ModelToRemoteViewAdapter implements GameEventListener {
     }
 
     @Override
-    public void onChooseOtherCards() {
-
-    }
-
-    @Override
     public void onShowTribe(String playerNickname, TribeStatusDTO tribe) {
         GameObserver activeObs = playerObservers.get(playerNickname);
         if (activeObs != null) {
@@ -102,6 +95,17 @@ public class ModelToRemoteViewAdapter implements GameEventListener {
                 activeObs.askTotemPlacement();
             } catch (RemoteException e) {
                 System.err.println("Network error with: " + playerNickname);
+            }
+        }
+    }
+
+    @Override
+    public void onShowBoard(BoardDTO board) {
+        for (GameObserver o : playerObservers.values()) {
+            try {
+                o.onDisplayBoard(board);
+            } catch (RemoteException e) {
+                System.err.println("Network error sending board");
             }
         }
     }

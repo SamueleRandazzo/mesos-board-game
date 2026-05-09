@@ -4,8 +4,8 @@ public abstract class BuildingCard extends Card {
     private final int foodCost;
     private final int prestigePoints;
 
-    protected BuildingCard(int era, int minPlayer, boolean isObtainable, int foodCost, int prestigePoints) {
-        super(era, minPlayer, isObtainable);
+    protected BuildingCard(String id, int era, int minPlayer, boolean isObtainable, int foodCost, int prestigePoints) {
+        super(id, era, minPlayer, isObtainable);
         this.foodCost = foodCost;
         this.prestigePoints = prestigePoints;
     }

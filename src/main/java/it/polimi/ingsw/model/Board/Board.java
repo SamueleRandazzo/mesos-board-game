@@ -2,9 +2,12 @@ package it.polimi.ingsw.model.Board;
 
 import it.polimi.ingsw.model.Cards.*;
 import it.polimi.ingsw.model.Interfaces.*;
+import it.polimi.ingsw.network.DTO.BoardDTO;
+import it.polimi.ingsw.network.DTO.CardDTO;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Represents the game board of Mesos.
@@ -13,10 +16,10 @@ import java.util.List;
  * exposes it via Game.getBoard(). Board itself is NOT a Singleton.
  * <p>
  * Responsibilities:
- *  - Maintaining the four visible card rows (upper/lower tribe, upper/lower building)
- *  - Holding the tribe deck and the current-era building deck
- *  - Providing card-pick operations for both tribe and building rows
- *  - Executing end-of-round cleanup and era transitions
+ * - Maintaining the four visible card rows (upper/lower tribe, upper/lower building)
+ * - Holding the tribe deck and the current-era building deck
+ * - Providing card-pick operations for both tribe and building rows
+ * - Executing end-of-round cleanup and era transitions
  */
 public class Board {
 
@@ -189,7 +192,7 @@ public class Board {
      * method is safe to call both for initial setup and for end-of-round refill.
      * <p>
      * Rules reference (rulebook p. 2 step 5, p. 6 step 4):
-     *  - Upper row target size = numPlayers + 4
+     * - Upper row target size = numPlayers + 4
      * <p>
      * Note: detection of era changes when a next-era card is drawn, and the
      * special handling of Event cards that must go to the upper row during
@@ -233,12 +236,12 @@ public class Board {
     /**
      * Performs the end-of-round board cleanup (rulebook p. 6):
      * <p>
-     *  1. Discard all Character and Event cards from the lower tribe row.
-     *     Building cards in the lower row are NOT affected (they stay).
-     *  2. Move all Character and Event cards from the upper tribe row
-     *     down to the lower tribe row.
-     *     Building cards in the upper row are NOT affected (they stay).
-     *  3. Refill the upper tribe row via {@link #fillUpperRow(int)}.
+     * 1. Discard all Character and Event cards from the lower tribe row.
+     * Building cards in the lower row are NOT affected (they stay).
+     * 2. Move all Character and Event cards from the upper tribe row
+     * down to the lower tribe row.
+     * Building cards in the upper row are NOT affected (they stay).
+     * 3. Refill the upper tribe row via {@link #fillUpperRow(int)}.
      * <p>
      * Event resolution and era-change detection happen in Game, which calls
      * this method after all players have taken their turns.
@@ -311,6 +314,43 @@ public class Board {
      */
     public boolean isTribeDeckEmpty() {
         return tribeDeck.isEmpty();
+    }
+
+    // -------------------------------------------------------------------------
+    // DTO Generation
+    // -------------------------------------------------------------------------
+
+    /**
+     * Generates a BoardDTO representing the current state of the board.
+     * Uses CardDTOs to send only the unique identifiers of the cards to the network/View.
+     *
+     * @return A DTO snapshot of the board.
+     */
+    public BoardDTO toDTO() {
+        List<CardDTO> upperTribe = getIdsFromTribeList(this.upperTribeCards);
+        List<CardDTO> lowerTribe = getIdsFromTribeList(this.lowerTribeCards);
+        List<CardDTO> upperBuildings = getIdsFromBuildingList(this.upperBuildingCards);
+        List<CardDTO> lowerBuildings = getIdsFromBuildingList(this.lowerBuildingCards);
+
+        return new BoardDTO(upperTribe, lowerTribe, upperBuildings, lowerBuildings);
+    }
+
+    /**
+     * Helper to extract CardDTOs from TribeDeck lists.
+     */
+    private List<CardDTO> getIdsFromTribeList(List<TribeDeck> cards) {
+        return cards.stream()
+                .map(card -> new CardDTO(card.getId()))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Helper to extract CardDTOs from BuildingCard lists.
+     */
+    private List<CardDTO> getIdsFromBuildingList(List<BuildingCard> cards) {
+        return cards.stream()
+                .map(card -> new CardDTO(card.getId()))
+                .collect(Collectors.toList());
     }
 
     @Override

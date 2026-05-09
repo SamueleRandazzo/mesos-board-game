@@ -24,8 +24,8 @@ public class EventCard extends Card implements TribeDeck {
      * @param eventEffect the specific effect triggered by this event
      * @throws IllegalArgumentException if eventEffect is null
      */
-    public EventCard(int era, int minPlayer, boolean isFinal, EventEffect eventEffect) {
-        super(era, minPlayer, false);
+    public EventCard(String id, int era, int minPlayer, boolean isFinal, EventEffect eventEffect) {
+        super(id, era, minPlayer, false);
 
         if (eventEffect == null) {
             throw new IllegalArgumentException("EventEffect cannot be null.");

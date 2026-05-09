@@ -10,9 +10,9 @@ public class HuntBuilding extends BuildingCard {
     private final int extraPoints;
     private final CharacterTypeCount typeCount;
 
-    public HuntBuilding(int era, int minPlayer, boolean isObtainable, int foodCost, int prestigePoints,
+    public HuntBuilding(String id, int era, int minPlayer, boolean isObtainable, int foodCost, int prestigePoints,
                         int extraFood, int extraPoints, CharacterTypeCount typeCount) {
-        super(era, minPlayer, isObtainable, foodCost, prestigePoints);
+        super(id, era, minPlayer, isObtainable, foodCost, prestigePoints);
         this.extraFood = extraFood;
         this.extraPoints = extraPoints;
         this.typeCount = typeCount;

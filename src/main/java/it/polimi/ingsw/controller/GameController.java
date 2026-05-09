@@ -29,7 +29,7 @@ public class GameController extends UnicastRemoteObject implements RemoteControl
 
     /**
      * Constructs a new GameController and links it to the provided game model.
-     * It also initializes the internal mapping of action prefixes to their respective methods.
+     * Initializes the internal mapping of action prefixes to their respective methods.
      *
      * @param game the game model instance this controller will manipulate.
      * @throws RemoteException if there is an error during the export of the remote object.
@@ -37,6 +37,7 @@ public class GameController extends UnicastRemoteObject implements RemoteControl
     public GameController(Game game) throws RemoteException {
         super();
         this.game = game;
+
         initializeCardActions();
     }
 
@@ -46,30 +47,29 @@ public class GameController extends UnicastRemoteObject implements RemoteControl
      * allowing both RMI and Socket clients to use a unified command protocol.
      */
     private void initializeCardActions() {
-        cardActions.put("U", this::handleUpperCardSelection);
-        cardActions.put("B", this::handleLowerCardSelection);
-        cardActions.put("BU", this::handleUpperBuildingSelection);
-        cardActions.put("BB", this::handleLowerBuildingSelection);
+        this.cardActions.put("T", this::handleUpperCardSelection);
+        this.cardActions.put("L", this::handleLowerCardSelection);
+        this.cardActions.put("B", this::handleUpperBuildingSelection);
+        this.cardActions.put("G", this::handleLowerBuildingSelection);
     }
 
     /**
-     * Executes a game action based on a string prefix and an integer argument.
-     * This acts as the primary entry point for networked commands, decoupling the
-     * transmission protocol from the specific controller methods.
-     *
-     * @param prefix the unique string identifier for the action (e.g., "U", "BU").
-     * @param n the numerical argument for the selection or action.
-     * @throws RemoteException if the underlying game logic throws a RemoteException.
+     * Executes a card action based on the prefix mapping.
      */
     @Override
     public void executeCardAction(String prefix, int n) throws RemoteException {
         RemoteAction action = cardActions.get(prefix);
         if (action != null) {
-            action.apply(n);
+            try {
+                action.apply(n);
+            } catch (Exception e) {
+                throw new RuntimeException(e.getMessage());
+            }
         } else {
-           System.err.println("Unknown card action prefix: " + prefix);
+            throw new IllegalArgumentException("Unknown card prefix: " + prefix);
         }
     }
+
 
     /**
      * Handles the player's request to place a totem on a specific board tile.
