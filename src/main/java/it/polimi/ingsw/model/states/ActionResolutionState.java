@@ -92,7 +92,7 @@ public class ActionResolutionState extends GameState {
         }
 
         context.executeUpperCardPick(player, pos);
-        context.notifyShowTribe();
+        context.notifyShowTribe(player.getNickname());
 
         upperPicksLeft--;
 
@@ -125,7 +125,7 @@ public class ActionResolutionState extends GameState {
         }
 
         context.executeLowerCardPick(player, pos);
-        context.notifyShowTribe();
+        context.notifyShowTribe(player.getNickname());
 
         lowerPicksLeft--;
 
@@ -164,7 +164,7 @@ public class ActionResolutionState extends GameState {
         }
 
         context.executeUpperBuildingPick(player, pos);
-        context.notifyShowTribe();
+        context.notifyShowTribe(player.getNickname());
 
         hasBoughtBuilding = true;
         upperPicksLeft--;
@@ -204,7 +204,7 @@ public class ActionResolutionState extends GameState {
         }
 
         context.executeLowerBuildingPick(player, pos);
-        context.notifyShowTribe();
+        context.notifyShowTribe(player.getNickname());
 
         hasBoughtBuilding = true;
         lowerPicksLeft--;
@@ -250,7 +250,7 @@ public class ActionResolutionState extends GameState {
             }
         }
 
-        context.notifyShowTribe();
+        context.notifyShowTribe(player.getNickname());
         context.advanceTurn();
 
         // BOARD HAS CHANGED: Send the updated board before asking the next player to pick

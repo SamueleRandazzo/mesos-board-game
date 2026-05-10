@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.Cards;
 
+import it.polimi.ingsw.model.Game;
 import it.polimi.ingsw.model.Interfaces.EventEffect;
 import it.polimi.ingsw.model.Player;
 import it.polimi.ingsw.model.Interfaces.TribeDeck;
@@ -42,7 +43,7 @@ public class EventCard extends Card implements TribeDeck {
      * @throws IllegalArgumentException if the players list is null
      * @throws IllegalStateException    if the players list is empty
      */
-    public void raiseEvent(List<Player> players) {
+    public void raiseEvent(List<Player> players, Game game) {
         if (players == null) {
             throw new IllegalArgumentException("Players list cannot be null.");
         }
@@ -50,7 +51,7 @@ public class EventCard extends Card implements TribeDeck {
             throw new IllegalStateException("Cannot resolve event with no players.");
         }
 
-        eventEffect.resolve(players);
+        eventEffect.resolve(players, game);
     }
 
     /**

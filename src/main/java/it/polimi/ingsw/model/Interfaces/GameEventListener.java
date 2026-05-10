@@ -11,4 +11,5 @@ public interface GameEventListener {
     void onCardChosen();
     void onShowTribe(String playerNickname, TribeStatusDTO tribe);
     void onShowBoard(BoardDTO board);
+    void onEventMessage(String playerNickname, String message);
 }

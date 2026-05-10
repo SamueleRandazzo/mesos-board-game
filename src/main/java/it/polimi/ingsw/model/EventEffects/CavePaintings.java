@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.EventEffects;
 
+import it.polimi.ingsw.model.Game;
 import it.polimi.ingsw.model.Interfaces.EventEffect;
 import it.polimi.ingsw.model.Player;
 
@@ -67,7 +68,7 @@ public class CavePaintings implements EventEffect {
      * @throws IllegalStateException if {@code players} is empty
      */
     @Override
-    public void resolve(List<Player> players) {
+    public void resolve(List<Player> players, Game game) {
         if (players == null)
             throw new IllegalArgumentException("Players list cannot be null");
 
@@ -78,16 +79,20 @@ public class CavePaintings implements EventEffect {
             if (p == null)
                 throw new IllegalArgumentException("Player cannot be null");
 
-            // Food gained from Cave Painting buildings
-            p.changeFoodAmount(p.getTribe().totalFoodByCavePaintingBuildings());
+            int totalFoodAmount = p.getTribe().totalFoodByCavePaintingBuildings();
+            p.changeFoodAmount(totalFoodAmount);
 
             int numberOfArtists = p.getTribe().getArtistsCount();
 
-            // Prestige logic
-            if (numberOfArtists < penaltyThreshold)
-                p.changePrestigePoints(-penaltyPoints); // penaltyPoints is positive
-            else
-                p.changePrestigePoints(bonusPointsPerArtist * numberOfArtists);
+            if (numberOfArtists < penaltyThreshold) {
+                p.changePrestigePoints(-penaltyPoints);
+                game.notifyEventMessage(p, String.format("CAVE PAINTINGS EVENT: You earn %d foods and lost %d prestige points.", totalFoodAmount, penaltyPoints));
+            }
+            else {
+                int totalPrestigePoints = bonusPointsPerArtist * numberOfArtists;
+                p.changePrestigePoints(totalPrestigePoints);
+                game.notifyEventMessage(p, String.format("CAVE PAINTINGS EVENT: You earn %d foods and %d prestige points.", totalFoodAmount, totalPrestigePoints));
+            }
         }
     }
 }

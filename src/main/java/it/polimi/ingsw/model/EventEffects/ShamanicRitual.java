@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.EventEffects;
 
+import it.polimi.ingsw.model.Game;
 import it.polimi.ingsw.model.Interfaces.EventEffect;
 import it.polimi.ingsw.model.Player;
 import java.util.HashMap;
@@ -63,7 +64,7 @@ public class ShamanicRitual implements EventEffect {
      * @throws IllegalStateException if players is empty
      */
     @Override
-    public void resolve(List<Player> players) {
+    public void resolve(List<Player> players, Game game) {
         if (players == null)
             throw new IllegalArgumentException("Players list cannot be null");
 
@@ -108,6 +109,7 @@ public class ShamanicRitual implements EventEffect {
             boolean doubleReward = pl.getTribe().getShamanicAttr().isDoubleOnWinning();
             int reward = doubleReward ? victoryPrestigePoints * 2 : victoryPrestigePoints;
             pl.changePrestigePoints(reward);
+            game.notifyEventMessage(pl, String.format("SHAMANIC RITUAL EVENT: You earn %d prestige points.", reward));
         }
 
         // Apply defeat penalties (subtracting positive points)
@@ -115,6 +117,8 @@ public class ShamanicRitual implements EventEffect {
             boolean preventLoss = pl.getTribe().getShamanicAttr().isPreventLoss();
             int penalty = preventLoss ? 0 : -defeatPrestigePoints; // subtract positive value
             pl.changePrestigePoints(penalty);
+            game.notifyEventMessage(pl, String.format("SHAMANIC RITUAL EVENT: You lost %d prestige points.", penalty));
+
         }
     }
 }

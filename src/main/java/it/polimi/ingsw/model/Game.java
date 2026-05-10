@@ -222,11 +222,17 @@ public class Game {
 
     }
 
-    public void notifyShowTribe() {
+    public void notifyShowTribe(String playerNickname) {
         TribeStatusDTO tribeDTO = this.getCurrentActivePlayer().getTribe().toDTO();
 
         for (GameEventListener l : listeners) {
-            l.onShowTribe(this.getCurrentActivePlayer().getNickname(), tribeDTO);
+            l.onShowTribe(playerNickname, tribeDTO);
+        }
+    }
+
+    public void notifyEventMessage(Player player, String eventMessage) {
+        for (GameEventListener l : listeners) {
+            l.onEventMessage(player.getNickname(), eventMessage);
         }
     }
 
@@ -293,7 +299,11 @@ public class Game {
         events.sort(Comparator.comparingInt(EventCard::getEra));
 
         for (EventCard event : events) {
-            event.raiseEvent(getPlayers());
+            event.raiseEvent(getPlayers(), this);
+        }
+
+        for (Player p: players) {
+            notifyShowTribe(p.getNickname());
         }
     }
 
@@ -350,7 +360,11 @@ public class Game {
         events.sort(Comparator.comparingInt(EventCard::getEra));
 
         for (EventCard event : events) {
-            event.raiseEvent(getPlayers()); // NOTE: to fix after EventCard Singleton dependency is removed.
+            event.raiseEvent(getPlayers(), this);
+        }
+
+        for (Player p: players) {
+            notifyShowTribe(p.getNickname());
         }
     }
 

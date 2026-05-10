@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.EventEffects;
 
+import it.polimi.ingsw.model.Game;
 import it.polimi.ingsw.model.Interfaces.EventEffect;
 import it.polimi.ingsw.model.Player;
 
@@ -49,7 +50,7 @@ public class Hunt implements EventEffect {
      * @throws IllegalStateException if {@code players} is empty
      */
     @Override
-    public void resolve(List<Player> players) {
+    public void resolve(List<Player> players, Game game) {
         if (players == null)
             throw new IllegalArgumentException("Players list cannot be null");
 
@@ -60,15 +61,15 @@ public class Hunt implements EventEffect {
             if (p == null)
                 throw new IllegalArgumentException("Player cannot be null");
 
-            // Food and Prestige from Hunt buildings
-            p.changeFoodAmount(p.getTribe().totalFoodByHuntBuildings());
-            p.changePrestigePoints(p.getTribe().totalPointsByHuntBuildings());
-
-            // Additional rewards based on Hunters
             int numberOfHunters = p.getTribe().getHuntersCount();
 
-            p.changeFoodAmount(numberOfHunters);
-            p.changePrestigePoints(numberOfHunters * pointsPerCard);
+            int totalFoodReward = p.getTribe().totalFoodByHuntBuildings() + numberOfHunters;
+            int totalPointsReward = p.getTribe().totalPointsByHuntBuildings() + numberOfHunters * pointsPerCard;
+
+            p.changeFoodAmount(totalFoodReward);
+            p.changePrestigePoints(totalPointsReward);
+
+            game.notifyEventMessage(p, String.format("HUNT EVENT: You earn %d foods and %d prestige points.", totalFoodReward, totalPointsReward));
         }
     }
 }

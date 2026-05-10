@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.EventEffects;
 
+import it.polimi.ingsw.model.Game;
 import it.polimi.ingsw.model.Interfaces.EventEffect;
 import it.polimi.ingsw.model.Player;
 
@@ -40,7 +41,7 @@ public class Sustenance implements EventEffect {
      * @throws IllegalStateException if the players list is empty.
      */
     @Override
-    public void resolve(List<Player> players) {
+    public void resolve(List<Player> players, Game game) {
         // 1. Initial Validation
         if (players == null) {
             throw new IllegalArgumentException("Players list cannot be null.");
@@ -67,6 +68,8 @@ public class Sustenance implements EventEffect {
                 if (currentFood >= toFeed) {
                     // The player has enough food, just subtract the required amount
                     p.changeFoodAmount(-toFeed);
+
+                    game.notifyEventMessage(p, String.format("SUSTENANCE EVENT: You lost %d food.", toFeed));
                 } else {
                     // The player does not have enough food
                     int missingFood = toFeed - currentFood;
@@ -77,6 +80,8 @@ public class Sustenance implements EventEffect {
                     // Apply the prestige penalty for the missing food
                     int totalPenalty = missingFood * pointsPenalty;
                     p.changePrestigePoints(-totalPenalty);
+
+                    game.notifyEventMessage(p, String.format("SUSTENANCE EVENT: You lost %d food and %d prestige points.", currentFood, totalPenalty));
                 }
             }
         }
