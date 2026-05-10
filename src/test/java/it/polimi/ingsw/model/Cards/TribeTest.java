@@ -32,9 +32,9 @@ class TribeTest {
     @Test
     void testAddBasicCharacters_CountsUpdateCorrectly() {
         // SETUP & EXECUTE: Add various characters without immediate special effects
-        tribe.addCard(new Artist(1, 2, true));
-        tribe.addCard(new Artist(1, 2, true));
-        tribe.addCard(new Gatherer(1, 2, true));
+        tribe.addCard(new Artist("artist_1", 1, 2, true));
+        tribe.addCard(new Artist("artist_2", 1, 2, true));
+        tribe.addCard(new Gatherer("gatherer_1", 1, 2, true));
 
         // ASSERT
         assertEquals(2, tribe.getArtistsCount(), "Tribe should have 2 Artists.");
@@ -48,21 +48,21 @@ class TribeTest {
         player.setFoodAmount(0);
 
         // EXECUTE 1: Add a Hunter WITHOUT food icon
-        tribe.addCard(new Hunter(1, 2, true, false));
+        tribe.addCard(new Hunter("hunter_1", 1, 2, true, false));
         // ASSERT 1
         assertEquals(1, tribe.getHuntersCount());
         assertEquals(0, player.getFoodAmount(), "Hunter without icon should not give food.");
 
         // EXECUTE 2: Add a Hunter WITH food icon.
         // MESOS RULE: Gives 1 food for EVERY Hunter in the tribe (now there are 2)
-        tribe.addCard(new Hunter(1, 2, true, true));
+        tribe.addCard(new Hunter("hunter_2", 1, 2, true, true));
 
         // ASSERT 2
         assertEquals(2, player.getFoodAmount(), "Player should immediately gain 2 food (1 for each Hunter).");
 
         // EXECUTE 3: Add another Hunter WITH food icon.
         // Tribe now has 3 Hunters. Should give +3 food immediately.
-        tribe.addCard(new Hunter(1, 2, true, true));
+        tribe.addCard(new Hunter("hunter_3", 1, 2, true, true));
 
         // ASSERT 3
         assertEquals(5, player.getFoodAmount(), "Player should have 2 + 3 = 5 food.");
@@ -71,14 +71,14 @@ class TribeTest {
     @Test
     void testShamanAttributesUpdate() {
         // EXECUTE: Add a Shaman with 3 stars
-        tribe.addCard(new Shaman(1, 2, true, 3));
+        tribe.addCard(new Shaman("shaman_1", 1, 2, true, 3));
 
         // ASSERT
         assertEquals(1, tribe.getShamansCount());
         assertEquals(3, tribe.getShamanicAttr().getStars(), "Shamanic stars should be updated to 3.");
 
         // EXECUTE: Add another Shaman with 2 stars
-        tribe.addCard(new Shaman(1, 2, true, 2));
+        tribe.addCard(new Shaman("shaman_2", 1, 2, true, 2));
 
         // ASSERT
         assertEquals(5, tribe.getShamanicAttr().getStars(), "Shamanic stars should accumulate to 5.");
@@ -87,8 +87,8 @@ class TribeTest {
     @Test
     void testBuilderCalculations() {
         // EXECUTE: Add Builders with different discounts and prestige points
-        tribe.addCard(new Builder(1, 2, true, 2, 1)); // Discount 2, PP 1
-        tribe.addCard(new Builder(1, 2, true, 1, 3)); // Discount 1, PP 3
+        tribe.addCard(new Builder("builder_1", 1, 2, true, 2, 1)); // Discount 2, PP 1
+        tribe.addCard(new Builder("builder_2", 1, 2, true, 1, 3)); // Discount 1, PP 3
 
         // ASSERT
         assertEquals(3, tribe.totalBuildersFoodDiscount(), "Total builder discount should be 2 + 1 = 3.");
@@ -98,9 +98,9 @@ class TribeTest {
     @Test
     void testInventorDifferentIcons() {
         // EXECUTE: Add Inventors with specific icons
-        tribe.addCard(new Inventor(1, 2, true, InventionIcon.CANOE));
-        tribe.addCard(new Inventor(1, 2, true, InventionIcon.CANOE)); // Duplicate
-        tribe.addCard(new Inventor(1, 2, true, InventionIcon.ROPE));
+        tribe.addCard(new Inventor("inventor_1", 1, 2, true, InventionIcon.CANOE));
+        tribe.addCard(new Inventor("inventor_2", 1, 2, true, InventionIcon.CANOE)); // Duplicate
+        tribe.addCard(new Inventor("inventor_3", 1, 2, true, InventionIcon.ROPE));
 
         // ASSERT
         assertEquals(3, tribe.getInventorsCount(), "There should be 3 Inventors total.");
@@ -110,10 +110,10 @@ class TribeTest {
     @Test
     void testSetCountOfDifferentCards() {
         // SETUP: Add 4 DIFFERENT characters (Artist, Builder, Gatherer, Hunter)
-        tribe.addCard(new Artist(1, 2, true));
-        tribe.addCard(new Builder(1, 2, true, 0, 0));
-        tribe.addCard(new Gatherer(1, 2, true));
-        tribe.addCard(new Hunter(1, 2, true, false));
+        tribe.addCard(new Artist("artist_1", 1, 2, true));
+        tribe.addCard(new Builder("builder_1", 1, 2, true, 0, 0));
+        tribe.addCard(new Gatherer("gatherer_1", 1, 2, true));
+        tribe.addCard(new Hunter("hunter_1", 1, 2, true, false));
 
         // ASSERT 1: We have exactly one set of 4 different cards
         assertEquals(1, tribe.getSetCountOfDifferentCard(4), "Should find 1 set of 4 different cards.");
@@ -122,9 +122,9 @@ class TribeTest {
         assertEquals(0, tribe.getSetCountOfDifferentCard(5), "Should find 0 sets of 5 different cards.");
 
         // SETUP: Add duplicates (2 more Artists, 1 more Builder)
-        tribe.addCard(new Artist(1, 2, true));
-        tribe.addCard(new Artist(1, 2, true));
-        tribe.addCard(new Builder(1, 2, true, 0, 0));
+        tribe.addCard(new Artist("artist_2", 1, 2, true));
+        tribe.addCard(new Artist("artist_3", 1, 2, true));
+        tribe.addCard(new Builder("builder_2", 1, 2, true, 0, 0));
 
         // At this point we have: 3 Artists, 2 Builders, 1 Gatherer, 1 Hunter.
         // We can make ONE set of 4 different cards (1 Art, 1 Bld, 1 Gath, 1 Hunt).
@@ -138,12 +138,12 @@ class TribeTest {
     @Test
     void testCavePaintingBuildingBonus() {
         // SETUP: Add 3 Artists
-        tribe.addCard(new Artist(1, 2, true));
-        tribe.addCard(new Artist(1, 2, true));
-        tribe.addCard(new Artist(1, 2, true));
+        tribe.addCard(new Artist("artist_1", 1, 2, true));
+        tribe.addCard(new Artist("artist_2", 1, 2, true));
+        tribe.addCard(new Artist("artist_3", 1, 2, true));
 
         // EXECUTE: Add a Cave Painting building that gives 2 food per Artist
-        CavePaintingBuilding building = new CavePaintingBuilding(1, 2, true, 0, 0, 2, new ArtistsCount());
+        CavePaintingBuilding building = new CavePaintingBuilding("cave_1", 1, 2, true, 0, 0, 2, new ArtistsCount());
         tribe.addCard(building);
 
         // ASSERT: 3 Artists * 2 Extra Food = 6 Food total
@@ -153,11 +153,11 @@ class TribeTest {
     @Test
     void testHuntBuildingBonus() {
         // SETUP: Add 2 Hunters
-        tribe.addCard(new Hunter(1, 2, true, false));
-        tribe.addCard(new Hunter(1, 2, true, false));
+        tribe.addCard(new Hunter("hunter_1", 1, 2, true, false));
+        tribe.addCard(new Hunter("hunter_2", 1, 2, true, false));
 
         // EXECUTE: Add a Hunt building giving 1 food and 3 points per Hunter
-        HuntBuilding building = new HuntBuilding(1, 2, true, 0, 0, 1, 3, new HuntersCount());
+        HuntBuilding building = new HuntBuilding("hunt_1", 1, 2, true, 0, 0, 1, 3, new HuntersCount());
         tribe.addCard(building);
 
         // ASSERT
@@ -168,13 +168,13 @@ class TribeTest {
     @Test
     void testSustenanceBuildingBonus() {
         // SETUP: Add 4 Gatherers
-        tribe.addCard(new Gatherer(1, 2, true));
-        tribe.addCard(new Gatherer(1, 2, true));
-        tribe.addCard(new Gatherer(1, 2, true));
-        tribe.addCard(new Gatherer(1, 2, true));
+        tribe.addCard(new Gatherer("gatherer_1", 1, 2, true));
+        tribe.addCard(new Gatherer("gatherer_2", 1, 2, true));
+        tribe.addCard(new Gatherer("gatherer_3", 1, 2, true));
+        tribe.addCard(new Gatherer("gatherer_4", 1, 2, true));
 
         // EXECUTE: Add a Sustenance building giving 2 discount per Gatherer
-        SustenanceBuilding building = new SustenanceBuilding(1, 2, true, 0, 0, 2, new GatherersCount());
+        SustenanceBuilding building = new SustenanceBuilding("sustenance_1", 1, 2, true, 0, 0, 2, new GatherersCount());
         tribe.addCard(building);
 
         // ASSERT
@@ -188,25 +188,25 @@ class TribeTest {
 
         // Create a CardAddedBuilding that gives 5 Food every time a set of 3 different characters is completed
         // Parameters: era, minPlayer, isObtainable, foodCost, PP, bonusOnDuplicateInventor, bonusOnSetCharacters, foodBonus, setDim
-        CardAddedBuilding building = new CardAddedBuilding(1, 2, true, 0, 0, false, true, 5, 3);
+        CardAddedBuilding building = new CardAddedBuilding("card_added_1", 1, 2, true, 0, 0, false, true, 5, 3);
         tribe.addCard(building);
 
         // EXECUTE 1: Add first 2 distinct cards (No set of 3 yet)
-        tribe.addCard(new Artist(1, 2, true));
-        tribe.addCard(new Gatherer(1, 2, true));
+        tribe.addCard(new Artist("artist_1", 1, 2, true));
+        tribe.addCard(new Gatherer("gatherer_1", 1, 2, true));
 
         // ASSERT 1
         assertEquals(0, player.getFoodAmount(), "Set not complete, should not receive food.");
 
         // EXECUTE 2: Add 3rd distinct card (Completes a set of 3)
         // Note: The addCard method internally calls checkSetBonus()
-        tribe.addCard(new Builder(1, 2, true, 0, 0));
+        tribe.addCard(new Builder("builder_1", 1, 2, true, 0, 0));
 
         // ASSERT 2
         assertEquals(5, player.getFoodAmount(), "Set of 3 completed! Player should automatically receive 5 food.");
 
         // EXECUTE 3: Add duplicate cards (Does not complete a NEW set of 3 distinct)
-        tribe.addCard(new Artist(1, 2, true));
+        tribe.addCard(new Artist("artist_2", 1, 2, true));
         assertEquals(5, player.getFoodAmount(), "No new set completed, food remains 5.");
     }
 }

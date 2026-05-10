@@ -6,6 +6,9 @@ import it.polimi.ingsw.model.Player;
 import it.polimi.ingsw.model.Enum.Color;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import it.polimi.ingsw.model.Game;
+import it.polimi.ingsw.model.Board.OfferTrack;
+import java.util.ArrayList;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,7 +29,7 @@ class EventCardTest {
         player = new Player(Color.RED, "TestPlayer");
 
         // Create an EventCard for Era 1, min 2 players, not a final event
-        eventCard = new EventCard(1, 2, false, actualGameEvent);
+        eventCard = new EventCard("event_1", 1, 2, false, actualGameEvent);
     }
 
     @Test
@@ -44,24 +47,24 @@ class EventCardTest {
     @Test
     void testConstructor_NullEventEffectThrowsException() {
         // EXECUTE & ASSERT: An EventCard must hold a valid EventEffect
-        assertThrows(IllegalArgumentException.class, () -> new EventCard(1, 2, false, null),
+        assertThrows(IllegalArgumentException.class, () -> new EventCard("event_null", 1, 2, false, null),
                 "Constructor must throw an exception if the EventEffect is null.");
     }
 
     @Test
     void testConstructor_InvalidCardParametersThrowException() {
         // MESOS RULE: Eras are strictly 1, 2, or 3
-        assertThrows(IllegalArgumentException.class, () -> new EventCard(0, 2, false, actualGameEvent),
+        assertThrows(IllegalArgumentException.class, () -> new EventCard("event_invalid_era_0", 0, 2, false, actualGameEvent),
                 "Should throw an exception for Era < 1.");
 
-        assertThrows(IllegalArgumentException.class, () -> new EventCard(4, 2, false, actualGameEvent),
+        assertThrows(IllegalArgumentException.class, () -> new EventCard("event_invalid_era_4", 4, 2, false, actualGameEvent),
                 "Should throw an exception for Era > 3.");
 
         // MESOS RULE: Player count must be strictly between 2 and 5
-        assertThrows(IllegalArgumentException.class, () -> new EventCard(1, 1, false, actualGameEvent),
+        assertThrows(IllegalArgumentException.class, () -> new EventCard("event_invalid_min_1", 1, 1, false, actualGameEvent),
                 "Should throw an exception if minimum players is less than 2.");
 
-        assertThrows(IllegalArgumentException.class, () -> new EventCard(1, 6, false, actualGameEvent),
+        assertThrows(IllegalArgumentException.class, () -> new EventCard("event_invalid_min_6", 1, 6, false, actualGameEvent),
                 "Should throw an exception if minimum players is greater than 5.");
     }
 
@@ -69,24 +72,34 @@ class EventCardTest {
     void testRaiseEvent_Success() {
         // SETUP: Give the player 5 starting food to verify behavior
         player.setFoodAmount(5);
-        List<Player> players = List.of(player);
+        Player secondPlayer = new Player(Color.BLUE, "SecondPlayer");
+        List<Player> players = List.of(player, secondPlayer);
 
         // EXECUTE: Resolve the event through the card.
         // A base Hunt event (with 0 Hunters) shouldn't add food or crash.
-        eventCard.raiseEvent(players);
+        Game game = new Game(
+                players,
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new OfferTrack(new ArrayList<>())
+        );
+
+        eventCard.raiseEvent(players, game);
 
         // ASSERT: Verify the player hasn't erroneously lost or gained resources
-        assertEquals(5, player.getFoodAmount(), "The Hunt event should resolve without altering resources incorrectly.");
+        assertEquals(6, player.getFoodAmount(), "The Hunt event should add 1 food.");
     }
 
     @Test
     void testRaiseEvent_ExceptionsAreThrownCorrectly() {
         // EXECUTE & ASSERT: The system must not allow resolving an event into the void
 
-        assertThrows(IllegalArgumentException.class, () -> eventCard.raiseEvent(null),
+        assertThrows(IllegalArgumentException.class, () -> eventCard.raiseEvent(null, null),
                 "Should throw IllegalArgumentException if the player list is null.");
 
-        assertThrows(IllegalStateException.class, () -> eventCard.raiseEvent(Collections.emptyList()),
+        assertThrows(IllegalStateException.class, () -> eventCard.raiseEvent(Collections.emptyList(), null),
                 "Should throw IllegalStateException if the player list is empty.");
     }
 

@@ -13,7 +13,7 @@ class CardTest {
      */
     private static class DummyCard extends Card {
         public DummyCard(int era, int minPlayer, boolean isObtainable) {
-            super(era, minPlayer, isObtainable);
+            super("dummy_card", era, minPlayer, isObtainable);
         }
 
         @Override

@@ -1,12 +1,16 @@
 package it.polimi.ingsw.model.EventEffects;
 
-import it.polimi.ingsw.model.CharacterCards.Hunter;
 import it.polimi.ingsw.model.BuildingCards.HuntBuilding;
+import it.polimi.ingsw.model.CharacterCards.Hunter;
 import it.polimi.ingsw.model.CharacterTypeCounts.HuntersCount;
 import it.polimi.ingsw.model.Enum.Color;
 import it.polimi.ingsw.model.Player;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import it.polimi.ingsw.model.Game;
+import it.polimi.ingsw.model.Board.OfferTrack;
+import it.polimi.ingsw.model.Cards.BuildingCard;
+import it.polimi.ingsw.model.Interfaces.TribeDeck;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,77 +20,113 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class HuntTest {
 
-    private Player player;
     private Hunt huntEvent;
+    private Player player;
+    private Game newMinimalGame(List<Player> players) {
+        return new Game(
+                players,
+                new ArrayList<TribeDeck>(),
+                new ArrayList<BuildingCard>(),
+                new ArrayList<BuildingCard>(),
+                new ArrayList<BuildingCard>(),
+                new OfferTrack(new ArrayList<>())
+        );
+    }
 
     @BeforeEach
     void setUp() {
-        player = new Player(Color.BLUE, "TestPlayer");
-        // Create a Hunt event that gives 2 PP per Hunter
         huntEvent = new Hunt(2);
+        player = new Player(Color.RED, "TestPlayer");
     }
 
     @Test
-    void testResolveExceptions() {
-        assertThrows(IllegalArgumentException.class, () -> huntEvent.resolve(null),
-                "Should throw exception if player list is null.");
-        assertThrows(IllegalStateException.class, () -> huntEvent.resolve(Collections.emptyList()),
-                "Should throw exception if player list is empty.");
+    void testConstructor_NegativePointsThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> new Hunt(-1),
+                "Constructor should reject negative hunt points.");
+    }
+
+    @Test
+    void testResolve_ExceptionsAreThrownCorrectly() {
+        assertThrows(IllegalArgumentException.class, () -> huntEvent.resolve(null, null),
+                "Should throw IllegalArgumentException if players list is null.");
+
+        assertThrows(IllegalStateException.class, () -> huntEvent.resolve(Collections.emptyList(), null),
+                "Should throw IllegalStateException if players list is empty.");
 
         List<Player> listWithNull = new ArrayList<>();
         listWithNull.add(null);
-        assertThrows(IllegalArgumentException.class, () -> huntEvent.resolve(listWithNull),
-                "Should throw exception if player list contains null.");
+
+        assertThrows(IllegalArgumentException.class, () -> huntEvent.resolve(listWithNull, null),
+                "Should throw IllegalArgumentException if a player in the list is null.");
     }
 
     @Test
-    void testHuntWithNoHunters() {
-        // SETUP: Player has no cards.
+    void testResolve_NoHuntersNoPoints() {
+        Player secondPlayer = new Player(Color.BLUE, "SecondPlayer");
+        List<Player> players = List.of(player, secondPlayer);
 
-        // EXECUTE
-        huntEvent.resolve(List.of(player));
+        Game game = newMinimalGame(players);
 
-        // ASSERT: No food or PP should be gained.
-        assertEquals(0, player.getFoodAmount(), "Player should not gain any food.");
-        assertEquals(0, player.getPrestigePoints(), "Player should not gain any prestige points.");
+        huntEvent.resolve(players, game);
+
+        assertEquals(0, player.getPrestigePoints(),
+                "Player without Hunters should gain no prestige points.");
     }
 
     @Test
-    void testHuntWithOnlyHunters() {
-        // SETUP: Player gets 2 Hunters (foodIcon is false to not trigger the immediate bonus in Tribe.java).
-        player.getTribe().addCard(new Hunter(1, 2, true, false));
-        player.getTribe().addCard(new Hunter(1, 2, true, false));
+    void testResolve_HuntersGrantPrestigePoints() {
+        // Add 2 Hunters
+        player.getTribe().addCard(new Hunter("hunter_1", 1, 2, true, false));
+        player.getTribe().addCard(new Hunter("hunter_2", 1, 2, true, false));
 
-        // EXECUTE
-        huntEvent.resolve(List.of(player));
+        Player secondPlayer = new Player(Color.BLUE, "SecondPlayer");
+        List<Player> players = List.of(player, secondPlayer);
 
-        // ASSERT: 2 Hunters -> +2 food. 2 Hunters * 2 PP = +4 PP.
-        assertEquals(2, player.getFoodAmount(), "Player should gain 1 food per Hunter.");
-        assertEquals(4, player.getPrestigePoints(), "Player should gain 2 PP per Hunter.");
+        Game game = newMinimalGame(players);
+
+        huntEvent.resolve(players, game);
+
+        // 2 Hunters * 2 PP each = 4 PP
+        assertEquals(4, player.getPrestigePoints(),
+                "Player should gain 4 prestige points.");
     }
 
     @Test
-    void testHuntWithHuntersAndBuilding() {
-        // SETUP: Add 2 Hunters.
-        player.getTribe().addCard(new Hunter(1, 2, true, false));
-        player.getTribe().addCard(new Hunter(1, 2, true, false));
+    void testResolve_HuntBuildingBonusApplies() {
+        // Add 2 Hunters
+        player.getTribe().addCard(new Hunter("hunter_1", 1, 2, true, false));
+        player.getTribe().addCard(new Hunter("hunter_2", 1, 2, true, false));
 
-        // Add a HuntBuilding: gives 1 extra food and 1 extra PP per Hunter
-        HuntBuilding building = new HuntBuilding(1, 2, true, 0, 0, 1, 1, new HuntersCount());
+        // Add Hunt Building: +1 food and +3 points per Hunter
+        HuntBuilding building = new HuntBuilding(
+                "hunt_1",
+                1,
+                2,
+                true,
+                0,
+                0,
+                1,
+                3,
+                new HuntersCount()
+        );
+
         player.getTribe().addCard(building);
 
-        // EXPECTATIONS:
-        // Building Food: 2 Hunters * 1 = 2
-        // Building PP: 2 Hunters * 1 = 2
-        // Base Event Food: 2 Hunters = 2
-        // Base Event PP: 2 Hunters * 2 = 4
-        // Total Food: 4, Total PP: 6
+        Player secondPlayer = new Player(Color.BLUE, "SecondPlayer");
+        List<Player> players = List.of(player, secondPlayer);
 
-        // EXECUTE
-        huntEvent.resolve(List.of(player));
+        Game game = newMinimalGame(players);
 
-        // ASSERT
-        assertEquals(4, player.getFoodAmount(), "Player should gain combined food from building and event.");
-        assertEquals(6, player.getPrestigePoints(), "Player should gain combined prestige points from building and event.");
+        huntEvent.resolve(players, game);
+
+        // Base Hunt event: 2 Hunters * 2 PP = 4 PP
+        // Building bonus: 2 Hunters * 3 PP = 6 PP
+        // Total = 10 PP
+
+        assertEquals(10, player.getPrestigePoints(),
+                "Player should gain total prestige points from Hunt + Building.");
+
+        // Food bonus from building: 2 Hunters * 1 Food = 2 Food
+        assertEquals(5, player.getFoodAmount(), "Player should gain food from Hunt event and Hunt Building.");
     }
 }

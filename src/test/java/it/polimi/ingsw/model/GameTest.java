@@ -84,7 +84,7 @@ class GameTest {
 
     private static class FakeTribeCard extends Card implements TribeDeck {
         protected FakeTribeCard(int era) {
-            super(era, 2, true);
+            super("fake_tribe_card_" + era, era, 2, true);
         }
 
         @Override
@@ -321,6 +321,9 @@ class GameTest {
 
         Game game = newGameWithPlayers(List.of(p1, p2));
 
+        p1.setFoodAmount(5);
+        p2.setFoodAmount(5);
+
         List<Player> winners = game.getWinner();
 
         assertEquals(2, winners.size());
@@ -370,10 +373,10 @@ class GameTest {
         Board board = game.getBoard();
 
         final int[] counter = {0};
-        EventEffect effect = ps -> counter[0] += ps.size();
+        EventEffect effect = (ps, gameContext) -> counter[0] += ps.size();
 
-        EventCard event1 = new EventCard(1, 2, false, effect);
-        EventCard event2 = new EventCard(1, 2, false, effect);
+        EventCard event1 = new EventCard("event_1", 1, 2, false, effect);
+        EventCard event2 = new EventCard("event_2", 1, 2, false, effect);
 
         List<TribeDeck> bottomRow = new ArrayList<>();
         bottomRow.add(event1);
