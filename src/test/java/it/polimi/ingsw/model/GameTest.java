@@ -289,33 +289,41 @@ class GameTest {
     }
 
     @Test
-    void getWinner_shouldReturnSingleWinnerWhenOnePlayerHasMorePrestige() {
+    void getLeaderboard_shouldReturnPlayersOrderedByPrestige() {
         Player p1 = newPlayer(Color.RED, 20, 1);
         Player p2 = newPlayer(Color.BLUE, 10, 99);
 
         Game game = newGameWithPlayers(List.of(p1, p2));
 
-        List<Player> winners = game.getLeaderboard();
+        p1.setFoodAmount(1);
+        p2.setFoodAmount(99);
 
-        assertEquals(1, winners.size());
-        assertSame(p1, winners.get(0));
+        List<Player> leaderboard = game.getLeaderboard();
+
+        assertEquals(2, leaderboard.size());
+        assertSame(p1, leaderboard.get(0));
+        assertSame(p2, leaderboard.get(1));
     }
 
     @Test
-    void getWinner_shouldUseFoodAsTieBreakerWhenPrestigeIsEqual() {
+    void getLeaderboard_shouldUseFoodAsTieBreakerWhenPrestigeIsEqual() {
         Player p1 = newPlayer(Color.RED, 20, 3);
         Player p2 = newPlayer(Color.BLUE, 20, 7);
 
         Game game = newGameWithPlayers(List.of(p1, p2));
 
-        List<Player> winners = game.getLeaderboard();
+        p1.setFoodAmount(3);
+        p2.setFoodAmount(7);
 
-        assertEquals(1, winners.size());
-        assertSame(p2, winners.get(0));
+        List<Player> leaderboard = game.getLeaderboard();
+
+        assertEquals(2, leaderboard.size());
+        assertSame(p2, leaderboard.get(0));
+        assertSame(p1, leaderboard.get(1));
     }
 
     @Test
-    void getWinner_shouldReturnSharedVictoryWhenPrestigeAndFoodAreEqual() {
+    void getLeaderboard_shouldKeepTiedPlayersAdjacentWhenPrestigeAndFoodAreEqual() {
         Player p1 = newPlayer(Color.RED, 20, 5);
         Player p2 = newPlayer(Color.BLUE, 20, 5);
 
@@ -324,15 +332,19 @@ class GameTest {
         p1.setFoodAmount(5);
         p2.setFoodAmount(5);
 
-        List<Player> winners = game.getLeaderboard();
+        List<Player> leaderboard = game.getLeaderboard();
 
-        assertEquals(2, winners.size());
-        assertTrue(winners.contains(p1));
-        assertTrue(winners.contains(p2));
+        assertEquals(2, leaderboard.size());
+        assertTrue(leaderboard.contains(p1));
+        assertTrue(leaderboard.contains(p2));
+        assertEquals(20, leaderboard.get(0).getPrestigePoints());
+        assertEquals(20, leaderboard.get(1).getPrestigePoints());
+        assertEquals(5, leaderboard.get(0).getFoodAmount());
+        assertEquals(5, leaderboard.get(1).getFoodAmount());
     }
 
     @Test
-    void getWinner_shouldWorkWithMoreThanTwoPlayers() {
+    void getLeaderboard_shouldWorkWithMoreThanTwoPlayers() {
         Player p1 = newPlayer(Color.RED, 10, 1);
         Player p2 = newPlayer(Color.BLUE, 15, 2);
         Player p3 = newPlayer(Color.YELLOW, 15, 4);
@@ -340,10 +352,18 @@ class GameTest {
 
         Game game = newGameWithPlayers(List.of(p1, p2, p3, p4));
 
-        List<Player> winners = game.getLeaderboard();
+        p1.setFoodAmount(1);
+        p2.setFoodAmount(2);
+        p3.setFoodAmount(4);
+        p4.setFoodAmount(10);
 
-        assertEquals(1, winners.size());
-        assertSame(p3, winners.get(0));
+        List<Player> leaderboard = game.getLeaderboard();
+
+        assertEquals(4, leaderboard.size());
+        assertSame(p3, leaderboard.get(0));
+        assertSame(p2, leaderboard.get(1));
+        assertSame(p1, leaderboard.get(2));
+        assertSame(p4, leaderboard.get(3));
     }
 
     @Test
