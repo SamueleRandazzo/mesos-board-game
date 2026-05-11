@@ -476,7 +476,7 @@ public class Tribe {
         allBuildingIds.addAll(getIdsFromList(this.cardAddedBuildings));
 
         // Pre-calculating totals for the View
-        int totalPrestige = totalBuildersPoints() + getTotalScoringBuildingsPoints();
+        int totalPrestige = owner.getPrestigePoints();
         int currentFood = owner.getFoodAmount();
         int totalSustenanceFoodDiscount = totalSustenanceDiscount();
         int totalBuildingDiscount = totalBuildersFoodDiscount();

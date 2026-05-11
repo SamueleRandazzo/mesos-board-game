@@ -25,7 +25,7 @@ public class Player
         return tribe;
     }
 
-    public int  getPrestigePoints(){
+    public int getPrestigePoints(){
         return prestigePoints;
     }
 

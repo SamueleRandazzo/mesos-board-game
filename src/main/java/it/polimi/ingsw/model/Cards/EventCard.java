@@ -4,7 +4,6 @@ import it.polimi.ingsw.model.Game;
 import it.polimi.ingsw.model.Interfaces.EventEffect;
 import it.polimi.ingsw.model.Player;
 import it.polimi.ingsw.model.Interfaces.TribeDeck;
-
 import java.util.List;
 
 /**

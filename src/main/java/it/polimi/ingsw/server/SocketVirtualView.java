@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.ingsw.model.Enum.Color;
 import it.polimi.ingsw.network.DTO.BoardDTO;
+import it.polimi.ingsw.network.DTO.LeaderboardDTO;
 import it.polimi.ingsw.network.DTO.OfferTileDTO;
 import it.polimi.ingsw.network.DTO.TribeStatusDTO;
 import it.polimi.ingsw.network.GameObserver;
@@ -64,15 +65,6 @@ class SocketVirtualView implements GameObserver {
     }
 
     @Override
-    public void onShowError(String error) throws RemoteException {
-        try {
-            out.println("ERROR " + error);
-        } catch (Exception e) {
-            System.err.println("Serialization error: " + e.getMessage());
-        }
-    }
-
-    @Override
     public void askCardChoose() throws RemoteException {
         try {
             out.println("ASK_CARD_CHOOSE");
@@ -111,8 +103,7 @@ class SocketVirtualView implements GameObserver {
 
     @Override
     public void onShowTribe(TribeStatusDTO tribe) {
-        try
-        {
+        try {
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(tribe);
 
@@ -139,6 +130,21 @@ class SocketVirtualView implements GameObserver {
             out.println("DISPLAY_BOARD " + cleanedJson);
             out.flush();
 
+        } catch (JsonProcessingException e) {
+            System.err.println("Error serializing BoardDTO: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void onDisplayLeaderboard(LeaderboardDTO leaderboard) throws RemoteException {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+
+            String jsonLeaderboard = mapper.writeValueAsString(leaderboard);
+            String cleanedJson = jsonLeaderboard.replace("\n", "").replace("\r", "");
+
+            out.println("DISPLAY_LEADERBOARD " + cleanedJson);
+            out.flush();
         } catch (JsonProcessingException e) {
             System.err.println("Error serializing BoardDTO: " + e.getMessage());
         }

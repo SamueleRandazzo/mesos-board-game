@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model;
 
 import it.polimi.ingsw.model.Cards.*;
+import it.polimi.ingsw.model.EventEffects.Sustenance;
 import it.polimi.ingsw.model.Interfaces.*;
 import it.polimi.ingsw.model.Board.*;
 import it.polimi.ingsw.model.factories.TurnOrderFactory;
@@ -8,7 +9,9 @@ import it.polimi.ingsw.model.states.EndGameState;
 import it.polimi.ingsw.model.states.GameState;
 import it.polimi.ingsw.model.states.SetupGameState;
 import it.polimi.ingsw.model.states.TotemPlacementState;
+import it.polimi.ingsw.network.DTO.LeaderboardDTO;
 import it.polimi.ingsw.network.DTO.OfferTileDTO;
+import it.polimi.ingsw.network.DTO.PlayerRankDTO;
 import it.polimi.ingsw.network.DTO.TribeStatusDTO;
 
 import java.util.*;
@@ -218,10 +221,6 @@ public class Game {
         }
     }
 
-    public void notifyOnCardChosen() {
-
-    }
-
     public void notifyShowTribe(String playerNickname) {
         TribeStatusDTO tribeDTO = this.getCurrentActivePlayer().getTribe().toDTO();
 
@@ -242,6 +241,14 @@ public class Game {
     public void notifyOnShowBoard() {
         for (GameEventListener l : listeners) {
             l.onShowBoard(this.board.toDTO());
+        }
+    }
+
+    public void notifyOnShowLeaderboard() {
+        LeaderboardDTO leaderboardDTO = createLeaderboardDTO();
+
+        for (GameEventListener l : listeners) {
+            l.onShowLeaderboard(leaderboardDTO);
         }
     }
     //endregion
@@ -294,17 +301,17 @@ public class Game {
 
         if (events.isEmpty()) return;
 
-        // Sort: non-sustenance events first (by era), sustenance last.
-        // TODO: identify Sustenance by subclass once EventCard subclasses are available.
-        events.sort(Comparator.comparingInt(EventCard::getEra));
+        resolveSortedEvents(events);
+    }
 
-        for (EventCard event : events) {
-            event.raiseEvent(getPlayers(), this);
-        }
+    private void resolveSortedEvents(List<EventCard> events) {
+        List<EventCard> sortedEvents = events.stream().sorted(Comparator.comparingInt((EventCard card) ->
+                                                                card.getEventEffect() instanceof Sustenance ? 1 : 0)
+                                                                .thenComparingInt(EventCard::getEra)).toList();
 
-        for (Player p: players) {
-            notifyShowTribe(p.getNickname());
-        }
+        sortedEvents.forEach(card -> card.raiseEvent(players, this));
+
+        players.forEach(p -> notifyShowTribe(p.getNickname()));
     }
 
     /**
@@ -357,15 +364,7 @@ public class Game {
             if (card instanceof EventCard) events.add((EventCard) card);
         }
 
-        events.sort(Comparator.comparingInt(EventCard::getEra));
-
-        for (EventCard event : events) {
-            event.raiseEvent(getPlayers(), this);
-        }
-
-        for (Player p: players) {
-            notifyShowTribe(p.getNickname());
-        }
+        resolveSortedEvents(events);
     }
 
     /**
@@ -375,7 +374,6 @@ public class Game {
      *  - 10 PP per every 2 Artist cards
      *  - Building card PP (printed + end-game effects)
      * <p>
-     * TODO: implement once Tribe exposes the required query methods.
      */
     private void computeFinalScores() {
         for (Player p : players) {
@@ -384,35 +382,6 @@ public class Game {
             p.changePrestigePoints(p.getTribe().getInventorsCount() * p.getTribe().totalDifferentInventorIcon());
             p.changePrestigePoints(p.getTribe().totalBuildersPoints());
         }
-    }
-
-    /**
-     * Determines and returns the winner(s) (rulebook p. 7).
-     * Tiebreaker: most food. If still tied, victory is shared.
-     *
-     * @return list of winning players (size > 1 means shared victory)
-     */
-    public List<Player> getWinner() {
-        int maxPP = players.stream()
-                .mapToInt(Player::getPrestigePoints)
-                .max()
-                .orElse(0);
-
-        List<Player> winners = players.stream()
-                .filter(p -> p.getPrestigePoints() == maxPP)
-                .collect(Collectors.toList());
-
-        if (winners.size() == 1) return winners;
-
-        // Tiebreaker: most food
-        int maxFood = winners.stream()
-                .mapToInt(Player::getFoodAmount)
-                .max()
-                .orElse(0);
-
-        return winners.stream()
-                .filter(p -> p.getFoodAmount() == maxFood)
-                .collect(Collectors.toList());
     }
 
     //region Getters
@@ -520,6 +489,7 @@ public class Game {
             computeFinalScores();
 
             this.setState(new EndGameState());
+            notifyOnShowLeaderboard();
         }
     }
 
@@ -590,17 +560,63 @@ public class Game {
      * Updates the turn order for the current phase.
      * @param newOrder the list of players in the order they must act.
      */
-    public void setTurnOrder(List<Player> newOrder){
+    public void setTurnOrder(List<Player> newOrder) {
         this.roundTurnOrder = new ArrayList<>(newOrder);
         this.currentPlayerIndex = 0;
     }
 
-    public TurnOrderTile getTurnOrderTile(){
-
+    public TurnOrderTile getTurnOrderTile() {
         return this.turnOrderTile;
     }
 
     public void resolveEndTurn() {
         this.currentState.endTurn(this, this.getCurrentActivePlayer());
+    }
+
+    /**
+     * Returns the players ranked from first to last place.
+     * Ranking criteria:
+     * 1. Highest Prestige Points
+     * 2. Tiebreaker: Most food
+     *
+     * @return list of players sorted by rank (descending)
+     */
+    public List<Player> getLeaderboard() {
+        return players.stream()
+                .sorted(Comparator
+                        .comparingInt(Player::getPrestigePoints).reversed()
+                        .thenComparing(Comparator.comparingInt(Player::getFoodAmount).reversed())
+                )
+                .collect(Collectors.toList());
+    }
+
+
+    public LeaderboardDTO createLeaderboardDTO() {
+        List<Player> sortedPlayers = getLeaderboard();
+        List<PlayerRankDTO> elements = new ArrayList<>();
+
+        for (int i = 0; i < sortedPlayers.size(); i++) {
+            Player p = sortedPlayers.get(i);
+
+            int actualPosition = i + 1;
+            if (i > 0) {
+                Player previous = sortedPlayers.get(i - 1);
+                if (p.getPrestigePoints() == previous.getPrestigePoints() &&
+                        p.getFoodAmount() == previous.getFoodAmount()) {
+                    actualPosition = elements.get(i - 1).getPosition();
+                }
+            }
+
+            elements.add(new PlayerRankDTO(
+                    p.getNickname(),
+                    p.getPrestigePoints(),
+                    p.getFoodAmount(),
+                    actualPosition,
+                    actualPosition == 1 // Winner
+            ));
+        }
+
+        long winnerCount = elements.stream().filter(PlayerRankDTO::isWinner).count();
+        return new LeaderboardDTO(elements, winnerCount > 1);
     }
 }

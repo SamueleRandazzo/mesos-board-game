@@ -83,11 +83,6 @@ public class ModelToRemoteViewAdapter implements GameEventListener {
     }
 
     @Override
-    public void onCardChosen() {
-
-    }
-
-    @Override
     public void onShowTribe(String playerNickname, TribeStatusDTO tribe) {
         GameObserver activeObs = playerObservers.get(playerNickname);
         if (activeObs != null) {
@@ -118,6 +113,17 @@ public class ModelToRemoteViewAdapter implements GameEventListener {
                 obs.onShowMessage(message);
             } catch (RemoteException e) {
                 System.err.println("Network error with: " + playerNickname);
+            }
+        }
+    }
+
+    @Override
+    public void onShowLeaderboard(LeaderboardDTO leaderboard) {
+        for (GameObserver o : playerObservers.values()) {
+            try {
+                o.onDisplayLeaderboard(leaderboard);
+            } catch (RemoteException e) {
+                System.err.println("Network error sending board");
             }
         }
     }

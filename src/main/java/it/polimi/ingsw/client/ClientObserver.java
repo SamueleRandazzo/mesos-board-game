@@ -42,11 +42,6 @@ public class ClientObserver implements GameObserver {
     }
 
     @Override
-    public void onShowError(String error) throws RemoteException {
-        view.showError(error);
-    }
-
-    @Override
     public void askCardChoose() throws RemoteException {
         view.askCardChoose();
     }
@@ -74,5 +69,10 @@ public class ClientObserver implements GameObserver {
     @Override
     public void onDisplayBoard(BoardDTO board) throws RemoteException {
         view.displayBoard(board);
+    }
+
+    @Override
+    public void onDisplayLeaderboard(LeaderboardDTO leaderboard) throws RemoteException {
+        view.displayLeaderboard(leaderboard);
     }
 }

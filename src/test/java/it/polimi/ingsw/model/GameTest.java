@@ -295,7 +295,7 @@ class GameTest {
 
         Game game = newGameWithPlayers(List.of(p1, p2));
 
-        List<Player> winners = game.getWinner();
+        List<Player> winners = game.getLeaderboard();
 
         assertEquals(1, winners.size());
         assertSame(p1, winners.get(0));
@@ -308,7 +308,7 @@ class GameTest {
 
         Game game = newGameWithPlayers(List.of(p1, p2));
 
-        List<Player> winners = game.getWinner();
+        List<Player> winners = game.getLeaderboard();
 
         assertEquals(1, winners.size());
         assertSame(p2, winners.get(0));
@@ -324,7 +324,7 @@ class GameTest {
         p1.setFoodAmount(5);
         p2.setFoodAmount(5);
 
-        List<Player> winners = game.getWinner();
+        List<Player> winners = game.getLeaderboard();
 
         assertEquals(2, winners.size());
         assertTrue(winners.contains(p1));
@@ -340,7 +340,7 @@ class GameTest {
 
         Game game = newGameWithPlayers(List.of(p1, p2, p3, p4));
 
-        List<Player> winners = game.getWinner();
+        List<Player> winners = game.getLeaderboard();
 
         assertEquals(1, winners.size());
         assertSame(p3, winners.get(0));

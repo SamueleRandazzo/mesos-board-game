@@ -12,7 +12,6 @@ public interface GameObserver extends Remote {
     void onGameStarted(RemoteController controller, int totalPlayers) throws RemoteException;
     void askMaxPlayers() throws RemoteException;
     void askTotemPlacement() throws RemoteException;
-    void onShowError(String error) throws RemoteException;
     void askCardChoose() throws RemoteException;
     void onShowMessage(String message) throws RemoteException;
     void onShowPlayersOrder(List<String> playersOrder) throws RemoteException;
@@ -20,4 +19,5 @@ public interface GameObserver extends Remote {
     void onShowPlayersInfo(Map<String, Color> playersInfo) throws RemoteException;
     void onShowTribe(TribeStatusDTO tribe) throws RemoteException;
     void onDisplayBoard(BoardDTO board) throws RemoteException;
+    void onDisplayLeaderboard(LeaderboardDTO leaderboard) throws RemoteException;
 }

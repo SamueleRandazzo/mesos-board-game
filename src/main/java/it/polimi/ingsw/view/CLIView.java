@@ -108,7 +108,7 @@ public class CLIView implements View {
 
     /**
      * Displays an error message to the user.
-     * * @param error the error message to display.
+     * @param error the error message to display.
      */
     @Override
     public void showError(String error) {
@@ -137,9 +137,14 @@ public class CLIView implements View {
     }
 
     /**
-     * Displays the current offer track and asks the player to choose a tile for totem placement.
-     * This is an interactive method that forwards the user's choice to the server.
-     * * @param tiles a list of {@link OfferTileDTO} representing the current state of the offer track.
+     * Prompts the user to select an offer tile for totem placement.
+     * <p>
+     * This method clears the input buffer, reads the user's choice from the console,
+     * and communicates the selection to the server. It includes recursive error
+     * handling for invalid numerical input or network-related issues.
+     * </p>
+     *
+     * @throws NumberFormatException if the user input is not a valid integer
      */
     @Override
     public void askTotemPlacement() {
@@ -161,7 +166,7 @@ public class CLIView implements View {
     /**
      * Formats and prints the offer track table to the console.
      * It displays indices, bonuses, and the occupancy status of each tile.
-     * * @param tiles the list of data transfer objects containing tile information.
+     * @param tiles the list of data transfer objects containing tile information.
      */
     @Override
     public void displayOfferTrack(List<OfferTileDTO> tiles) {
@@ -186,14 +191,6 @@ public class CLIView implements View {
         System.out.println("-".repeat(56));
     }
 
-    @Override
-    public void retryTotemPlacement() {
-        if (lastTiles != null) {
-            displayOfferTrack(lastTiles);
-            askTotemPlacement();
-        }
-    }
-
     private String handleNetworkError(Exception e) {
         if (e instanceof RemoteException) {
             return cleanRemoteException((RemoteException) e);
@@ -204,11 +201,22 @@ public class CLIView implements View {
         }
     }
 
+    /**
+     * Displays a generic message to the user via the standard output.
+     *
+     * @param message the string message to be printed
+     */
     @Override
     public void showMessage(String message) {
         System.out.println(message);
     }
 
+    /**
+     * Displays the current turn order of the players.
+     * The list is formatted as a numbered vertical list for better readability in the terminal.
+     *
+     * @param playersOrder the list of player nicknames in their respective turn order
+     */
     @Override
     public void showPlayersOrder(List<String> playersOrder) {
         String orderMessage = IntStream.range(0, playersOrder.size())
@@ -220,6 +228,15 @@ public class CLIView implements View {
         System.out.println(finalMessage);
     }
 
+    /**
+     * Provides information about player-color associations.
+     * <p>
+     * Note: This implementation is empty as the CLI version of the game
+     * does not currently utilize player colors for its display logic.
+     * </p>
+     *
+     * @param playersInfo a map associating player nicknames with their chosen {@code Color}
+     */
     @Override
     public void showPlayersInfo(Map<String,Color> playersInfo) {
         //CLI does not need to know player color
@@ -267,6 +284,17 @@ public class CLIView implements View {
         System.out.println("=".repeat(56) + "\n");
     }
 
+    /**
+     * Renders the current state of the game board to the console.
+     * <p>
+     * This method updates the local cache of the board state and prints a formatted
+     * representation of the four main card rows: Upper Tribe, Lower Tribe,
+     * Upper Building, and Lower Building.
+     * </p>
+     *
+     * @param board the {@code BoardDTO} containing the current state of all card rows
+     *              to be displayed
+     */
     public void displayBoard(BoardDTO board) {
         this.lastBoard = board;
         System.out.println("\n======================== BOARD ========================");
@@ -323,4 +351,65 @@ public class CLIView implements View {
         }
     }
 
+    /**
+     * Displays the final game rankings in the terminal.
+     * The leaderboard includes the position, player nickname, prestige points, and food amount.
+     * Winners are highlighted with special formatting.
+     *
+     * @param leaderboard the DTO containing the final standings and victory status
+     */
+    @Override
+    public void displayLeaderboard(LeaderboardDTO leaderboard) {
+        System.out.println("\n" + "=".repeat(60));
+        System.out.println(centerText("FINAL LEADERBOARD", 60));
+        System.out.println("=".repeat(60));
+
+        // Table Header: %-5s (Position), %-20s (Nickname), %-12s (Prestige), %-8s (Food)
+        String header = String.format("%-5s | %-20s | %-12s | %-8s", "POS", "PLAYER", "PRESTIGE", "FOOD");
+        System.out.println(header);
+        System.out.println("-".repeat(60));
+
+        for (PlayerRankDTO entry : leaderboard.getRankings()) {
+            String posString = entry.getPosition() + "°";
+            String name = entry.getNickname();
+
+            // Highlight winners with stars and uppercase
+            if (entry.isWinner()) {
+                name = "★ " + name.toUpperCase() + " ★";
+            }
+
+            String row = String.format("%-5s | %-20s | %-12d | %-8d",
+                    posString,
+                    name,
+                    entry.getPrestigePoints(),
+                    entry.getFoodAmount());
+
+            System.out.println(row);
+        }
+
+        System.out.println("-".repeat(60));
+
+        // Final Message
+        if (leaderboard.isSharedVictory()) {
+            System.out.println(" It's a draw! Victory is shared among the leaders.");
+        } else if (!leaderboard.getRankings().isEmpty()) {
+            String winnerName = leaderboard.getRankings().getFirst().getNickname();
+            System.out.println(" Congratulations " + winnerName + "! You are the absolute winner!");
+        }
+
+        System.out.println("=".repeat(60) + "\n");
+    }
+
+    /**
+     * Helper method to center text within a given width for better CLI aesthetics.
+     *
+     * @param text The string to center
+     * @param width The total width of the line
+     * @return The centered string padded with spaces
+     */
+    private String centerText(String text, int width) {
+        if (text.length() >= width) return text;
+        int padding = (width - text.length()) / 2;
+        return " ".repeat(padding) + text;
+    }
 }

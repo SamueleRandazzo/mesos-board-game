@@ -3,7 +3,6 @@ package it.polimi.ingsw.view;
 import it.polimi.ingsw.model.Enum.Color;
 import it.polimi.ingsw.network.DTO.*;
 import it.polimi.ingsw.network.RemoteController;
-
 import java.util.List;
 import java.util.Map;
 
@@ -17,9 +16,9 @@ public interface View {
     void askCardChoose();
     void showMessage(String message);
     void showPlayersOrder(List<String> playersOrder);
-    void retryTotemPlacement();
     void displayOfferTrack(List<OfferTileDTO> tiles);
     void showPlayersInfo(Map<String, Color> playersInfo);
     void showTribe(TribeStatusDTO tribe);
     void displayBoard(BoardDTO board);
+    void displayLeaderboard(LeaderboardDTO leaderboard);
 }

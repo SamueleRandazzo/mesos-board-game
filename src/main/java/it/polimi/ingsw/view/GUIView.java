@@ -125,12 +125,6 @@ public class GUIView implements View {
     }
 
     @Override
-    public void retryTotemPlacement() {
-        displayOfferTrack(this.lastTiles);
-        askTotemPlacement();
-    }
-
-    @Override
     public void askCardChoose() {
         Platform.runLater(() -> {
             currentController.displayChoosableCards();
@@ -165,6 +159,12 @@ public class GUIView implements View {
 
     //TODO: implement abstract method displayBoard(it.polimi.ingsw.network.DTO.BoardDTO)
     public void displayBoard(BoardDTO board) {
+        Platform.runLater(() -> {});
+    }
+
+    //TODO
+    @Override
+    public void displayLeaderboard(LeaderboardDTO leaderboard) {
         Platform.runLater(() -> {});
     }
 }

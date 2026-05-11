@@ -8,8 +8,8 @@ public interface GameEventListener {
     void onTotemPlaced(String playerNickname, int tileIndex);
     void onActionResultTurnChanged(String playerNickname);
     void onShowOfferTrack(List<OfferTileDTO> tiles);
-    void onCardChosen();
     void onShowTribe(String playerNickname, TribeStatusDTO tribe);
     void onShowBoard(BoardDTO board);
     void onEventMessage(String playerNickname, String message);
+    void onShowLeaderboard(LeaderboardDTO leaderboard);
 }
