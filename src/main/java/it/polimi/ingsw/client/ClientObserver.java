@@ -75,4 +75,14 @@ public class ClientObserver implements GameObserver {
     public void onDisplayLeaderboard(LeaderboardDTO leaderboard) throws RemoteException {
         view.displayLeaderboard(leaderboard);
     }
+
+    @Override
+    public void ping() throws RemoteException {
+        // method to check if client is alive
+    }
+
+    @Override
+    public void onShowFatalError(String error) throws RemoteException {
+        view.showFatalError(error);
+    }
 }

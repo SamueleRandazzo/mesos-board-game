@@ -116,6 +116,17 @@ public class CLIView implements View {
         System.out.flush();
     }
 
+    @Override
+    public void showFatalError(String error) {
+        System.out.print("\r\033[K");
+        System.out.println("\u001B[31m" + error + "\u001B[0m");
+        System.out.flush();
+
+        try { Thread.sleep(100); } catch (InterruptedException ignored) {}
+
+        System.exit(1);
+    }
+
     /**
      * Prompts the host player to set the maximum number of players for the game session.
      * Only the first player to join (the host) will trigger this method.

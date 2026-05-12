@@ -159,17 +159,21 @@ public class GUIView implements View {
         });
     }
 
-
     public void displayBoard(BoardDTO board) {
         Platform.runLater(() -> {
             currentController.displayBoard(board);
         });
     }
 
-
-
+    //TODO display leaderboard screen
     @Override
     public void displayLeaderboard(LeaderboardDTO leaderboard) {
+        Platform.runLater(() -> {});
+    }
+
+    //TODO display fatal error screen
+    @Override
+    public void showFatalError(String error) {
         Platform.runLater(() -> {});
     }
 }

@@ -619,4 +619,8 @@ public class Game {
         long winnerCount = elements.stream().filter(PlayerRankDTO::isWinner).count();
         return new LeaderboardDTO(elements, winnerCount > 1);
     }
+
+    public void setEndGameStatus() {
+        this.currentState = new EndGameState();
+    }
 }

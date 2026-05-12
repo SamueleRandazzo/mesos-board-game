@@ -20,4 +20,6 @@ public interface GameObserver extends Remote {
     void onShowTribe(TribeStatusDTO tribe) throws RemoteException;
     void onDisplayBoard(BoardDTO board) throws RemoteException;
     void onDisplayLeaderboard(LeaderboardDTO leaderboard) throws RemoteException;
+    void ping() throws RemoteException;
+    void onShowFatalError(String error) throws RemoteException;
 }

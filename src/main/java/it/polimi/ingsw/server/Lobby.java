@@ -14,6 +14,9 @@ import it.polimi.ingsw.network.ModelToRemoteViewAdapter;
 import org.jetbrains.annotations.NotNull;
 import java.rmi.RemoteException;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class Lobby {
@@ -27,6 +30,9 @@ public class Lobby {
     private final List<Color> colors = new ArrayList<>();
     private final Map<String, GameObserver> playerObservers = new HashMap<>();
     private final Map<String, Color> playersInfo = new LinkedHashMap<>();
+    private Game currentGame;
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private boolean healthCheckStarted = false;
 
     /**
      * Handles player login requests. Adds players to the lobby and manages
@@ -57,6 +63,9 @@ public class Lobby {
         colors.add(color);
         remoteObservers.add(observer);
         playerObservers.put(nickname, observer);
+
+        if (!healthCheckStarted)
+            startNetworkHealthCheck();
 
         if (nicknames.size() == 1) {
             System.out.println(nickname + " is the Host. Waiting for target players number");
@@ -113,8 +122,8 @@ public class Lobby {
 
             Collections.shuffle(players);
 
-            Game game = getGame(players, targetPlayers);
-            GameController gameController = new GameController(game);
+            currentGame = getGame(players, targetPlayers);
+            GameController gameController = new GameController(currentGame);
 
             List<String> playerOrders = players.stream().map(Player::getNickname).collect(Collectors.toList());
 
@@ -130,11 +139,11 @@ public class Lobby {
             }
 
             ModelToRemoteViewAdapter adapter = new ModelToRemoteViewAdapter(this.playerObservers);
-            game.addListener(adapter);
+            currentGame.addListener(adapter);
 
-            game.notifyOnShowBoard();
-            game.notifyOnShowOfferTrack();
-            game.notifyTotemPlacementTurnChanged();
+            currentGame.notifyOnShowBoard();
+            currentGame.notifyOnShowOfferTrack();
+            currentGame.notifyTotemPlacementTurnChanged();
         } else {
             for (GameObserver o : remoteObservers) {
                 o.onPlayerJoined(nicknames.size(), targetPlayers == -1 ? 0 : targetPlayers);
@@ -152,5 +161,84 @@ public class Lobby {
         OfferTrack offerTrack = loader.loadOfferTrack(players.size());
 
         return new Game(players, decks, era1Buildings, era2Buildings, era3Buildings, offerTrack);
+    }
+
+    public void handleDisconnection(String nickname) {
+        if (nickname == null || !nicknames.contains(nickname)) {
+            return;
+        }
+
+        synchronized (this) {
+            if (!nicknames.contains(nickname)) return;
+
+            int index = nicknames.indexOf(nickname);
+            if (index != -1) {
+                remoteObservers.remove(index);
+                playerObservers.remove(nickname);
+                nicknames.remove(nickname);
+            }
+        }
+
+        terminateGame(nickname);
+    }
+
+    private void terminateGame(String disconnectedNickname) {
+        System.err.println("FATAL: Player " + disconnectedNickname + " disconnected. Terminating match.");
+
+        if (currentGame != null)
+            currentGame.setEndGameStatus();
+
+        for (GameObserver observer : remoteObservers) {
+            try {
+                observer.onShowFatalError("Game ended: player " + disconnectedNickname + " disconnected.");
+            } catch (RemoteException e) {
+                // ignore
+            }
+        }
+
+        this.currentGame = null;
+        this.nicknames.clear();
+        this.colors.clear();
+        this.remoteObservers.clear();
+        this.playerObservers.clear();
+        this.targetPlayers = -1;
+    }
+
+    public void startNetworkHealthCheck() {
+        Runnable healthCheckTask = () -> {
+            try {
+                checkConnections();
+            } catch (Exception e) {
+                System.err.println("Health check error: " + e.getMessage());
+            }
+        };
+
+        scheduler.scheduleAtFixedRate(healthCheckTask, 5, 5, TimeUnit.SECONDS);
+    }
+
+    private void checkConnections() {
+        Map<String, GameObserver> copy;
+        synchronized (this) {
+            if (playerObservers.isEmpty()) return;
+            copy = new HashMap<>(playerObservers);
+        }
+
+        List<String> toDisconnect = new ArrayList<>();
+
+        for (Map.Entry<String, GameObserver> entry : copy.entrySet()) {
+            String nickname = entry.getKey();
+            GameObserver observer = entry.getValue();
+
+            try {
+                observer.ping();
+            } catch (RemoteException e) {
+                System.err.println("Client " + nickname + " not responding to ping.");
+                toDisconnect.add(nickname);
+            }
+        }
+
+        for (String nick : toDisconnect) {
+            handleDisconnection(nick);
+        }
     }
 }

@@ -14,6 +14,7 @@ public class SocketClientHandler extends Thread {
     private final Socket socket;
     private final Lobby lobby;
     private RemoteController controller;
+    private String nickname;
 
     public SocketClientHandler(Socket s, Lobby l) {
         this.socket = s;
@@ -45,8 +46,11 @@ public class SocketClientHandler extends Thread {
                 }
             }
 
-        } catch (IOException e) {
-            System.err.println("Connection lost.");
+        } catch (IOException | NoSuchElementException e) {
+            if (this.nickname != null) {
+                System.err.println("Connection lost for player: " + this.nickname);
+                lobby.handleDisconnection(this.nickname);
+            }
         }
     }
 
@@ -60,6 +64,8 @@ public class SocketClientHandler extends Thread {
                     Color chosenColor = Color.valueOf(parts[2].toUpperCase());
                     SocketVirtualView vView = new SocketVirtualView(out, this);
                     lobby.addPlayer(nick, chosenColor, vView);
+                    this.nickname = nick;
+                    out.println("PING"); // Notify that the player logged
                     return true;
                 } catch (Exception e) {
                     out.println("ERROR " + e.getMessage());

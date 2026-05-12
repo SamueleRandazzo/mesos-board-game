@@ -21,4 +21,5 @@ public interface View {
     void showTribe(TribeStatusDTO tribe);
     void displayBoard(BoardDTO board);
     void displayLeaderboard(LeaderboardDTO leaderboard);
+    void showFatalError(String error);
 }

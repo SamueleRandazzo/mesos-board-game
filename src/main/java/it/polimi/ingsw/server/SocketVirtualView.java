@@ -149,4 +149,21 @@ class SocketVirtualView implements GameObserver {
             System.err.println("Error serializing BoardDTO: " + e.getMessage());
         }
     }
+
+    @Override
+    public void ping() throws RemoteException {
+        out.println("PING");
+        if (out.checkError()) {
+            throw new RemoteException("Socket connection lost during ping");
+        }
+    }
+
+    @Override
+    public void onShowFatalError(String error) throws RemoteException {
+        try {
+            out.println("SHOW_FATAL_ERROR " + error);
+        } catch (Exception e) {
+            System.err.println("Serialization error: " + e.getMessage());
+        }
+    }
 }
