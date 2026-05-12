@@ -20,7 +20,7 @@ public class SocketServerListener implements Runnable {
     // Health check
     private long lastContact = System.currentTimeMillis();
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-    private static final int TIMEOUT_SECONDS = 5;
+    private static final int TIMEOUT_SECONDS = 10;
     private boolean timerStarted = false;
 
     public SocketServerListener(InputStream is, View view) {
@@ -39,7 +39,7 @@ public class SocketServerListener implements Runnable {
                 String header = parts[0];
                 String[] args = parts.length > 1 ? parts[1].split(" ") : new String[0];
 
-                if (!timerStarted && header.equals("LOGIN_SUCCESS")) {
+                if (!timerStarted && header.equals("PING")) {
                     startInactivityTimer();
                     timerStarted = true;
                 }

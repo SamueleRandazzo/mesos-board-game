@@ -30,4 +30,9 @@ public class RMIServer extends UnicastRemoteObject implements Loggable {
             throw new RemoteException(e.getMessage());
         }
     }
+
+    @Override
+    public void ping() throws RemoteException {
+        // Only used to check if RMI server is alive
+    }
 }

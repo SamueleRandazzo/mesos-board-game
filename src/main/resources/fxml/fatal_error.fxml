@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.text.Font?>
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="it.polimi.ingsw.view.GUI.FatalErrorController"
+      prefHeight="400.0" prefWidth="600.0"
+      style="-fx-background-color: #1a1a1a;">
+    <Label text="GAME OVER" textFill="#ff4444">
+        <font>
+            <Font name="System Bold" size="48.0"/>
+        </font>
+    </Label>
+    <Label fx:id="errorMessage" text="Fatal error.." textFill="WHITE" wrapText="true" textAlignment="CENTER">
+        <font>
+            <Font size="18.0"/>
+        </font>
+    </Label>
+</VBox>

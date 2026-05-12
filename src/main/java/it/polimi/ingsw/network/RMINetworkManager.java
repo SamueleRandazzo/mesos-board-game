@@ -6,14 +6,20 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class RMINetworkManager extends NetworkManager {
     private Loggable serverStub;
+    private final ScheduledExecutorService heartbeatScheduler = Executors.newSingleThreadScheduledExecutor();
 
     @Override
     public void connect(String ip, int port) throws Exception {
         Registry registry = LocateRegistry.getRegistry(ip, port);
         this.serverStub = (Loggable) registry.lookup("Loggable");
+
+        startHeartbeat();
     }
 
     @Override
@@ -42,5 +48,22 @@ public class RMINetworkManager extends NetworkManager {
     @Override
     public void tileSelection(int tileIndex) throws RemoteException {
         controller.handleTileSelection(tileIndex);
+    }
+
+    private void startHeartbeat() {
+        heartbeatScheduler.scheduleAtFixedRate(() -> {
+            try {
+                serverStub.ping();
+            } catch (RemoteException e) {
+                handleServerDisconnection();
+            }
+        }, 0, 5, TimeUnit.SECONDS);
+    }
+
+    private synchronized void handleServerDisconnection() {
+        if (!heartbeatScheduler.isShutdown()) {
+            heartbeatScheduler.shutdownNow();
+            view.showFatalError("Connection lost. The server is unreachable.");
+        }
     }
 }

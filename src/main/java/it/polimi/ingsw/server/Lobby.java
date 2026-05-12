@@ -14,6 +14,7 @@ import it.polimi.ingsw.network.ModelToRemoteViewAdapter;
 import org.jetbrains.annotations.NotNull;
 import java.rmi.RemoteException;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -31,8 +32,10 @@ public class Lobby {
     private final Map<String, GameObserver> playerObservers = new HashMap<>();
     private final Map<String, Color> playersInfo = new LinkedHashMap<>();
     private Game currentGame;
+
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private boolean healthCheckStarted = false;
+    private final ExecutorService pingExecutor = Executors.newCachedThreadPool();
 
     /**
      * Handles player login requests. Adds players to the lobby and manages
@@ -217,28 +220,20 @@ public class Lobby {
     }
 
     private void checkConnections() {
-        Map<String, GameObserver> copy;
+        List<Map.Entry<String, GameObserver>> observersCopy;
         synchronized (this) {
             if (playerObservers.isEmpty()) return;
-            copy = new HashMap<>(playerObservers);
+            observersCopy = new ArrayList<>(playerObservers.entrySet());
         }
 
-        List<String> toDisconnect = new ArrayList<>();
-
-        for (Map.Entry<String, GameObserver> entry : copy.entrySet()) {
+        for (Map.Entry<String, GameObserver> entry : observersCopy) {
             String nickname = entry.getKey();
             GameObserver observer = entry.getValue();
 
-            try {
-                observer.ping();
-            } catch (RemoteException e) {
-                System.err.println("Client " + nickname + " not responding to ping.");
-                toDisconnect.add(nickname);
-            }
-        }
-
-        for (String nick : toDisconnect) {
-            handleDisconnection(nick);
+            pingExecutor.submit(() -> {
+                try { observer.ping(); }
+                catch (RemoteException e) { handleDisconnection(nickname); }
+            });
         }
     }
 }

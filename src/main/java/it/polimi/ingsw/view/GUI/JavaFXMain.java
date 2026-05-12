@@ -31,4 +31,9 @@ public class JavaFXMain extends Application {
 
         view.showLogin();
     }
+
+    @Override
+    public void stop() {
+        System.exit(0);
+    }
 }

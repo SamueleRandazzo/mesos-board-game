@@ -4,6 +4,7 @@ import it.polimi.ingsw.model.Enum.Color;
 import it.polimi.ingsw.network.DTO.*;
 import it.polimi.ingsw.network.NetworkManager;
 import it.polimi.ingsw.network.RemoteController;
+import it.polimi.ingsw.view.GUI.FatalErrorController;
 import it.polimi.ingsw.view.GUI.SceneController;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -174,6 +175,14 @@ public class GUIView implements View {
     //TODO display fatal error screen
     @Override
     public void showFatalError(String error) {
-        Platform.runLater(() -> {});
+        SceneController controller = loadScene("fatal_error.fxml");
+
+        Platform.runLater(() -> {
+            if (controller instanceof FatalErrorController fatalController) {
+                fatalController.setErrorMessage(error);
+            } else {
+                System.err.println("Critical Error: " + error);
+            }
+        });
     }
 }
