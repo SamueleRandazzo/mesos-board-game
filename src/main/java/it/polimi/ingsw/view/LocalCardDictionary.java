@@ -17,6 +17,7 @@ public class LocalCardDictionary {
 
     private static LocalCardDictionary instance;
     private final Map<String, String> cardDescriptions;
+    private final Map<String, String> cardImagePaths;
 
     private static final Map<String, String> DESCRIPTION_TEMPLATE = new LinkedHashMap<>();
     static {
@@ -37,7 +38,10 @@ public class LocalCardDictionary {
 
     private LocalCardDictionary() {
         cardDescriptions = new HashMap<>();
+        cardImagePaths = new HashMap<>();
+        
         loadDictionary();
+        loadImagesDictionary();
     }
 
     public static LocalCardDictionary getInstance() {
@@ -78,6 +82,54 @@ public class LocalCardDictionary {
             }
         }
     }
+    
+    //Translation from json to PNG in order to upload the images
+    private void loadImagesDictionary() {
+        
+        ObjectMapper mapper = new ObjectMapper();
+        
+        //Rules to translate from Json to PNG
+        Map<String, String> rules = new LinkedHashMap<>();
+        rules.put("/cards/tribe_cards.json", "/images/Cards/Front/Card ");
+        rules.put("/cards/buildings_era1.json", "/images/Houses/Front/House Age 1.");
+        rules.put("/cards/buildings_era2.json", "/images/Houses/Front/House Age 2.");
+        rules.put("/cards/buildings_era3.json", "/images/Houses/Front/House Age 3.");
+        rules.put("/cards/event_cards.json", "/images/Events/Front/Event ");
+
+        for (Map.Entry<String, String> rule : rules.entrySet()) {
+            String jsonFilePath = rule.getKey();     // Es. "/cards/buildings_era1.json"
+            String imagePrefix = rule.getValue();    // Es. "/images/Houses/Front/House Age 1."
+
+            try (InputStream is = getClass().getResourceAsStream(jsonFilePath)) {
+                if (is != null) {
+                    JsonNode root = mapper.readTree(is);
+
+                    int imageIndex = 1; // Name of files starts from one for each new JSON
+
+                    for (JsonNode node : root) {
+                        if (node.has("id")) {
+                            String cardId = node.get("id").asText(); // Es. "building_3"
+                            
+                            String fullImagePath = imagePrefix + imageIndex + ".png";
+
+                            //Save in the GUI Map
+                            cardImagePaths.put(cardId, fullImagePath);
+
+                            imageIndex++; // next card
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("Impossible to translate images from: " + jsonFilePath);
+            }
+        }
+        
+    }
+
+    public String getImagePath(String cardId) {
+        if (cardId == null) return "[Empty]";
+        return cardImagePaths.get(cardId);
+    }
 
     /**
      * Builds a summary string based on the card's JSON properties.
@@ -107,4 +159,6 @@ public class LocalCardDictionary {
         if (cardId == null) return "[Empty]";
         return cardDescriptions.getOrDefault(cardId, "ID: " + cardId);
     }
+
+
 }

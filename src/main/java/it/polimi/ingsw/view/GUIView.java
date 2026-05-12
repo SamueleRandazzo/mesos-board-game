@@ -154,15 +154,20 @@ public class GUIView implements View {
 
     @Override
     public void showTribe(TribeStatusDTO tribe) {
-
+        Platform.runLater(() -> {
+                currentController.showTribe(tribe);
+        });
     }
 
-    //TODO: implement abstract method displayBoard(it.polimi.ingsw.network.DTO.BoardDTO)
+
     public void displayBoard(BoardDTO board) {
-        Platform.runLater(() -> {});
+        Platform.runLater(() -> {
+            currentController.displayBoard(board);
+        });
     }
 
-    //TODO
+
+
     @Override
     public void displayLeaderboard(LeaderboardDTO leaderboard) {
         Platform.runLater(() -> {});

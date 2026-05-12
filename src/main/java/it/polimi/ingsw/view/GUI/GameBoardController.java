@@ -1,17 +1,20 @@
 package it.polimi.ingsw.view.GUI;
 
 import it.polimi.ingsw.model.Enum.Color;
-import it.polimi.ingsw.network.DTO.OfferTileDTO;
+import it.polimi.ingsw.network.DTO.*;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.*;
+import it.polimi.ingsw.view.LocalCardDictionary;
 
 import java.net.URL;
 import java.util.LinkedHashMap;
@@ -22,7 +25,13 @@ public class GameBoardController extends SceneController {
 
     private static final int OFFER_TILE_WIDTH = 92;
     private static final int OFFER_TILE_HEIGHT = 148;
+    private static final int CARD_WIDTH = 88;
+    private static final int CARD_HEIGHT = 128;
+
     private int totalPlayers;
+    private BoardDTO lastBoard; //Last board because displayBoard and askCardChoose comes in different moments
+    private boolean cardSelectionEnabled;
+
     private final Map<String, Color> playersInfo = new LinkedHashMap<>();
 
     //TODO: Verificare le OfferTile effettive per ogni giocatore
@@ -48,6 +57,9 @@ public class GameBoardController extends SceneController {
     @FXML
     private HBox lowerCardsContainer;
 
+    @FXML
+    private Label gameLogLabel;
+
     /**
      * Initializes the board scene with disabled offer tiles and  cards.
      *
@@ -64,17 +76,12 @@ public class GameBoardController extends SceneController {
     }
 
     /**
-     * Renders temporary card backs in the upper and lower board rows.
-     *
-     * TODO: Replace the fixed placeholder counts with the actual number of cards
-     * received from the server once board card DTOs are implemented.
+     * Renders temporary card backs in the upper and lower board rows in order to show times meanwhile the first BoardDTO is loading
      */
     private void renderStaticCardBacks() {
         upperCardsContainer.getChildren().clear();
         lowerCardsContainer.getChildren().clear();
 
-        // TODO: sostituire questi numeri con upperCards.size() e lowerCards.size()
-        // quando arriveranno i DTO delle carte dal server.
         int upperCardsPlaceholderCount = 7;
         int lowerCardsPlaceholderCount = 4;
 
@@ -108,14 +115,21 @@ public class GameBoardController extends SceneController {
         return card;
     }
 
+    //Write only on the state lines (white one)
     @Override
     public void showNotification(String msg) {
         Platform.runLater(() -> setNotification(msg, false));
     }
 
+    //Write on the error lines (red one)
     @Override
     public void showErrorMessage(String msg) {
-        Platform.runLater(() -> setNotification(msg, true));
+        Platform.runLater(() -> {
+            setNotification(msg, true);
+            if(!cardSelectionEnabled) {
+                setCardSelectionEnabled(true);
+            }
+        });
     }
 
     @Override
@@ -155,7 +169,6 @@ public class GameBoardController extends SceneController {
         Platform.runLater(() -> {
             offerTrackContainer.getChildren().clear();
 
-            int num_players = total;
             List <String> map_images = OFFER_TILE_IMAGES.get(total);
 
             // Index 0 is the static starting tile; offer tile DTOs start from index 1.
@@ -174,8 +187,44 @@ public class GameBoardController extends SceneController {
             });
     }
 
+    /*
+    method that saves a new board when it comes from server and put it in "lastBoard", in this moment the player can't click it
+     */
     public void displayBoardCards() {
-        //TODO: carica le carte sopra e sotto quando ci saranno
+        if (lastBoard == null) {
+            renderStaticCardBacks();
+            return;
+        }
+
+        upperCardsContainer.getChildren().clear();
+        lowerCardsContainer.getChildren().clear();
+
+        renderCardRow(upperCardsContainer, lastBoard.getUpperTribeRow(), "T");
+        renderCardRow(upperCardsContainer, lastBoard.getUpperBuildingRow(), "B");
+
+        renderCardRow(lowerCardsContainer, lastBoard.getLowerTribeRow(), "L");
+        renderCardRow(lowerCardsContainer, lastBoard.getLowerBuildingRow(), "G");
+    }
+
+    /**
+     * Adds all cards from a DTO row to a JavaFX container.
+     */
+    private void renderCardRow(HBox container, List<CardDTO> cards, String prefix) {
+        for (int i = 0; i < cards.size(); i++) {
+            container.getChildren().add(createBoardCard(cards.get(i), prefix, i));
+        }
+    }
+
+    /**
+    method that saves a new board when it comes from server and put it in "lastBoard", in this moment the player can't click it
+     */
+    @Override
+    public void displayBoard(BoardDTO board) {
+        Platform.runLater(() -> {
+            this.lastBoard = board;
+            this.cardSelectionEnabled = false;
+            displayBoardCards();
+        });
     }
 
     /**
@@ -191,13 +240,12 @@ public class GameBoardController extends SceneController {
 
     /**
      * Handles the card selection phase notification.
-     *
-     * TODO: Enable card selection here once board card DTOs are available.
      */
     @Override
     public void displayChoosableCards() {
         Platform.runLater(() -> {
             setNotification("Your turn: choose a card position.", false);
+            setCardSelectionEnabled(true);
         });
     }
 
@@ -229,7 +277,7 @@ public class GameBoardController extends SceneController {
                 }
             });
         } else {
-            tileButton.setDisable(true);
+            tileButton.setCursor(Cursor.DEFAULT);
         }
 
         return tileButton;
@@ -244,8 +292,15 @@ public class GameBoardController extends SceneController {
         tilePane.setMaxSize(OFFER_TILE_WIDTH, OFFER_TILE_HEIGHT);
 
         ImageView imageView = createImageView(imagePath, OFFER_TILE_WIDTH, OFFER_TILE_HEIGHT);
+
+        //if the tile is not available opacity is low, in order to make the name of player more visible
+        if(!tile.isAvailable()){
+            imageView.setOpacity(0.4);
+        }
+
         tilePane.getChildren().add(imageView);
 
+        // Add the player's nickname if the tile is occupied
         if (!tile.isAvailable()) {
             Label owner = new Label(tile.getNickname());
             owner.setMaxWidth(OFFER_TILE_WIDTH - 12);
@@ -261,18 +316,6 @@ public class GameBoardController extends SceneController {
             StackPane.setAlignment(owner, Pos.TOP_CENTER);
             tilePane.getChildren().add(owner);
         }
-
-        Label index = new Label(String.valueOf(tile.getIndex()));
-        index.setStyle("""
-                -fx-background-color: rgba(255,255,255,0.88);
-                -fx-text-fill: #243447;
-                -fx-font-size: 12px;
-                -fx-font-weight: bold;
-                -fx-padding: 2 6 2 6;
-                -fx-background-radius: 12;
-                """);
-        StackPane.setAlignment(index, Pos.BOTTOM_LEFT);
-        tilePane.getChildren().add(index);
 
         return tilePane;
     }
@@ -305,17 +348,36 @@ public class GameBoardController extends SceneController {
     }
 
     /**
-     * Updates the top notification label using a different color for errors.
+     * Enables or disables card selection on the board. True to enable card selection, false to disable.
+     */
+    private void setCardSelectionEnabled(boolean enabled) {
+        this.cardSelectionEnabled = enabled;
+        displayBoardCards(); // Re-render cards to apply style changes
+    }
+
+
+
+    /**
+     * Updates the top notification label.
+     * If it's an error, it populates the log label.
+     * If it's a standard message, it updates the main status and clears old logs.
      */
     private void setNotification(String msg, boolean error) {
-        if (gameNotificationLabel == null) {
+        if (gameNotificationLabel == null || gameLogLabel == null) {
             return;
         }
 
-        gameNotificationLabel.setText(msg);
-        gameNotificationLabel.setTextFill(error
-                ? javafx.scene.paint.Color.web("#ffb3a7")
-                : javafx.scene.paint.Color.WHITE);
+        if(error) {
+            // Errors go to the red bold label
+            gameLogLabel.setText("Error: " + msg);
+        } else {
+
+            gameNotificationLabel.setText(msg);
+            gameNotificationLabel.setTextFill(error
+                    ? javafx.scene.paint.Color.web("#ffb3a7")
+                    : javafx.scene.paint.Color.WHITE);
+
+        }
     }
 
     private String offerTileStyle(boolean available) {
@@ -353,6 +415,109 @@ public class GameBoardController extends SceneController {
         tilePane.getChildren().add(imageView);
 
         return tilePane;
+    }
+
+    /**
+     * Creates a visual representation of a card on the board, making it interactive if card selection is enabled.
+     *  * Uses LocalCardDictionary to resolve the card ID into the correct image path.
+     */
+    private StackPane createBoardCard(CardDTO card, String prefix, int index) {
+        StackPane cardPane = new StackPane();
+        cardPane.setPrefSize(CARD_WIDTH, CARD_HEIGHT);
+        cardPane.setMinSize(CARD_WIDTH, CARD_HEIGHT);
+        cardPane.setMaxSize(CARD_WIDTH, CARD_HEIGHT);
+
+        //Start operations of translation
+        String cardId = card.getCardId();
+
+        // Asks the dictionary for the image path corresponding to the ID
+        String imagePath = LocalCardDictionary.getInstance().getImagePath(cardId);
+
+        // If the image path is null (empty slot or ID not found)
+        if (imagePath == null || imagePath.equals("[Empty]")) {
+            cardPane.setStyle(disabledCardStyle());
+            cardPane.setOpacity(0); // Makes the slot completely transparent
+            return cardPane;
+        }
+
+        ImageView imageView = createImageView(imagePath, CARD_WIDTH, CARD_HEIGHT);
+        cardPane.getChildren().add(imageView);
+
+
+        //Choose if a card is a building or a tribe card
+        boolean isEventCard = cardId != null && cardId.startsWith("event");
+
+
+        if (cardSelectionEnabled) {
+            if (isEventCard) {
+                // Gli eventi sono passivi: non si illuminano e restituiscono un errore locale
+                cardPane.setStyle(nonSelectableCardStyle());
+                cardPane.setOnMouseClicked(event -> {
+                    showErrorMessage("You cannot select event cards.");
+                });
+            }else{
+                    cardPane.setStyle(selectableCardStyle());
+
+                    cardPane.setOnMouseClicked(event -> {
+                        try {
+                            setCardSelectionEnabled(false);
+
+                            // Forwards the input (e.g., "T0") to the NetworkManager regex parser
+                            network.cardSelection(prefix + index);
+                        } catch (Exception e) {
+                            setCardSelectionEnabled(true);
+                            showErrorMessage(handleNetworkError(e));
+
+                        }
+                    });
+            }
+
+        }else{ //if is not player turn, all card are not clickable
+
+                cardPane.setStyle(disabledCardStyle());
+                cardPane.setOnMouseClicked(null);
+        }
+
+        return cardPane;
+    }
+
+
+    /**
+     * Modify the style of the cards, when "cardSelectionEnabled" is true the card id normal, when is false the card is visible but neutral
+     *
+     */
+    private String selectableCardStyle() {
+        return """
+        -fx-background-color: #fff8e6;
+        -fx-border-color: #d7b35a;
+        -fx-border-width: 2;
+        -fx-border-radius: 6;
+        -fx-background-radius: 6;
+        -fx-cursor: hand;
+        -fx-padding: 3;
+        -fx-opacity: 1.0;
+        """;
+    }
+
+    private String disabledCardStyle() {
+        return """
+        -fx-background-color: transparent;
+        -fx-border-color: transparent;
+        -fx-border-width: 2;
+        -fx-padding: 3;
+        -fx-opacity: 0.6;
+        """;
+    }
+
+    private String nonSelectableCardStyle() {
+        return """
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-width: 2;
+    -fx-padding: 3;
+    -fx-opacity: 0.6;
+    -fx-cursor: not-allowed;
+    """;
     }
 
 }

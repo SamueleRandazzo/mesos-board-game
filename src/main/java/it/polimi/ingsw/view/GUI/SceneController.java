@@ -1,7 +1,7 @@
 package it.polimi.ingsw.view.GUI;
 
 import it.polimi.ingsw.model.Enum.Color;
-import it.polimi.ingsw.network.DTO.OfferTileDTO;
+import it.polimi.ingsw.network.DTO.*;
 import it.polimi.ingsw.network.NetworkManager;
 import it.polimi.ingsw.view.GUIView;
 import java.rmi.RemoteException;
@@ -25,6 +25,8 @@ public abstract class SceneController {
     public void updatePlayersOrder(List<String> order) {}
     public void setTotalPlayers(int totalPlayers) {}
     public void setPlayersInfo(Map<String, Color> playersInfo) {}
+    public void displayBoard(BoardDTO board) {};
+    public void showTribe(TribeStatusDTO tribe) {};
 
     String handleNetworkError(Exception e) {
         if (e instanceof RemoteException) {
