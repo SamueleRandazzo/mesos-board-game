@@ -264,13 +264,9 @@ public class ActionResolutionState extends GameState {
             List<Player> nextRoundOrder = context.getTurnOrderTile().getNextRoundOrder();
 
             context.setTurnOrder(nextRoundOrder);
-            context.nextRound();
-
             context.setState(new TotemPlacementState());
 
-            // At the start of a new round, update the board state and offer track
-            context.notifyOnShowOfferTrack();
-            context.notifyTotemPlacementTurnChanged();
+            context.nextRound();
         } else {
             context.notifyActionResultTurnChanged();
         }

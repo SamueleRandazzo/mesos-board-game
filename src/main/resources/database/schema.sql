@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS player_matches (
 CREATE OR REPLACE VIEW global_rankings AS
 SELECT p.nickname
     ,m.player_count
-    ,SUM(pm.score)
+    ,SUM(pm.score) as total_points
 FROM player_matches pm
 JOIN players p
     ON pm.player_id = p.id

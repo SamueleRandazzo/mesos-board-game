@@ -1,5 +1,6 @@
 package it.polimi.ingsw.network;
 
+import it.polimi.ingsw.database.*;
 import it.polimi.ingsw.model.Interfaces.GameEventListener;
 import it.polimi.ingsw.network.DTO.*;
 import java.rmi.RemoteException;
@@ -118,12 +119,30 @@ public class ModelToRemoteViewAdapter implements GameEventListener {
     }
 
     @Override
-    public void onShowLeaderboard(LeaderboardDTO leaderboard) {
-        for (GameObserver o : playerObservers.values()) {
+    public void onEndGame(LeaderboardDTO leaderboard) {
+
+        if (DatabaseManager.isAvailable()) {
+            MatchDAO.saveFullMatch(leaderboard.getRankings());
+        }
+
+        for (Map.Entry<String, GameObserver> entry : playerObservers.entrySet()) {
+            String nickname = entry.getKey();
+            GameObserver observer = entry.getValue();
+
             try {
-                o.onDisplayLeaderboard(leaderboard);
+                observer.onDisplayLeaderboard(leaderboard);
+
+                if (DatabaseManager.isAvailable()) {
+                    int targetPlayers = leaderboard.getRankings().size();
+                    int rank = MatchDAO.getRankByTotalPoints(nickname, targetPlayers);
+
+                    if (rank != -1) {
+                        String rankMessage = String.format("Your global rank in %d-player matches is: %d", targetPlayers, rank);
+                        observer.onShowMessage(rankMessage);
+                    }
+                }
             } catch (RemoteException e) {
-                System.err.println("Network error sending board");
+                System.err.println("Network error sending leaderboard/rank to " + nickname);
             }
         }
     }

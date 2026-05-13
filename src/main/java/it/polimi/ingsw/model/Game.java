@@ -40,7 +40,7 @@ public class Game {
 
     //region Constants
     /** Total number of rounds in a game of Mesos. */
-    private static final int TOTAL_ROUNDS = 10;
+    private static final int TOTAL_ROUNDS = 3;
     /** First era number. */
     private static final int FIRST_ERA = 1;
     //endregion
@@ -193,12 +193,22 @@ public class Game {
         }
     }
 
-    public void notifyOnTotemPlaced (int tileIndex) {
+    /**
+     * Notifies all registered listeners that a totem has been placed by the current player.
+     *
+     * @param tileIndex the index of the tile where the totem was positioned.
+     */
+    public void notifyOnTotemPlaced(int tileIndex) {
         for (GameEventListener l : listeners) {
             l.onTotemPlaced(this.getCurrentActivePlayer().getNickname(), tileIndex);
         }
     }
 
+    /**
+     * Synchronizes the state of the Offer Track by notifying all listeners.
+     * It maps the domain model tiles to Data Transfer Objects (DTOs), including
+     * the nickname of the player who occupied the tile, if applicable.
+     */
     public void notifyOnShowOfferTrack() {
         List<OfferTile> modelTiles = offerTrack.getTiles();
         List<OfferTileDTO> tiles = new ArrayList<>();
@@ -221,14 +231,33 @@ public class Game {
         }
     }
 
+    /**
+     * Notifies listeners to update the visual representation of a specific player's tribe.
+     * Converts the current player's tribe status into a DTO for remote transmission.
+     *
+     * @param playerNickname the nickname of the player whose tribe status is being broadcast.
+     */
     public void notifyShowTribe(String playerNickname) {
-        TribeStatusDTO tribeDTO = this.getCurrentActivePlayer().getTribe().toDTO();
+        Player player = players.stream()
+                               .filter(p -> p.getNickname().equals(playerNickname))
+                               .findFirst()
+                               .orElse(null);
 
-        for (GameEventListener l : listeners) {
-            l.onShowTribe(playerNickname, tribeDTO);
+        if (player != null) {
+            TribeStatusDTO tribeDTO = player.getTribe().toDTO();
+
+            for (GameEventListener l : listeners) {
+                l.onShowTribe(playerNickname, tribeDTO);
+            }
         }
     }
 
+    /**
+     * Broadcasts a generic game event message associated with a specific player to all listeners.
+     *
+     * @param player       the player instance related to the event.
+     * @param eventMessage the description or content of the event to be displayed.
+     */
     public void notifyEventMessage(Player player, String eventMessage) {
         for (GameEventListener l : listeners) {
             l.onEventMessage(player.getNickname(), eventMessage);
@@ -244,12 +273,16 @@ public class Game {
         }
     }
 
-    //TODO save game in DB, then show to players general ranking and general leaderboard
-    public void notifyOnShowLeaderboard() {
+    /**
+     * Triggers the end-game sequence by notifying all listeners that the match has concluded.
+     * It generates a comprehensive leaderboard DTO containing the final scores and rankings
+     * to be displayed to all participants.
+     */
+    public void notifyEndGame() {
         LeaderboardDTO leaderboardDTO = createLeaderboardDTO();
 
         for (GameEventListener l : listeners) {
-            l.onShowLeaderboard(leaderboardDTO);
+            l.onEndGame(leaderboardDTO);
         }
     }
     //endregion
@@ -483,16 +516,20 @@ public class Game {
     }
 
     public void nextRound() {
-        endOfRound(); // clean boards and events
         this.currentRound++;
-        this.currentPlayerIndex = 0; // Reset for the next round
+        this.currentPlayerIndex = 0;
+
+        endOfRound(); // clean boards and events
 
         if (this.currentRound > TOTAL_ROUNDS) {
             resolveRemainingEvents();
             computeFinalScores();
 
             this.setState(new EndGameState());
-            notifyOnShowLeaderboard();
+            notifyEndGame();
+        } else {
+            notifyOnShowOfferTrack();
+            notifyTotemPlacementTurnChanged();
         }
     }
 

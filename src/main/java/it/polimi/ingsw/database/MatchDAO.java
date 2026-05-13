@@ -1,6 +1,8 @@
 package it.polimi.ingsw.database;
 
 import it.polimi.ingsw.model.Player;
+import it.polimi.ingsw.network.DTO.PlayerRankDTO;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +16,9 @@ public class MatchDAO {
 
     //region SQL
     // --- Table Names ---
-    private static final String TABLE_PLAYERS = "players";
     private static final String TABLE_MATCHES = "matches";
     private static final String TABLE_PLAYER_MATCHES = "player_matches";
+    private static final String VIEW_GLOBAL_RANKINGS = "global_rankings";
 
     // --- Column Names ---
     private static final String COL_PLAYER_ID = "player_id";
@@ -24,7 +26,7 @@ public class MatchDAO {
     private static final String COL_NICKNAME = "nickname";
     private static final String COL_SCORE = "score";
     private static final String COL_PLAYER_COUNT = "player_count";
-    private static final String COL_MATCH_DATE = "match_date";
+    private static final String COL_TOTAL_POINTS = "total_points";
 
     // --- SQL Queries ---
     private static final String INSERT_MATCH =
@@ -34,27 +36,31 @@ public class MatchDAO {
             "INSERT INTO " + TABLE_PLAYER_MATCHES + " (" + COL_PLAYER_ID + ", " + COL_MATCH_ID + ", " + COL_SCORE + ") VALUES (?, ?, ?)";
 
     private static final String SELECT_LEADERBOARD =
-            "SELECT p." + COL_NICKNAME + ", pm." + COL_SCORE + ", m." + COL_MATCH_DATE + " " +
-                    "FROM " + TABLE_PLAYER_MATCHES + " pm " +
-                    "JOIN " + TABLE_PLAYERS + " p ON pm." + COL_PLAYER_ID + " = p.id " +
-                    "JOIN " + TABLE_MATCHES + " m ON pm." + COL_MATCH_ID + " = m.id " +
-                    "WHERE m." + COL_PLAYER_COUNT + " = ? " +
-                    "ORDER BY pm." + COL_SCORE + " DESC";
+            "SELECT " + COL_NICKNAME + ", " + COL_TOTAL_POINTS + " " +
+                    "FROM " + VIEW_GLOBAL_RANKINGS + " " +
+                    "WHERE " + COL_PLAYER_COUNT + " = ? " +
+                    "ORDER BY " + COL_TOTAL_POINTS + " DESC";
 
-    private static final String SELECT_RANK =
-            "SELECT COUNT(*) + 1 FROM " + TABLE_PLAYER_MATCHES + " pm " +
-                    "JOIN " + TABLE_MATCHES + " m ON pm." + COL_MATCH_ID + " = m.id " +
-                    "WHERE m." + COL_PLAYER_COUNT + " = ? AND pm." + COL_SCORE + " > ?";
+    private static final String SELECT_GLOBAL_RANK_BY_SUM =
+            "SELECT COUNT(*) + 1 AS ranking " +
+                    "FROM " + VIEW_GLOBAL_RANKINGS + " v1 " +
+                    "WHERE v1." + COL_PLAYER_COUNT + " = ? " +
+                    "AND v1." + COL_TOTAL_POINTS + " > (" +
+                    "    SELECT v2." + COL_TOTAL_POINTS + " " +
+                    "    FROM " + VIEW_GLOBAL_RANKINGS + " v2 " +
+                    "    WHERE v2." + COL_NICKNAME + " = ? AND v2." + COL_PLAYER_COUNT + " = ?" +
+                    ")";
     //endregion
 
     /**
      * Saves the complete results of a match using a transaction.
      *
      * @param players     The list of players who participated.
-     * @param playerCount The total number of players for this match category.
      */
-    public static void saveFullMatch(List<Player> players, int playerCount) {
+    public static void saveFullMatch(List<PlayerRankDTO> players) {
         if (!DatabaseManager.isAvailable()) return;
+
+        int playerCount = players.size();
 
         Connection conn = null;
         try {
@@ -76,7 +82,7 @@ public class MatchDAO {
 
             // 2. Insert link records (Batch)
             try (PreparedStatement psDetail = conn.prepareStatement(INSERT_PLAYER_MATCH)) {
-                for (Player p : players) {
+                for (PlayerRankDTO p : players) {
                     // Reusing PlayerDAO to get or create the unique player ID
                     int playerId = PlayerDAO.saveOrGetPlayer(p.getNickname());
 
@@ -104,7 +110,11 @@ public class MatchDAO {
     }
 
     /**
-     * Retrieves the leaderboard for a specific player count mode.
+     * Retrieves the global leaderboard (cumulative points) for a specific match type.
+     * Uses the SQL View 'v_player_total_points' for efficiency.
+     *
+     * @param playerCount The type of match (2-5 players).
+     * @return A list of strings formatted as "Rank. Nickname - Total Points: X".
      */
     public static List<String> getLeaderboard(int playerCount) {
         List<String> results = new ArrayList<>();
@@ -114,37 +124,48 @@ public class MatchDAO {
              PreparedStatement pstmt = conn.prepareStatement(SELECT_LEADERBOARD)) {
 
             pstmt.setInt(1, playerCount);
+
             try (ResultSet rs = pstmt.executeQuery()) {
+                int rank = 1;
                 while (rs.next()) {
-                    String entry = String.format("%s: %d (Played on %s)",
+                    String entry = String.format("%d. %s - Total Points: %d",
+                            rank++,
                             rs.getString(COL_NICKNAME),
-                            rs.getInt(COL_SCORE),
-                            rs.getTimestamp(COL_MATCH_DATE).toString());
+                            rs.getInt(COL_TOTAL_POINTS));
                     results.add(entry);
                 }
             }
         } catch (SQLException e) {
-            System.err.println("[DB] Error fetching leaderboard: " + e.getMessage());
+            System.err.println("[DB] Error fetching leaderboard from view: " + e.getMessage());
         }
         return results;
     }
 
     /**
-     * Gets the rank of a player's score.
+     * Calculates the global rank of a player based on their total accumulated score
+     * across all matches played with the same number of players.
+     *
+     * @param nickname    The player's unique nickname.
+     * @param playerCount The match type (e.g., 2, 3, 4, or 5 players).
+     * @return The ranking position (1 is best). Returns -1 if player is not found or an error occurs.
      */
-    public static int getRank(int score, int playerCount) {
+    public static int getRankByTotalPoints(String nickname, int playerCount) {
         if (!DatabaseManager.isAvailable()) return -1;
 
         try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(SELECT_RANK)) {
+             PreparedStatement pstmt = conn.prepareStatement(SELECT_GLOBAL_RANK_BY_SUM)) {
 
             pstmt.setInt(1, playerCount);
-            pstmt.setInt(2, score);
+            pstmt.setString(2, nickname);
+            pstmt.setInt(3, playerCount);
+
             try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) return rs.getInt(1);
+                if (rs.next()) {
+                    return rs.getInt("ranking");
+                }
             }
         } catch (SQLException e) {
-            System.err.println("[DB] Error calculating rank: " + e.getMessage());
+            System.err.println("[DB] Error calculating cumulative rank: " + e.getMessage());
         }
         return -1;
     }
