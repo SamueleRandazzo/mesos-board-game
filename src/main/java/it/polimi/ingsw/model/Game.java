@@ -329,6 +329,8 @@ public class Game {
                 break; // One transition per round is enough
             }
         }
+
+        notifyOnShowBoard();
     }
 
     /**
