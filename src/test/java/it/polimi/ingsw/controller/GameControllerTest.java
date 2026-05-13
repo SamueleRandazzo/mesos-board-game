@@ -65,21 +65,4 @@ class GameControllerTest {
         assertFalse(game.getOfferTrack().getTiles().get(0).isAvailable());
         assertEquals(players.get(1), game.getCurrentActivePlayer());
     }
-
-    @Test
-    void handleEndTurnRequest_shouldThrowWhenNotAllowedInCurrentState() throws RemoteException {
-        List<Player> players = List.of(
-                new Player(Color.RED, "p1"),
-                new Player(Color.BLUE, "p2")
-        );
-
-        Game game = newGame(players);
-        game.initializeGame();
-        game.setState(new TotemPlacementState());
-        GameController controller = new GameController(game);
-
-        assertEquals(players.get(0), game.getCurrentActivePlayer());
-
-        assertThrows(RuntimeException.class, controller::handleEndTurnRequest);
-    }
 }

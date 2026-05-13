@@ -6,15 +6,13 @@ import it.polimi.ingsw.model.Enum.Color;
 public class Player
 {
     private String nickname;
-    private String password;
     private int prestigePoints;
     private int foodAmount;
     public final Color color;
     private Tribe tribe;
 
-    public Player(Color color, String nickname){ //perhaps a different implementation is needed
+    public Player(Color color, String nickname){
         this.nickname = nickname;
-        this.password = "";
         this.prestigePoints = 0;
         this.foodAmount = 0;
         this.color = color;

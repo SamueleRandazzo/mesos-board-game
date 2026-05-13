@@ -145,19 +145,4 @@ public class GameController extends UnicastRemoteObject implements RemoteControl
             throw new RuntimeException(e);
         }
     }
-
-    /**
-     * Processes a request to end the current player's turn and proceed with game logic
-     * (e.g., checking for victory conditions, rotating turns).
-     * @throws RemoteException if a network error occurs during the remote call.
-     * @throws RuntimeException if the model logic encounters an unrecoverable error.
-     */
-    @Override
-    public void handleEndTurnRequest() throws RemoteException {
-        try {
-            game.resolveEndTurn();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 }
