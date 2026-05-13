@@ -244,6 +244,7 @@ public class Game {
         }
     }
 
+    //TODO save game in DB, then show to players general ranking and general leaderboard
     public void notifyOnShowLeaderboard() {
         LeaderboardDTO leaderboardDTO = createLeaderboardDTO();
 

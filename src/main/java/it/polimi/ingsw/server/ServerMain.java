@@ -1,5 +1,6 @@
 package it.polimi.ingsw.server;
 
+import it.polimi.ingsw.database.DatabaseManager;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -12,7 +13,20 @@ public class ServerMain {
 
     public static void main(String[] args) {
         // String serverIp = "127.0.0.1";
-        // System.setProperty("java.rmi.server.hostname", serverIp);
+        //System.setProperty("java.rmi.server.hostname", serverIp);
+
+        if (args.length < 2) {
+            System.err.println("WARNING: DB credential not provided");
+            System.err.println("Ranking functionality disabled.");
+        } else {
+            String dbUser = args[0];
+            String dbPass = args[1];
+
+            DatabaseManager.init(dbUser, dbPass);
+        }
+
+        System.setProperty("sun.rmi.transport.tcp.responseTimeout", "5000");
+        System.setProperty("sun.rmi.transport.connectionTimeout", "5000");
 
         Lobby lobby = new Lobby();
 

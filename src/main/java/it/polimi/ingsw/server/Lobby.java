@@ -19,6 +19,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import it.polimi.ingsw.database.*;
 
 public class Lobby {
 
@@ -60,6 +61,15 @@ public class Lobby {
 
         if (colors.contains(color)){
             throw new CustomException.ColorAlreadyUsedException();
+        }
+
+        try {
+            if (DatabaseManager.isAvailable()) {
+                PlayerDAO.saveOrGetPlayer(nickname);
+                System.out.println("[DB] Player " + nickname + " registered/verified.");
+            }
+        } catch (Exception e) {
+            System.err.println("[DB] Could not register player: " + e.getMessage());
         }
 
         nicknames.add(nickname);

@@ -12,6 +12,7 @@ module it.polimi.ingsw {
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.core;
     requires com.fasterxml.jackson.annotation;
+    requires java.sql;
 
     // Export
     exports it.polimi.ingsw.view.GUI;
