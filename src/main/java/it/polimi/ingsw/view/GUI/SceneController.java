@@ -27,6 +27,7 @@ public abstract class SceneController {
     public void setPlayersInfo(Map<String, Color> playersInfo) {}
     public void displayBoard(BoardDTO board) {};
     public void showTribe(TribeStatusDTO tribe) {};
+    public void displayLeaderboard(LeaderboardDTO leaderboard, String globalRankMessage) {};
 
     String handleNetworkError(Exception e) {
         if (e instanceof RemoteException) {

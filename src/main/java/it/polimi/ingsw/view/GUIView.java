@@ -166,23 +166,21 @@ public class GUIView implements View {
         });
     }
 
-    //TODO display leaderboard screen
     @Override
     public void displayLeaderboard(LeaderboardDTO leaderboard) {
-        Platform.runLater(() -> {});
-    }
-
-    //TODO display fatal error screen
-    @Override
-    public void showFatalError(String error) {
-        SceneController controller = loadScene("fatal_error.fxml");
+        loadScene("leaderboard.fxml");
 
         Platform.runLater(() -> {
-            if (controller instanceof FatalErrorController fatalController) {
-                fatalController.setErrorMessage(error);
-            } else {
-                System.err.println("Critical Error: " + error);
-            }
+           currentController.displayLeaderboard(leaderboard, null);
+        });
+    }
+
+    @Override
+    public void showFatalError(String error) {
+        loadScene("fatal_error.fxml");
+
+        Platform.runLater(() -> {
+            currentController.showErrorMessage(error);
         });
     }
 }

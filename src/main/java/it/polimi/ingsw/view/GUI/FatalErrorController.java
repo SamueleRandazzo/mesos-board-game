@@ -8,7 +8,8 @@ public class FatalErrorController extends SceneController {
     @FXML
     private Label errorMessage;
 
-    public void setErrorMessage(String message) {
+    @Override
+    public void showErrorMessage(String message) {
         errorMessage.setText(message);
     }
 }
