@@ -516,6 +516,8 @@ public class Game {
     }
 
     public void nextRound() {
+        checkExtraCardChoose();
+
         this.currentRound++;
         this.currentPlayerIndex = 0;
 
@@ -530,6 +532,25 @@ public class Game {
         } else {
             notifyOnShowOfferTrack();
             notifyTotemPlacementTurnChanged();
+        }
+    }
+
+
+    /**
+     * Scans the turn order of the current round to identify players entitled to an extra card
+     * choice (e.g., due to a specific tribe ability or power).
+     * <p>
+     * If a player with the 'extraCardFromUpper' flag is found, the current player index
+     * is updated to point to them, and a notification is sent to the observers to
+     * signal the turn change and update the UI/Client state.
+     * </p>
+     */
+    public void checkExtraCardChoose() {
+        for (int i = 0; i < roundTurnOrder.size(); i++) {
+            if (roundTurnOrder.get(i).getTribe().getExtraCardFromUpper()) {
+                this.currentPlayerIndex = i;
+                notifyActionResultTurnChanged();
+            }
         }
     }
 
