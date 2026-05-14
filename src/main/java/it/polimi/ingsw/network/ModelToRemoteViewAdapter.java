@@ -120,7 +120,6 @@ public class ModelToRemoteViewAdapter implements GameEventListener {
 
     @Override
     public void onEndGame(LeaderboardDTO leaderboard) {
-
         if (DatabaseManager.isAvailable()) {
             MatchDAO.saveFullMatch(leaderboard.getRankings());
         }
@@ -129,21 +128,19 @@ public class ModelToRemoteViewAdapter implements GameEventListener {
             String nickname = entry.getKey();
             GameObserver observer = entry.getValue();
 
-            try {
-                observer.onDisplayLeaderboard(leaderboard);
-
-                if (DatabaseManager.isAvailable()) {
-                    int targetPlayers = leaderboard.getRankings().size();
-                    int rank = MatchDAO.getRankByTotalPoints(nickname, targetPlayers);
-
-                    if (rank != -1) {
-                        String rankMessage = String.format("Your global rank in %d-player matches is: %d", targetPlayers, rank);
-                        observer.onShowMessage(rankMessage);
+            // Use separate threads to prevent RMI blocking calls from delaying Socket notifications
+            new Thread(() -> {
+                try {
+                    String rankMessage = null;
+                    if (DatabaseManager.isAvailable()) {
+                        int targetPlayers = leaderboard.getRankings().size();
+                        rankMessage = "Your global rank is: " + MatchDAO.getRankByTotalPoints(nickname, targetPlayers);
                     }
+                    observer.onDisplayLeaderboard(leaderboard, rankMessage);
+                } catch (RemoteException e) {
+                    System.err.println("Error notifying " + nickname);
                 }
-            } catch (RemoteException e) {
-                System.err.println("Network error sending leaderboard/rank to " + nickname);
-            }
+            }).start();
         }
     }
 }

@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 public class RMINetworkManager extends NetworkManager {
     private Loggable serverStub;
     private final ScheduledExecutorService heartbeatScheduler = Executors.newSingleThreadScheduledExecutor();
+    private GameObserver myObserver;
 
     @Override
     public void connect(String ip, int port) throws Exception {
@@ -24,7 +25,7 @@ public class RMINetworkManager extends NetworkManager {
 
     @Override
     public void login(Color color, String name) throws RemoteException {
-        GameObserver myObserver = new ClientObserver(this.view);
+        myObserver = new ClientObserver(this.view);
         UnicastRemoteObject.exportObject(myObserver, 0);
 
         serverStub.login(name, color, myObserver);
@@ -65,5 +66,10 @@ public class RMINetworkManager extends NetworkManager {
             heartbeatScheduler.shutdownNow();
             view.showFatalError("Connection lost. The server is unreachable.");
         }
+    }
+
+    @Override
+    public void seeGlobalLeaderboard(int targetPlayers) throws RemoteException {
+        serverStub.getGlobalLeaderboard(targetPlayers, myObserver);
     }
 }

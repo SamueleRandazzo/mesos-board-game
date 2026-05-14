@@ -20,6 +20,7 @@ public interface View {
     void showPlayersInfo(Map<String, Color> playersInfo);
     void showTribe(TribeStatusDTO tribe);
     void displayBoard(BoardDTO board);
-    void displayLeaderboard(LeaderboardDTO leaderboard);
+    void displayLeaderboard(LeaderboardDTO leaderboard, String globalRank);
     void showFatalError(String error);
+    void displayGlobalLeaderboard(GlobalLeaderboardDTO globalLeaderboard);
 }

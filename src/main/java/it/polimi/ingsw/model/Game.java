@@ -40,7 +40,7 @@ public class Game {
 
     //region Constants
     /** Total number of rounds in a game of Mesos. */
-    private static final int TOTAL_ROUNDS = 3;
+    private static final int TOTAL_ROUNDS = 1;
     /** First era number. */
     private static final int FIRST_ERA = 1;
     //endregion

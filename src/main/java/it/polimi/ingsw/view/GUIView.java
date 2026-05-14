@@ -167,11 +167,11 @@ public class GUIView implements View {
     }
 
     @Override
-    public void displayLeaderboard(LeaderboardDTO leaderboard) {
+    public void displayLeaderboard(LeaderboardDTO leaderboard, String globalRank) {
         loadScene("leaderboard.fxml");
 
         Platform.runLater(() -> {
-           currentController.displayLeaderboard(leaderboard, null);
+           currentController.displayLeaderboard(leaderboard, globalRank);
         });
     }
 
@@ -181,6 +181,13 @@ public class GUIView implements View {
 
         Platform.runLater(() -> {
             currentController.showErrorMessage(error);
+        });
+    }
+
+    //TODO
+    @Override
+    public void displayGlobalLeaderboard(GlobalLeaderboardDTO leaderboard) {
+        Platform.runLater(() -> {
         });
     }
 }

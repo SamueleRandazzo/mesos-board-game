@@ -2,7 +2,6 @@ package it.polimi.ingsw.network;
 
 import it.polimi.ingsw.model.Enum.Color;
 import it.polimi.ingsw.client.SocketServerListener;
-
 import java.io.PrintWriter;
 import java.net.Socket;
 
@@ -38,5 +37,10 @@ public class SocketNetworkManager extends NetworkManager {
     @Override
     protected void handleCardAction(String prefix, int n) {
         out.println("CARD_SELECT " + prefix + " " + n);
+    }
+
+    @Override
+    public void seeGlobalLeaderboard(int targetPlayers) {
+        out.println("GLOBAL_LEADERBOARD " + targetPlayers);
     }
 }

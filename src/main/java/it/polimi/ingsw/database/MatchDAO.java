@@ -1,6 +1,7 @@
 package it.polimi.ingsw.database;
 
 import it.polimi.ingsw.model.Player;
+import it.polimi.ingsw.network.DTO.GlobalPlayerRankDTO;
 import it.polimi.ingsw.network.DTO.PlayerRankDTO;
 
 import java.sql.*;
@@ -116,8 +117,8 @@ public class MatchDAO {
      * @param playerCount The type of match (2-5 players).
      * @return A list of strings formatted as "Rank. Nickname - Total Points: X".
      */
-    public static List<String> getLeaderboard(int playerCount) {
-        List<String> results = new ArrayList<>();
+    public static List<GlobalPlayerRankDTO> getLeaderboard(int playerCount) {
+        List<GlobalPlayerRankDTO> results = new ArrayList<>();
         if (!DatabaseManager.isAvailable()) return results;
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -128,11 +129,11 @@ public class MatchDAO {
             try (ResultSet rs = pstmt.executeQuery()) {
                 int rank = 1;
                 while (rs.next()) {
-                    String entry = String.format("%d. %s - Total Points: %d",
+                    results.add(new GlobalPlayerRankDTO(
                             rank++,
                             rs.getString(COL_NICKNAME),
-                            rs.getInt(COL_TOTAL_POINTS));
-                    results.add(entry);
+                            rs.getInt(COL_TOTAL_POINTS)
+                    ));
                 }
             }
         } catch (SQLException e) {

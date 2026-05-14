@@ -72,8 +72,8 @@ public class ClientObserver implements GameObserver {
     }
 
     @Override
-    public void onDisplayLeaderboard(LeaderboardDTO leaderboard) throws RemoteException {
-        view.displayLeaderboard(leaderboard);
+    public void onDisplayLeaderboard(LeaderboardDTO leaderboard, String globalRank) throws RemoteException {
+        view.displayLeaderboard(leaderboard, globalRank);
     }
 
     @Override
@@ -84,5 +84,10 @@ public class ClientObserver implements GameObserver {
     @Override
     public void onShowFatalError(String error) throws RemoteException {
         view.showFatalError(error);
+    }
+
+    @Override
+    public void onDisplayGlobalLeaderboard(GlobalLeaderboardDTO leaderboard) throws RemoteException {
+        view.displayGlobalLeaderboard(leaderboard);
     }
 }

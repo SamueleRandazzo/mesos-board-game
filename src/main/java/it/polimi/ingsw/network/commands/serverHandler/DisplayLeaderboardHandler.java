@@ -32,14 +32,14 @@ public class DisplayLeaderboardHandler implements ServerCommandHandler {
             }
 
             String jsonPayload = args[0];
+            String globalRank = args[1].replace("_", " ");
 
             LeaderboardDTO leaderboard = mapper.readValue(jsonPayload, LeaderboardDTO.class);
 
-            view.displayLeaderboard(leaderboard);
+            view.displayLeaderboard(leaderboard, globalRank);
         } catch (Exception e) {
             // If the JSON is malformed or missing, alert the user without crashing the client
             view.showError("Server data error: unable to load the leaderboard.");
-            e.printStackTrace();
         }
     }
 }

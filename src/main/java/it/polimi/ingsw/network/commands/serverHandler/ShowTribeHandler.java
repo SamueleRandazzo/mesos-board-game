@@ -44,7 +44,6 @@ public class ShowTribeHandler implements ServerCommandHandler {
         } catch (Exception e) {
             // If the JSON is malformed or missing, alert the user without crashing the client
             view.showError("Server data error: unable to show the tribe");
-            e.printStackTrace();
         }
     }
 }

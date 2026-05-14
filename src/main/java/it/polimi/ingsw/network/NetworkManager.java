@@ -21,6 +21,7 @@ public abstract class NetworkManager {
     public abstract void login(Color color, String name) throws Exception;
     public abstract void setTotalPlayers(int n) throws Exception;
     public abstract void tileSelection(int tileIndex) throws Exception;
+    public abstract void seeGlobalLeaderboard(int targetPlayers) throws Exception;
 
     public void setController(RemoteController controller) {
 

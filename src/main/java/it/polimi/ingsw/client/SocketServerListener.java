@@ -7,6 +7,7 @@ import it.polimi.ingsw.network.commands.ServerCommandHandler;
 import it.polimi.ingsw.view.View;
 import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -22,6 +23,8 @@ public class SocketServerListener implements Runnable {
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private static final int TIMEOUT_SECONDS = 10;
     private boolean timerStarted = false;
+
+    private final ExecutorService commandExecutor = Executors.newSingleThreadExecutor();
 
     public SocketServerListener(InputStream is, View view) {
         this.in = new Scanner(is);
@@ -44,16 +47,21 @@ public class SocketServerListener implements Runnable {
                     timerStarted = true;
                 }
 
-                ServerCommandHandler handler = ServerCommandFactory.getHandler(header);
-                if (handler != null) {
-                    handler.handle(args, view, mapper);
-                } else {
-                    System.err.println("Unknown command: " + header);
+                if (header.equals("PING")) {
+                    continue;
                 }
+
+                commandExecutor.submit(() -> {
+                    ServerCommandHandler handler = ServerCommandFactory.getHandler(header);
+                    if (handler != null) {
+                        handler.handle(args, view, mapper);
+                    }
+                });
             }
         } catch (NoSuchElementException e) {
             // It happens if the connection suddenly drops while the scanner is waiting
         } finally {
+            commandExecutor.shutdown();
             handleServerDisconnection();
         }
     }

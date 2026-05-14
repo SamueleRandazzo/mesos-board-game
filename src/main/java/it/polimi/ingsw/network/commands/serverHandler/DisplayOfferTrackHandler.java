@@ -20,7 +20,6 @@ public class DisplayOfferTrackHandler implements ServerCommandHandler {
             view.displayOfferTrack(tiles);
         } catch (Exception e) {
             view.showError("Server data error");
-            e.printStackTrace();
         }
     }
 }

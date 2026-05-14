@@ -3,10 +3,7 @@ package it.polimi.ingsw.server;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polimi.ingsw.model.Enum.Color;
-import it.polimi.ingsw.network.DTO.BoardDTO;
-import it.polimi.ingsw.network.DTO.LeaderboardDTO;
-import it.polimi.ingsw.network.DTO.OfferTileDTO;
-import it.polimi.ingsw.network.DTO.TribeStatusDTO;
+import it.polimi.ingsw.network.DTO.*;
 import it.polimi.ingsw.network.GameObserver;
 import it.polimi.ingsw.network.RemoteController;
 import java.io.PrintWriter;
@@ -136,14 +133,14 @@ class SocketVirtualView implements GameObserver {
     }
 
     @Override
-    public void onDisplayLeaderboard(LeaderboardDTO leaderboard) throws RemoteException {
+    public void onDisplayLeaderboard(LeaderboardDTO leaderboard, String globalRank) throws RemoteException {
         try {
             ObjectMapper mapper = new ObjectMapper();
 
             String jsonLeaderboard = mapper.writeValueAsString(leaderboard);
             String cleanedJson = jsonLeaderboard.replace("\n", "").replace("\r", "");
 
-            out.println("DISPLAY_LEADERBOARD " + cleanedJson);
+            out.println("DISPLAY_LEADERBOARD " + cleanedJson + " " + globalRank.replace(" ", "_"));
             out.flush();
         } catch (JsonProcessingException e) {
             System.err.println("Error serializing BoardDTO: " + e.getMessage());
@@ -162,6 +159,21 @@ class SocketVirtualView implements GameObserver {
     public void onShowFatalError(String error) throws RemoteException {
         try {
             out.println("SHOW_FATAL_ERROR " + error);
+            out.flush();
+        } catch (Exception e) {
+            System.err.println("Serialization error: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void onDisplayGlobalLeaderboard(GlobalLeaderboardDTO leaderboard) throws RemoteException {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonList = mapper.writeValueAsString(leaderboard);
+            String cleanedJson = jsonList.replace("\n", "").replace("\r", "");
+
+            out.println("DISPLAY_GLOBAL_LEADERBOARD " + cleanedJson);
+            out.flush();
         } catch (Exception e) {
             System.err.println("Serialization error: " + e.getMessage());
         }

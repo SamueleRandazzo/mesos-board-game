@@ -15,6 +15,7 @@ public class SocketClientHandler extends Thread {
     private final Lobby lobby;
     private RemoteController controller;
     private String nickname;
+    private SocketVirtualView vView;
 
     public SocketClientHandler(Socket s, Lobby l) {
         this.socket = s;
@@ -42,7 +43,7 @@ public class SocketClientHandler extends Thread {
                 if (handler != null) {
                     handler.handle(args, lobby, controller, out);
                 } else {
-                    out.println("ERROR unknown command " + header);
+                    out.println("ERROR unknown_command " + header);
                 }
             }
 
@@ -62,17 +63,16 @@ public class SocketClientHandler extends Thread {
                 try {
                     String nick = parts[1].replace("_", " ");
                     Color chosenColor = Color.valueOf(parts[2].toUpperCase());
-                    SocketVirtualView vView = new SocketVirtualView(out, this);
+                    this.vView = new SocketVirtualView(out, this);
                     lobby.addPlayer(nick, chosenColor, vView);
                     this.nickname = nick;
                     out.println("PING"); // Notify that the player logged
                     return true;
                 } catch (Exception e) {
-                    out.println("ERROR " + e.getMessage());
-                    out.println("LOGIN");
+                    out.println("LOGIN_ERROR " + e.getMessage());
                 }
             } else {
-                out.println("ERROR login first");
+                out.println("LOGIN_ERROR login first");
             }
         }
         return false;

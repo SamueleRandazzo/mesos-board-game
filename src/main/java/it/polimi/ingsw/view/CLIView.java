@@ -25,7 +25,6 @@ import static it.polimi.ingsw.exception.CustomException.cleanRemoteException;
 public class CLIView implements View {
     private final BufferedReader reader;
     private final NetworkManager network;
-    private List<OfferTileDTO> lastTiles;
     private BoardDTO lastBoard;
 
     /**
@@ -181,8 +180,6 @@ public class CLIView implements View {
      */
     @Override
     public void displayOfferTrack(List<OfferTileDTO> tiles) {
-        this.lastTiles = tiles;
-
         System.out.println("\n====================== OFFER TRACK ======================");
 
         System.out.printf("%-4s | %-6s | %-10s | %-10s | %-12s%n",
@@ -370,7 +367,7 @@ public class CLIView implements View {
      * @param leaderboard the DTO containing the final standings and victory status
      */
     @Override
-    public void displayLeaderboard(LeaderboardDTO leaderboard) {
+    public void displayLeaderboard(LeaderboardDTO leaderboard, String globalRank) {
         System.out.println("\n" + "=".repeat(60));
         System.out.println(centerText("FINAL LEADERBOARD", 60));
         System.out.println("=".repeat(60));
@@ -383,11 +380,6 @@ public class CLIView implements View {
         for (PlayerRankDTO entry : leaderboard.getRankings()) {
             String posString = entry.getPosition() + "°";
             String name = entry.getNickname();
-
-            // Highlight winners with stars and uppercase
-            if (entry.isWinner()) {
-                name = "★ " + name.toUpperCase() + " ★";
-            }
 
             String row = String.format("%-5s | %-20s | %-12d | %-8d",
                     posString,
@@ -405,10 +397,18 @@ public class CLIView implements View {
             System.out.println(" It's a draw! Victory is shared among the leaders.");
         } else if (!leaderboard.getRankings().isEmpty()) {
             String winnerName = leaderboard.getRankings().getFirst().getNickname();
-            System.out.println(" Congratulations " + winnerName + "! You are the absolute winner!");
+            System.out.println(" PLAYER  " + winnerName + " is the winner!");
         }
 
         System.out.println("=".repeat(60) + "\n");
+
+        if (globalRank != null) {
+            showMessage("\n--- GLOBAL RANKING ---");
+            showMessage(globalRank);
+
+            System.out.println("If you want to see the global leaderboard digit 'GLOBAL_LEADERBOARD'.");
+            askGlobalLeaderboard(leaderboard.getRankings().size());
+        }
     }
 
     /**
@@ -422,5 +422,48 @@ public class CLIView implements View {
         if (text.length() >= width) return text;
         int padding = (width - text.length()) / 2;
         return " ".repeat(padding) + text;
+    }
+
+    private void askGlobalLeaderboard(int targetPlayers) {
+        try {
+            boolean ok = false;
+            while (!ok) {
+                String choice = readLine().trim().toLowerCase();
+                if (choice.equalsIgnoreCase("GLOBAL_LEADERBOARD")) {
+                    network.seeGlobalLeaderboard(targetPlayers);
+                    ok = true;
+                }
+            }
+        } catch (Exception e) {
+            askGlobalLeaderboard(targetPlayers);
+        }
+    }
+
+    @Override
+    public void displayGlobalLeaderboard(GlobalLeaderboardDTO leaderboard) {
+        System.out.println("\n" + "╔" + "═".repeat(58) + "╗");
+        System.out.println("║" + centerText("GLOBAL HALL OF FAME", 58) + "║");
+        System.out.println("╠" + "═".repeat(58) + "╣");
+
+
+        String header = String.format("  %-6s  %-25s  %15s", "RANK", "NICKNAME", "TOTAL POINTS");
+        System.out.println("║" + String.format("%-58s", header) + "║");
+        System.out.println("╠" + "═".repeat(58) + "╣");
+
+        List<GlobalPlayerRankDTO> entries = leaderboard.getRankings();
+
+        if (entries == null || entries.isEmpty()) {
+            System.out.println("║" + centerText("No records found for this player count.", 58) + "║");
+        } else {
+            for (GlobalPlayerRankDTO entry : entries) {
+                String row = String.format("  #%-5d  %-25s  %15d",
+                        entry.getRank(),
+                        entry.getNickname(),
+                        entry.getTotalPoints());
+                System.out.println("║" + String.format("%-58s", row) + "║");
+            }
+        }
+
+        System.out.println("╚" + "═".repeat(58) + "╝\n");
     }
 }
