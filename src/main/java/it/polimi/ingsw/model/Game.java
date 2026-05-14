@@ -530,6 +530,7 @@ public class Game {
             this.setState(new EndGameState());
             notifyEndGame();
         } else {
+            this.setState(new TotemPlacementState());
             notifyOnShowOfferTrack();
             notifyTotemPlacementTurnChanged();
         }
