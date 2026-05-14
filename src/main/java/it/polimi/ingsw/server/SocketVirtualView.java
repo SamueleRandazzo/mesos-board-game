@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-class SocketVirtualView implements GameObserver {
+public class SocketVirtualView implements GameObserver {
     private PrintWriter out;
     private SocketClientHandler handler;
 
@@ -22,23 +22,23 @@ class SocketVirtualView implements GameObserver {
     }
 
     @Override
-    public void onPlayerJoined(int current, int target) throws RemoteException {
+    public void onPlayerJoined(int current, int target) {
         out.println("PLAYER_JOINED " + current + "/" + target);
     }
 
     @Override
-    public void onGameStarted(RemoteController controller, int totalPlayers) throws RemoteException {
+    public void onGameStarted(RemoteController controller, int totalPlayers) {
         this.handler.setController(controller);
         out.println("GAME_STARTED " + totalPlayers);
     }
 
     @Override
-    public void askMaxPlayers() throws RemoteException {
+    public void askMaxPlayers() {
         out.println("ASK_MAX_PLAYERS");
     }
 
     @Override
-    public void askTotemPlacement() throws RemoteException {
+    public void askTotemPlacement() {
         try {
             out.println("ASK_TOTEM_PLACEMENT");
         } catch (Exception e) {
@@ -62,7 +62,7 @@ class SocketVirtualView implements GameObserver {
     }
 
     @Override
-    public void askCardChoose() throws RemoteException {
+    public void askCardChoose() {
         try {
             out.println("ASK_CARD_CHOOSE");
         } catch (Exception e) {
@@ -71,7 +71,7 @@ class SocketVirtualView implements GameObserver {
     }
 
     @Override
-    public void onShowMessage(String message) throws RemoteException {
+    public void onShowMessage(String message) {
         try {
             out.println("MESSAGE " + message);
         } catch (Exception e) {
@@ -80,7 +80,7 @@ class SocketVirtualView implements GameObserver {
     }
 
     @Override
-    public void onShowPlayersOrder(List<String> playersOrder) throws RemoteException {
+    public void onShowPlayersOrder(List<String> playersOrder) {
         try {
             String joinedNames = String.join(",", playersOrder);
             out.println("PLAYERS_ORDER " + joinedNames);
@@ -90,7 +90,7 @@ class SocketVirtualView implements GameObserver {
     }
 
     @Override
-    public void onShowPlayersInfo(Map<String, Color> playersInfo) throws RemoteException {
+    public void onShowPlayersInfo(Map<String, Color> playersInfo) {
         String payload = playersInfo.entrySet().stream()
                 .map(entry -> entry.getKey() + ":" + entry.getValue().name())
                 .collect(Collectors.joining(","));
@@ -133,7 +133,7 @@ class SocketVirtualView implements GameObserver {
     }
 
     @Override
-    public void onDisplayLeaderboard(LeaderboardDTO leaderboard, String globalRank) throws RemoteException {
+    public void onDisplayLeaderboard(LeaderboardDTO leaderboard, String globalRank) {
         try {
             ObjectMapper mapper = new ObjectMapper();
 
@@ -148,7 +148,7 @@ class SocketVirtualView implements GameObserver {
     }
 
     @Override
-    public void ping() throws RemoteException {
+    public void ping() throws RemoteException{
         out.println("PING");
         if (out.checkError()) {
             throw new RemoteException("Socket connection lost during ping");
@@ -156,7 +156,7 @@ class SocketVirtualView implements GameObserver {
     }
 
     @Override
-    public void onShowFatalError(String error) throws RemoteException {
+    public void onShowFatalError(String error) {
         try {
             out.println("SHOW_FATAL_ERROR " + error);
             out.flush();
@@ -166,7 +166,7 @@ class SocketVirtualView implements GameObserver {
     }
 
     @Override
-    public void onDisplayGlobalLeaderboard(GlobalLeaderboardDTO leaderboard) throws RemoteException {
+    public void onDisplayGlobalLeaderboard(GlobalLeaderboardDTO leaderboard) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             String jsonList = mapper.writeValueAsString(leaderboard);
@@ -174,6 +174,14 @@ class SocketVirtualView implements GameObserver {
 
             out.println("DISPLAY_GLOBAL_LEADERBOARD " + cleanedJson);
             out.flush();
+        } catch (Exception e) {
+            System.err.println("Serialization error: " + e.getMessage());
+        }
+    }
+
+    public void onShowError(String error) {
+        try {
+            out.println("ERROR " + error);
         } catch (Exception e) {
             System.err.println("Serialization error: " + e.getMessage());
         }

@@ -420,8 +420,12 @@ public class CLIView implements View {
      */
     private String centerText(String text, int width) {
         if (text.length() >= width) return text;
-        int padding = (width - text.length()) / 2;
-        return " ".repeat(padding) + text;
+
+        int totalPadding = width - text.length();
+        int leftPadding = totalPadding / 2;
+        int rightPadding = totalPadding - leftPadding;
+
+        return " ".repeat(leftPadding) + text + " ".repeat(rightPadding);
     }
 
     private void askGlobalLeaderboard(int targetPlayers) {
