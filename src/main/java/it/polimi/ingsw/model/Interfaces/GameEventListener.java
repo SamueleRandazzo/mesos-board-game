@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.Interfaces;
 
+import it.polimi.ingsw.model.Game;
 import it.polimi.ingsw.network.DTO.*;
 import java.util.List;
 
@@ -9,7 +10,8 @@ public interface GameEventListener {
     void onActionResultTurnChanged(String playerNickname);
     void onShowOfferTrack(List<OfferTileDTO> tiles);
     void onDisplayTurnOrderTile(List<TurnOrderTileDTO> turnOrderTile);
-    void onShowTribe(String playerNickname, TribeStatusDTO tribe);
+    //void onShowTribe(String playerNickname, TribeStatusDTO tribe);
+    void onShowAllTribes(Game game);
     void onShowBoard(BoardDTO board);
     void onEventMessage(String playerNickname, String message);
     void onEndGame(LeaderboardDTO leaderboard);

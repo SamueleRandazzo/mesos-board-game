@@ -95,6 +95,10 @@ public class LoginController extends SceneController {
 
         System.out.println("Login with Nick: " + nickname + " and Color: " + selectedColor);
 
+        // --- ADDED FOR NETWORK SECURITY ---
+        // Save the local identity in the network manager before sending the request
+        network.setNickname(nickname);
+
         try {
             network.login(selectedColor, nickname);
         } catch (Exception e) {

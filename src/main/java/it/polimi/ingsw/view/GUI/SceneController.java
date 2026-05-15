@@ -40,4 +40,13 @@ public abstract class SceneController {
                     : e.getMessage();
         }
     }
+
+    /**
+     * Updates the UI with the status of all tribes.
+     * Overridden by controllers that need to display other players' data.
+     * * @param allTribes the DTO containing every player's tribe status.
+     */
+    public void showAllTribes(AllTribesStatusDTO allTribes) {
+        // Default empty implementation
+    }
 }

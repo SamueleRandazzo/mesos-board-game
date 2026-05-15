@@ -198,4 +198,19 @@ public class GUIView implements View {
             currentController.displayTurnOrderTile(turnOrderTile);
         });
     }
+
+    /**
+     * Receives the broadcast containing all players' tribes and forwards it
+     * to the currently active JavaFX controller.
+     *
+     * @param allTribes the DTO containing every player's tribe status.
+     */
+    @Override
+    public void showAllTribes(AllTribesStatusDTO allTribes) {
+        Platform.runLater(() -> {
+            if (currentController != null) {
+                currentController.showAllTribes(allTribes);
+            }
+        });
+    }
 }

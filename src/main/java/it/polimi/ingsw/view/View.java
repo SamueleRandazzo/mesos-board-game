@@ -24,4 +24,5 @@ public interface View {
     void showFatalError(String error);
     void displayGlobalLeaderboard(GlobalLeaderboardDTO globalLeaderboard);
     void displayTurnOrderTile(List<TurnOrderTileDTO> turnOrderTile);
+    void showAllTribes(AllTribesStatusDTO allTribes);
 }

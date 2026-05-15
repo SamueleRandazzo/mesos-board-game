@@ -130,6 +130,8 @@ public class Lobby {
             List<Player> players = new ArrayList<>();
             for (int i = 0; i < nicknames.size(); i++) {
                 players.add(new Player(colors.get(i), nicknames.get(i)));
+                // Opzionale ma consigliato: popola playersInfo che altrimenti rimarrebbe vuoto
+                playersInfo.put(nicknames.get(i), colors.get(i));
             }
 
             Collections.shuffle(players);
@@ -144,13 +146,10 @@ public class Lobby {
                 o.onShowPlayersInfo(playersInfo);
             }
 
-            for (Player p : players) {
-                GameObserver o = playerObservers.get(p.getNickname());
-                o.onShowTribe(p.getTribe().toDTO());
-            }
-
             ModelToRemoteViewAdapter adapter = new ModelToRemoteViewAdapter(this.playerObservers);
             currentGame.addListener(adapter);
+
+            currentGame.notifyShowAllTribes();
 
             currentGame.notifyDisplayTurnOrderTile();
             currentGame.notifyOnShowBoard();

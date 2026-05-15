@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.rmi.RemoteException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -26,6 +27,9 @@ public class CLIView implements View {
     private final BufferedReader reader;
     private final NetworkManager network;
     private BoardDTO lastBoard;
+    private Map<String, TribeStatusDTO> allTribesCache = new HashMap<>();
+    private String myNickname;
+    private String currentlyViewedPlayer;
 
     /**
      * Constructs a new CLIView.
@@ -77,6 +81,11 @@ public class CLIView implements View {
         }
 
         try {
+            // --- ADDED FOR LOCAL IDENTITY ---
+            this.myNickname = nickname;
+            this.currentlyViewedPlayer = nickname;
+            network.setNickname(nickname);
+
             System.out.println("Login request sent. Waiting for server confirmation...");
             network.login(selectedColor, nickname);
         } catch (Exception e) {
@@ -159,21 +168,24 @@ public class CLIView implements View {
 
     /**
      * Prompts the user to select an offer tile for totem placement.
-     * <p>
-     * This method clears the input buffer, reads the user's choice from the console,
-     * and communicates the selection to the server. It includes recursive error
-     * handling for invalid numerical input or network-related issues.
-     * </p>
-     *
-     * @throws NumberFormatException if the user input is not a valid integer
      */
     @Override
     public void askTotemPlacement() {
         clearInputBuffer();
 
+        System.out.println("Commands: [index] OR 'view [name]' to inspect a tribe.");
         System.out.print("Choose the offer tile: ");
         try {
-            int tileIndex = Integer.parseInt(readLine());
+            String input = readLine().trim();
+
+            // --- ADDED NAVIGATION CHECK ---
+            if (input.toLowerCase().startsWith("view ")) {
+                handleViewCommand(input.substring(5));
+                askTotemPlacement();
+                return;
+            }
+
+            int tileIndex = Integer.parseInt(input);
             network.tileSelection(tileIndex);
         } catch (NumberFormatException e) {
             showError("Insert a valid number!");
@@ -262,45 +274,14 @@ public class CLIView implements View {
     }
 
     /**
-     * Displays the tribe's state in the CLI.
-     * It organizes characters by category and shows calculated totals and buildings.
-     *
-     * @param tribe The DTO containing the tribe's data.
+     * Legacy support: updates the cache for the local player's tribe if a single update is sent.
      */
+    @Override
     public void showTribe(TribeStatusDTO tribe) {
-        // 1. Display Resources and Totals
-        System.out.printf("\n[FOOD: %d] | [PRESTIGE: %d] | [STARS: %d] | [SUSTENANCE DISCOUNT: %d] | [BUILDINGS DISCOUNT: %d]%n",
-                tribe.getCurrentFood(),
-                tribe.getTotalPrestigePoints(),
-                tribe.getShamanStars(),
-                tribe.getTotalSustenanceDiscount(),
-                tribe.getTotalBuildingsFoodDiscount());
-
-        System.out.println("\n" + "=".repeat(22) + " YOUR TRIBE " + "=".repeat(22));
-
-        // 2. Display Character Columns
-        System.out.println(" CHARACTERS:");
-        tribe.getCharactersByColumn().forEach((category, cardDTOs) -> {
-            if (!cardDTOs.isEmpty()) {
-                String joinedIds = cardDTOs.stream()
-                        .map(dto -> LocalCardDictionary.getInstance().getCardDetails(dto.getCardId()))
-                        .collect(Collectors.joining(", "));
-
-                System.out.printf("  %-12s: %s%n", category, joinedIds);
-            }
-        });
-
-        System.out.println("-".repeat(56));
-
-        // 3. Display Buildings Column
-        System.out.println(" BUILDINGS:");
-        for (int i = 0; i < tribe.getBuildingIds().size(); i++) {
-            System.out.print(tribe.getBuildingIds().get(i));
-            if (i < tribe.getBuildingIds().size() - 1) System.out.print(" | ");
-            if ((i + 1) % 4 == 0) System.out.print("\n");
+        allTribesCache.put(myNickname, tribe);
+        if (currentlyViewedPlayer != null && currentlyViewedPlayer.equals(myNickname)) {
+            displaySpecificTribe(myNickname);
         }
-
-        System.out.println("=".repeat(56) + "\n");
     }
 
     /**
@@ -343,23 +324,35 @@ public class CLIView implements View {
         }
     }
 
-
     /**
      * Prompts the user to choose a card.
-     * It actively reprints the entire board state using the LocalCardDictionary
-     * so the user has all available options directly above the input prompt.
      */
     @Override
     public void askCardChoose() {
         clearInputBuffer();
 
         System.out.println("Format: [Row Prefix][Index] (e.g., T0 for first Upper Tribe, G2 for third Lower Building)");
+        System.out.println("Commands: [Action] OR 'view [name]' to inspect a tribe.");
         System.out.print("Enter your choice: ");
-        String cardPosition = readLine().trim().toUpperCase();
+        String input = readLine().trim();
 
         try {
-            // Forwards the input (e.g., "T0") to the NetworkManager regex parser
-            network.cardSelection(cardPosition);
+            // --- ADDED NAVIGATION CHECK ---
+            if (input.toLowerCase().startsWith("view ")) {
+                handleViewCommand(input.substring(5));
+                askCardChoose();
+                return;
+            }
+
+            // --- ADDED SECURITY UI CHECK ---
+            if (!currentlyViewedPlayer.equals(myNickname)) {
+                showError("You cannot take cards while viewing an opponent! Type 'view me' to go back.");
+                askCardChoose();
+                return;
+            }
+
+            // Forwards the input to the NetworkManager parser
+            network.cardSelection(input.toUpperCase());
         } catch (Exception e) {
             showError(handleNetworkError(e));
 
@@ -530,5 +523,95 @@ public class CLIView implements View {
         }
 
         System.out.println("╚" + "═".repeat(58) + "╝\n");
+    }
+
+    /**
+     * Local cache within the CLIView to store all players' status.
+     */
+    private Map<String, TribeStatusDTO> globalTribesCache = new HashMap<>();
+
+    /**
+     * Updates the local cache with the status of all tribes received from the server broadcast.
+     * @param allTribes the global DTO containing every player's tribe status.
+     */
+    @Override
+    public void showAllTribes(AllTribesStatusDTO allTribes) {
+        this.allTribesCache = allTribes.getAllTribes();
+        System.out.println("\n[System] All tribes data updated. Type 'view [name]' to inspect others.");
+
+        // Refresh the current view if the user is already looking at a tribe
+        if (allTribesCache.containsKey(currentlyViewedPlayer)) {
+            displaySpecificTribe(currentlyViewedPlayer);
+        }
+    }
+
+
+    /**
+     * Renders a specific player's tribe to the console using the local dictionary.
+     * @param nickname the nickname of the player to display.
+     */
+    private void displaySpecificTribe(String nickname) {
+        TribeStatusDTO status = allTribesCache.get(nickname);
+        if (status == null) {
+            System.out.println("Tribe data for '" + nickname + "' is not available yet.");
+            return;
+        }
+
+        boolean isMe = nickname.equals(myNickname);
+        String title = isMe ? "YOUR TRIBE" : "TRIBE OF " + nickname.toUpperCase();
+
+        System.out.printf("\n[FOOD: %d] | [PRESTIGE: %d] | [STARS: %d] | [SUSTENANCE DISCOUNT: %d] | [BUILDINGS DISCOUNT: %d]%n",
+                status.getCurrentFood(),
+                status.getTotalPrestigePoints(),
+                status.getShamanStars(),
+                status.getTotalSustenanceDiscount(),
+                status.getTotalBuildingsFoodDiscount());
+
+        System.out.println("\n" + "=".repeat(22) + " " + title + " " + "=".repeat(22));
+
+        System.out.println(" CHARACTERS:");
+        status.getCharactersByColumn().forEach((category, cardDTOs) -> {
+            if (!cardDTOs.isEmpty()) {
+                String joinedIds = cardDTOs.stream()
+                        .map(dto -> LocalCardDictionary.getInstance().getCardDetails(dto.getCardId()))
+                        .collect(Collectors.joining(", "));
+
+                System.out.printf("  %-12s: %s%n", category, joinedIds);
+            }
+        });
+
+        System.out.println("-".repeat(56));
+
+        System.out.println(" BUILDINGS:");
+        if (status.getBuildingIds().isEmpty()) {
+            System.out.println("  [None]");
+        } else {
+            for (int i = 0; i < status.getBuildingIds().size(); i++) {
+                String cardDesc = LocalCardDictionary.getInstance().getCardDetails(status.getBuildingIds().get(i).getCardId());
+                System.out.print(cardDesc);
+                if (i < status.getBuildingIds().size() - 1) System.out.print(" | ");
+                if ((i + 1) % 4 == 0) System.out.print("\n");
+            }
+            System.out.println();
+        }
+
+        System.out.println("=".repeat(56) + "\n");
+
+        if (!isMe) {
+            System.out.println("(Viewing Opponent - Type 'view me' to return to your tribe)");
+        }
+    }
+
+    /**
+            * Helper to switch the CLI focus between players.
+     * @param target the player name or 'me' keyword.
+     */
+    private void handleViewCommand(String target) {
+        if (target.equalsIgnoreCase("me")) {
+            this.currentlyViewedPlayer = myNickname;
+        } else {
+            this.currentlyViewedPlayer = target;
+        }
+        displaySpecificTribe(currentlyViewedPlayer);
     }
 }

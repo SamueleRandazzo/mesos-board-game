@@ -1,7 +1,9 @@
 package it.polimi.ingsw.network;
 
 import it.polimi.ingsw.database.*;
+import it.polimi.ingsw.model.Game;
 import it.polimi.ingsw.model.Interfaces.GameEventListener;
+import it.polimi.ingsw.model.Player;
 import it.polimi.ingsw.network.DTO.*;
 import java.rmi.RemoteException;
 import java.util.*;
@@ -83,17 +85,6 @@ public class ModelToRemoteViewAdapter implements GameEventListener {
         }
     }
 
-    @Override
-    public void onShowTribe(String playerNickname, TribeStatusDTO tribe) {
-        GameObserver activeObs = playerObservers.get(playerNickname);
-        if (activeObs != null) {
-            try {
-                activeObs.onShowTribe(tribe);
-            } catch (RemoteException e) {
-                System.err.println("Network error with: " + playerNickname);
-            }
-        }
-    }
 
     @Override
     public void onShowBoard(BoardDTO board) {
@@ -162,6 +153,27 @@ public class ModelToRemoteViewAdapter implements GameEventListener {
                 o.onShowPlayersOrder(playersOrder);
             } catch (RemoteException e) {
                 System.err.println("Network error sending players order");
+            }
+        }
+    }
+
+    @Override
+    public void onShowAllTribes(Game game) {
+        Map<String, TribeStatusDTO> tribeMap = new HashMap<>();
+
+        // 1. Gather all tribe data
+        for (Player p : game.getPlayers()) {
+            tribeMap.put(p.getNickname(), p.getTribe().toDTO());
+        }
+
+        AllTribesStatusDTO globalStatus = new AllTribesStatusDTO(tribeMap);
+
+        // 2. Broadcast to everyone
+        for (GameObserver observer : playerObservers.values()) {
+            try {
+                observer.onShowAllTribes(globalStatus);
+            } catch (RemoteException e) {
+                System.err.println("Error broadcasting tribes: " + e.getMessage());
             }
         }
     }

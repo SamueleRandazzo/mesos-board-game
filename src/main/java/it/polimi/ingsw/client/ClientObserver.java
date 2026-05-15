@@ -61,10 +61,6 @@ public class ClientObserver implements GameObserver {
         view.showPlayersInfo(playersInfo);
     }
 
-    @Override
-    public void onShowTribe(TribeStatusDTO tribe) throws RemoteException  {
-        view.showTribe(tribe);
-    }
 
     @Override
     public void onDisplayBoard(BoardDTO board) throws RemoteException {
@@ -94,5 +90,18 @@ public class ClientObserver implements GameObserver {
     @Override
     public void onDisplayTurnOrderTile(List<TurnOrderTileDTO> turnOrderTile) throws RemoteException {
         view.displayTurnOrderTile(turnOrderTile);
+    }
+
+    /**
+     * Receives the global update of all player tribes from the server
+     * and forwards it to the local View.
+     *
+     * @param allTribes Data Transfer Object containing all tribes' status.
+     * @throws RemoteException if a communication error occurs.
+     */
+    @Override
+    public void onShowAllTribes(AllTribesStatusDTO allTribes) throws RemoteException {
+        // Forward the global DTO to the CLI or GUI view
+        view.showAllTribes(allTribes);
     }
 }

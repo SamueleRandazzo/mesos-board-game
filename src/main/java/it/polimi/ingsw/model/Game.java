@@ -233,24 +233,10 @@ public class Game {
         }
     }
 
-    /**
-     * Notifies listeners to update the visual representation of a specific player's tribe.
-     * Converts the current player's tribe status into a DTO for remote transmission.
-     *
-     * @param playerNickname the nickname of the player whose tribe status is being broadcast.
-     */
-    public void notifyShowTribe(String playerNickname) {
-        Player player = players.stream()
-                               .filter(p -> p.getNickname().equals(playerNickname))
-                               .findFirst()
-                               .orElse(null);
 
-        if (player != null) {
-            TribeStatusDTO tribeDTO = player.getTribe().toDTO();
-
-            for (GameEventListener l : listeners) {
-                l.onShowTribe(playerNickname, tribeDTO);
-            }
+    public void notifyShowAllTribes() {
+        for (GameEventListener l : listeners) {
+            l.onShowAllTribes(this);
         }
     }
 
@@ -377,7 +363,7 @@ public class Game {
 
         sortedEvents.forEach(card -> card.raiseEvent(players, this));
 
-        players.forEach(p -> notifyShowTribe(p.getNickname()));
+        notifyShowAllTribes();
     }
 
     /**
@@ -624,6 +610,7 @@ public class Game {
     public void executeUpperCardPick(Player player, int pos) {
         TribeDeck c = this.board.takeCardFromTopRow(pos);
         c.applyTo(player);
+        notifyShowAllTribes();
     }
 
     /**
@@ -632,6 +619,7 @@ public class Game {
     public void executeLowerCardPick(Player player, int pos) {
         TribeDeck c = this.board.takeCardFromBottomRow(pos);
         c.applyTo(player);
+        notifyShowAllTribes();
     }
 
     /**
@@ -640,6 +628,7 @@ public class Game {
     public void executeUpperBuildingPick(Player player, int pos) {
         BuildingCard c = this.board.takeCardFromUpperBuildingRow(pos);
         c.applyTo(player);
+        notifyShowAllTribes();
     }
 
     /**
@@ -648,6 +637,7 @@ public class Game {
     public void executeLowerBuildingPick(Player player, int pos) {
         BuildingCard c = this.board.takeCardFromLowerBuildingRow(pos);
         c.applyTo(player);
+        notifyShowAllTribes();
     }
 
     /**

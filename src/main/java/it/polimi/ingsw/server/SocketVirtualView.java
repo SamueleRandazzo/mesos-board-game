@@ -99,20 +99,6 @@ public class SocketVirtualView implements GameObserver {
     }
 
     @Override
-    public void onShowTribe(TribeStatusDTO tribe) {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            String json = mapper.writeValueAsString(tribe);
-
-            String cleanedJson = json.replace(" ", "").replace("\n", "").replace("\r", "");
-
-            out.println("SHOW_TRIBE " + cleanedJson);
-        } catch (Exception e) {
-            System.err.println("Serialization error: " + e.getMessage());
-        }
-    }
-
-    @Override
     public void onDisplayBoard(BoardDTO board) {
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -197,6 +183,27 @@ public class SocketVirtualView implements GameObserver {
             out.flush();
         } catch (Exception e) {
             System.err.println("Serialization error: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Serializes the global status of all tribes and sends it to the client via Socket.
+     *
+     * @param allTribes the DTO containing every player's tribe status.
+     */
+    @Override
+    public void onShowAllTribes(AllTribesStatusDTO allTribes) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String json = mapper.writeValueAsString(allTribes);
+
+            // Clean newlines to maintain the single-line socket protocol integrity
+            String cleanedJson = json.replace("\n", "").replace("\r", "");
+
+            out.println("SHOW_ALL_TRIBES " + cleanedJson);
+            out.flush();
+        } catch (Exception e) {
+            System.err.println("Serialization error in onShowAllTribes: " + e.getMessage());
         }
     }
 

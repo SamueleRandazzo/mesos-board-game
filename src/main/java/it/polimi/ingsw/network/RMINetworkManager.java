@@ -42,13 +42,14 @@ public class RMINetworkManager extends NetworkManager {
     }
 
     @Override
-    protected void handleCardAction(String prefix, int n) throws RemoteException {
-        controller.executeCardAction(prefix, n);
+    protected void handleCardAction(String nickname, String prefix, int n) throws RemoteException {
+        controller.executeCardAction(nickname, prefix, n);
     }
 
     @Override
     public void tileSelection(int tileIndex) throws RemoteException {
-        controller.handleTileSelection(tileIndex);
+        // Pass the local nickname to the server for validation
+        controller.handleTileSelection(this.nickname, tileIndex);
     }
 
     private void startHeartbeat() {
@@ -72,4 +73,6 @@ public class RMINetworkManager extends NetworkManager {
     public void seeGlobalLeaderboard(int targetPlayers) throws RemoteException {
         serverStub.getGlobalLeaderboard(targetPlayers, myObserver);
     }
+
+
 }

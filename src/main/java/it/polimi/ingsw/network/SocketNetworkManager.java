@@ -31,12 +31,31 @@ public class SocketNetworkManager extends NetworkManager {
 
     @Override
     public void tileSelection(int tileIndex) {
-        out.println("TILE_SELECT " + tileIndex);
+        // Format: TILE_SELECT nickname index
+        String safeNickname = this.nickname.replace(" ", "_");
+        out.println("TILE_SELECT " + safeNickname + " " + tileIndex);
+        out.flush();
     }
 
+    /**
+     * Handles the transmission of a card selection action over the socket connection.
+     * <p>
+     * It formats the request as a text command combining the action identifier,
+     * the player's nickname (with spaces replaced by underscores to maintain
+     * parameter integrity), the row prefix, and the card index.
+     * </p>
+     *
+     * @param nickname the nickname of the player making the move.
+     * @param prefix   the row identifier (e.g., "U", "B", "BU", "BB").
+     * @param n        the index of the chosen card.
+     */
     @Override
-    protected void handleCardAction(String prefix, int n) {
-        out.println("CARD_SELECT " + prefix + " " + n);
+    protected void handleCardAction(String nickname, String prefix, int n) {
+        // Ensure the nickname doesn't break the space-separated protocol
+        String safeNickname = nickname.replace(" ", "_");
+
+        // Assuming 'out' is your PrintWriter connected to the socket
+        out.println("CARD_SELECT " + safeNickname + " " + prefix + " " + n);
     }
 
     @Override

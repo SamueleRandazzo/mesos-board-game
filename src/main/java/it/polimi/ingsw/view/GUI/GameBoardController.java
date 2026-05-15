@@ -34,6 +34,51 @@ public class GameBoardController extends SceneController {
 
     private final Map<String, Color> playersInfo = new LinkedHashMap<>();
 
+    // --- ADDED FIELDS FOR MULTIPLAYER TRIBE CACHE ---
+    private Map<String, TribeStatusDTO> allTribesCache = new java.util.HashMap<>();
+    private String currentlyViewedNickname;
+    private String myNickname;
+
+    /**
+     * Sets the local player's identity for the board view.
+     * @param nickname the local player's nickname.
+     */
+    public void setMyNickname(String nickname) {
+        this.myNickname = nickname;
+        this.currentlyViewedNickname = nickname;
+    }
+
+    /**
+     * Receives the global tribe update and stores it in the local cache.
+     * If the UI is currently viewing the updated player, it refreshes the graphical components.
+     *
+     * @param allTribes the global DTO containing every player's tribe status.
+     */
+    @Override
+    public void showAllTribes(AllTribesStatusDTO allTribes) {
+        this.allTribesCache = allTribes.getAllTribes();
+
+        // Refresh the UI if we are looking at the player whose data just updated
+        if (currentlyViewedNickname != null && allTribesCache.containsKey(currentlyViewedNickname)) {
+            refreshTribeUI(currentlyViewedNickname);
+        }
+    }
+
+    /** TODO
+     * skeleton method to update the graphical components of the tribe.
+     * Currently acts as a wrapper for the legacy showTribe logic.
+     *
+     * @param nickname the player whose tribe should be rendered.
+     */
+    private void refreshTribeUI(String nickname) {
+        TribeStatusDTO statusToDraw = allTribesCache.get(nickname);
+        if (statusToDraw == null) return;
+
+        // For now, reuse the existing logic to draw the cards
+        // (This relies on your existing showTribe method implementation)
+        showTribe(statusToDraw);
+    }
+
     //TODO: Verificare le OfferTile effettive per ogni giocatore
     private static final Map<Integer, List<String>> OFFER_TILE_IMAGES = Map.of(
             2, List.of("/images/Map/Front/Font Map 2.png","/images/Map/Front/Font Map 3.png","/images/Map/Front/Font Map 5.png","/images/Map/Front/Font Map 6.png"),
@@ -48,6 +93,8 @@ public class GameBoardController extends SceneController {
             4, "/images/Map/Front/Start 4 Players.png",
             5, "/images/Map/Front/Start 5 Players.png"
     );
+
+
 
     @FXML
     private Label gameNotificationLabel;
@@ -362,26 +409,6 @@ public class GameBoardController extends SceneController {
         if(lastTurnOrderTile != null) {
             displayTurnOrderTile(lastTurnOrderTile);
         }
-    }
-
-    /**
-     * Updates the fixed tribe icon slots by setting each counter to the current size
-     * of the corresponding category list contained in the received DTO
-     */
-    @Override
-    public void showTribe(TribeStatusDTO tribe) {
-
-        this.lastTribe = tribe;
-
-        Map<String, List<CardDTO>> cols = tribe.getCharactersByColumn();
-
-        updateTribeSlot("ARTIST", cols.get("ARTISTS"), artistsIcon, artistsCount);
-        updateTribeSlot("GATHERER", cols.get("GATHERERS"), gatherersIcon, gatherersCount);
-        updateTribeSlot("BUILDER", cols.get("BUILDERS"), buildersIcon, buildersCount);
-        updateTribeSlot("HUNTER", cols.get("HUNTERS"), huntersIcon, huntersCount);
-        updateTribeSlot("INVENTOR", cols.get("INVENTORS"), inventorsIcon, inventorsCount);
-        updateTribeSlot("SHAMAN", cols.get("SHAMANS"), shamansIcon, shamansCount);
-
     }
 
     /**

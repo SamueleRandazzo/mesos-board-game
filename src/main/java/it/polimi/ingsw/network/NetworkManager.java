@@ -8,9 +8,14 @@ import java.util.regex.Pattern;
 public abstract class NetworkManager {
     protected RemoteController controller;
     protected View view;
+    protected String nickname;
 
     public NetworkManager() {
 
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 
     public void setView(View view) {
@@ -37,8 +42,8 @@ public abstract class NetworkManager {
         String prefix = matcher.group(1);
         int n = Integer.parseInt(matcher.group(2));
 
-        handleCardAction(prefix, n);
+        handleCardAction(nickname, prefix, n);
     }
 
-    protected abstract void handleCardAction(String prefix, int n) throws Exception;
+    protected abstract void handleCardAction(String nickname, String prefix, int n) throws Exception;
 }
