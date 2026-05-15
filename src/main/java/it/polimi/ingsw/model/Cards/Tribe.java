@@ -157,6 +157,14 @@ public class Tribe {
     public Map<String, List<? extends Card>> getAllCharacterCardsMap() {
         return Collections.unmodifiableMap(this.allCharacterCardsMap);
     }
+
+    public boolean getExtraCardFromUpper() {
+        return this.extraCardFromUpper;
+    }
+
+    public boolean getExtraFoodFromBonus() {
+        return this.extraFoodFromBonus;
+    }
     //endregion
 
     //region Card Adder

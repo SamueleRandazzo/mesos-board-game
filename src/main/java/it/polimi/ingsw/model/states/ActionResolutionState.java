@@ -17,6 +17,7 @@ public class ActionResolutionState extends GameState {
     private int lowerPicksLeft;
     private boolean hasBoughtBuilding;
     private Player currentActivePlayer;
+    private boolean extraCardChoose = false; // Used to permit an extra pick after resolution state
 
     /**
      * Initializes the ActionResolutionState.
@@ -37,6 +38,14 @@ public class ActionResolutionState extends GameState {
      * @param activePlayer the player currently executing their turn
      */
     private void initializeTurnIfNeeded(Game context, Player activePlayer) {
+        // extra card init
+        if (extraCardChoose) {
+            this.currentActivePlayer = activePlayer;
+            this.upperPicksLeft = 1;
+            this.hasBoughtBuilding = false;
+            return;
+        }
+
         // If the active player is not equal to the current one, it means a new turn has started
         if (this.currentActivePlayer == null || !this.currentActivePlayer.equals(activePlayer)) {
             this.currentActivePlayer = activePlayer;
@@ -81,9 +90,6 @@ public class ActionResolutionState extends GameState {
      */
     @Override
     public void resolveUpperCardPick(Game context, Player player, int pos) {
-        if (!player.equals(context.getCurrentActivePlayer())) {
-            throw new IllegalStateException("It is not " + player.getColor() + "'s turn!");
-        }
 
         initializeTurnIfNeeded(context, player);
 
@@ -114,18 +120,12 @@ public class ActionResolutionState extends GameState {
      */
     @Override
     public void resolveLowerCardPick(Game context, Player player, int pos) {
-        if (!player.equals(context.getCurrentActivePlayer())) {
-            throw new IllegalStateException("It is not " + player.getColor() + "'s turn!");
-        }
 
         initializeTurnIfNeeded(context, player);
 
         if (lowerPicksLeft <= 0) {
             throw new IllegalStateException("You have no lower row picks left!");
         }
-
-        context.executeLowerCardPick(player, pos);
-        context.notifyShowTribe(player.getNickname());
 
         lowerPicksLeft--;
 
@@ -147,10 +147,6 @@ public class ActionResolutionState extends GameState {
      */
     @Override
     public void resolveUpperBuildingPick(Game context, Player player, int pos) {
-        if (!player.equals(context.getCurrentActivePlayer())) {
-            throw new IllegalStateException("It is not " + player.getColor() + "'s turn!");
-        }
-
         initializeTurnIfNeeded(context, player);
 
         if (hasBoughtBuilding) {
@@ -187,10 +183,6 @@ public class ActionResolutionState extends GameState {
      */
     @Override
     public void resolveLowerBuildingPick(Game context, Player player, int pos) {
-        if (!player.equals(context.getCurrentActivePlayer())) {
-            throw new IllegalStateException("It is not " + player.getColor() + "'s turn!");
-        }
-
         initializeTurnIfNeeded(context, player);
 
         if (hasBoughtBuilding) {
@@ -231,6 +223,12 @@ public class ActionResolutionState extends GameState {
             throw new IllegalStateException("You must draw all your required tribe cards before ending your turn!");
         }
 
+        // if flag is true return immediately and show updated board
+        if (extraCardChoose) {
+            context.notifyOnShowBoard();
+            return;
+        }
+
         // Remove the totem from the Offer Track
         OfferTile tile = findTileForPlayer(context, player);
         tile.removeTotem();
@@ -239,7 +237,8 @@ public class ActionResolutionState extends GameState {
         int foodModifier = context.getTurnOrderTile().placeTotem(player);
 
         if (foodModifier > 0) {
-            player.changeFoodAmount(foodModifier);
+            int bonus = player.getTribe().getExtraFoodFromBonus() ? 1 : 0;
+            player.changeFoodAmount(foodModifier + bonus);
         } else if (foodModifier < 0) {
             int cost = Math.abs(foodModifier);
 
@@ -264,9 +263,9 @@ public class ActionResolutionState extends GameState {
             List<Player> nextRoundOrder = context.getTurnOrderTile().getNextRoundOrder();
 
             context.setTurnOrder(nextRoundOrder);
-            context.setState(new TotemPlacementState());
-
+            this.extraCardChoose = true; // set extra card flag true
             context.nextRound();
+            this.extraCardChoose = false; // round ended set extra card flag false
         } else {
             context.notifyActionResultTurnChanged();
         }
