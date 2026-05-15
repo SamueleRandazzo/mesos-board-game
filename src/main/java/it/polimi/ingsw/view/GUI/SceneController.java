@@ -29,7 +29,7 @@ public abstract class SceneController {
     public void showTribe(TribeStatusDTO tribe) {};
     public void displayLeaderboard(LeaderboardDTO leaderboard, String globalRankMessage) {};
     public void displayTurnOrderTile(List<TurnOrderTileDTO> turnOrderTile) {};
-
+    public void displayGlobalLeaderboard(GlobalLeaderboardDTO globalLeaderboard) {};
 
     String handleNetworkError(Exception e) {
         if (e instanceof RemoteException) {

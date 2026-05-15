@@ -183,10 +183,12 @@ public class GUIView implements View {
         });
     }
 
-    //TODO
     @Override
     public void displayGlobalLeaderboard(GlobalLeaderboardDTO leaderboard) {
+        loadScene("global_leaderboard.fxml");
+
         Platform.runLater(() -> {
+            currentController.displayGlobalLeaderboard(leaderboard);
         });
     }
 

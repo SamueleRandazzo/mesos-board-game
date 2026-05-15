@@ -9,6 +9,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 public class LeaderboardController extends SceneController {
 
+    private int playerSize = 0;
+
     @FXML private TableView<PlayerRankDTO> leaderboardTable;
     @FXML private TableColumn<PlayerRankDTO, String> posColumn;
     @FXML private TableColumn<PlayerRankDTO, String> nameColumn;
@@ -40,6 +42,8 @@ public class LeaderboardController extends SceneController {
     public void displayLeaderboard(LeaderboardDTO leaderboard, String globalRankMessage) {
         leaderboardTable.setItems(FXCollections.observableArrayList(leaderboard.getRankings()));
 
+        playerSize = leaderboard.getRankings().size();
+
         updateWinnerLabel(leaderboard);
 
         if (globalRankMessage != null && !globalRankMessage.isEmpty()) {
@@ -56,7 +60,11 @@ public class LeaderboardController extends SceneController {
 
     @FXML
     private void handleShowGlobalRankings() {
-        System.out.println("Opening Global Rankings...");
+        try {
+            network.seeGlobalLeaderboard(playerSize);
+        } catch (Exception e) {
+            showErrorMessage(handleNetworkError(e));
+        }
     }
 
     private void updateWinnerLabel(LeaderboardDTO leaderboard) {
