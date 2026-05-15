@@ -9,7 +9,6 @@ import it.polimi.ingsw.model.Game;
 import it.polimi.ingsw.model.Interfaces.TribeDeck;
 import it.polimi.ingsw.model.Player;
 import it.polimi.ingsw.model.factories.GameDataLoader;
-import it.polimi.ingsw.network.DTO.TurnOrderTileDTO;
 import it.polimi.ingsw.network.GameObserver;
 import it.polimi.ingsw.network.ModelToRemoteViewAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +18,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import it.polimi.ingsw.database.*;
 
 public class Lobby {
@@ -33,7 +31,6 @@ public class Lobby {
     private final List<Color> colors = new ArrayList<>();
     private final Map<String, GameObserver> playerObservers = new HashMap<>();
     private final Map<String, Color> playersInfo = new LinkedHashMap<>();
-    private final List<TurnOrderTileDTO> turnOrderTile = new ArrayList<>();
     private Game currentGame;
 
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -121,7 +118,7 @@ public class Lobby {
             try {
                 checkStartCondition();
             } catch (Exception e) {
-                e.printStackTrace();
+                System.err.println(e);
             }
         }).start();
     }
@@ -154,11 +151,10 @@ public class Lobby {
             ModelToRemoteViewAdapter adapter = new ModelToRemoteViewAdapter(this.playerObservers);
             currentGame.addListener(adapter);
 
+            currentGame.notifyDisplayTurnOrderTile();
             currentGame.notifyOnShowBoard();
             currentGame.notifyOnShowOfferTrack();
             currentGame.notifyTotemPlacementTurnChanged();
-            currentGame.notifyDisplayTurnOrderTile();
-
         } else {
             for (GameObserver o : remoteObservers) {
                 o.onPlayerJoined(nicknames.size(), targetPlayers == -1 ? 0 : targetPlayers);
@@ -228,6 +224,7 @@ public class Lobby {
             }
         };
 
+        this.healthCheckStarted = true;
         scheduler.scheduleAtFixedRate(healthCheckTask, 5, 5, TimeUnit.SECONDS);
     }
 

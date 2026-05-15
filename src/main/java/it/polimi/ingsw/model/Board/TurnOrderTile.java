@@ -1,7 +1,6 @@
 package it.polimi.ingsw.model.Board;
 
 import it.polimi.ingsw.model.Player;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,17 +48,15 @@ public class TurnOrderTile {
     public void cleanTurnOrderSlot(Player player) {
         for (TurnOrderSlot slot : slots) {
             slot.getOccupyingPlayer()
-                    .filter(p -> p.equals(player)) // Se p è presente ma player è null -> NPE
+                    .filter(p -> p.equals(player)) // If present but null -> NPE
                     .ifPresent(p -> slot.clean());
         }
     }
 
-    /*
-     * returns the foodBonus or malus of all slots
+    /**
+     * return turn order slot list
      */
-    public List<Integer> getFoodModifiers() {
-        return slots.stream()
-                .map(TurnOrderSlot::getFoodModifier)
-                .collect(Collectors.toList());
+    public List<TurnOrderSlot> getSlots() {
+        return slots;
     }
 }

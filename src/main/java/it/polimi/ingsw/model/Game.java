@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model;
 
 import it.polimi.ingsw.model.Cards.*;
+import it.polimi.ingsw.model.Enum.Color;
 import it.polimi.ingsw.model.EventEffects.Sustenance;
 import it.polimi.ingsw.model.Interfaces.*;
 import it.polimi.ingsw.model.Board.*;
@@ -71,7 +72,7 @@ public class Game {
      * Kept here so Game can hand them to Board when a new era begins.
      */
     private final List<List<BuildingCard>> eraBuildingDecks;
-    private int currentPlayerIndex = 0;
+    private int currentPlayerIndex;
 
     private GameState currentState;
 
@@ -82,18 +83,18 @@ public class Game {
     //endregion
 
     /**
-     * Creates and fully initialises a new Game instance.
+     * Creates and fully initializes a new Game instance.
      * <p>
      * The caller (e.g. a controller or factory) is responsible for building
      * the decks according to the setup rules (rulebook p. 2-3) before passing
      * them in.
      *
-     * @param players         players in initial (randomised) turn order; size must be 2-5
+     * @param players         players in initial (randomized) turn order; size must be 2-5
      * @param tribeDeck       full ordered tribe deck (Era I on top, Final Events at bottom)
      * @param era1Buildings   building cards selected for Era I
      * @param era2Buildings   building cards selected for Era II
      * @param era3Buildings   building cards selected for Era III
-     * @param offerTrack      the offer track initialised for the correct player count
+     * @param offerTrack      the offer track initialized for the correct player count
      * @throws IllegalArgumentException if player count is outside 2-5
      * @throws NullPointerException     if any argument is null
      */
@@ -282,18 +283,13 @@ public class Game {
 
         List<TurnOrderTileDTO> turnOrderTile = new ArrayList<>();
 
-        for (int foodModifier : this.turnOrderTile.getFoodModifiers()) {
-            turnOrderTile.add(new TurnOrderTileDTO(
-                    null, //nickname is dynamic
-                    null, //color is handled via playersInfo
-                    0, //not use during the initialization of the game
-                    foodModifier,
-                    0 //TODO: gestire il caso in cui se non c'è cibo si tolgono 2 PP, se non è stato fatto in altre parti
-                    ));
+        for (TurnOrderSlot s : this.turnOrderTile.getSlots()) {
+            String nick = s.getOccupyingPlayer().isPresent() ? s.getOccupyingPlayer().get().getNickname() : "Empty";
+            Color color = s.getOccupyingPlayer().isPresent() ? s.getOccupyingPlayer().get().getColor() : null;
+            turnOrderTile.add(new TurnOrderTileDTO(nick, color, s.getFoodModifier()));
         }
 
         for(GameEventListener l : listeners) {
-
             l.onDisplayTurnOrderTile(turnOrderTile);
         }
 

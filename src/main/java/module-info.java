@@ -20,6 +20,7 @@ module it.polimi.ingsw {
     exports it.polimi.ingsw.client;
     exports it.polimi.ingsw.network.DTO;
     exports it.polimi.ingsw.view;
+    exports it.polimi.ingsw.model.Enum;
 
     // Opens
     opens it.polimi.ingsw.view.GUI to javafx.graphics, javafx.fxml;

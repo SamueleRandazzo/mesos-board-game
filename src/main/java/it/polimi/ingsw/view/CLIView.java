@@ -412,8 +412,30 @@ public class CLIView implements View {
     }
 
     @Override
-    public void displayTurnOrderTile(List<TurnOrderTileDTO> turnOrderTile) {
-        //CLI doesn't need it
+    public void displayTurnOrderTile(List<TurnOrderTileDTO> turnOrderTiles) {
+        if (turnOrderTiles == null || turnOrderTiles.isEmpty()) {
+            System.out.println("\n[TURN ORDER TILE]: No data available.");
+            return;
+        }
+
+        System.out.println("=".repeat(56));
+        System.out.println(centerText("TURN ORDER TILE", 56));
+        System.out.println("=".repeat(56));
+        System.out.printf("%-4s | %-15s | %-10s%n", "Pos", "Player", "Food bonus");
+        System.out.println("-".repeat(56));
+
+        int pos = 1;
+        for (TurnOrderTileDTO tile : turnOrderTiles) {
+            String colorString = tile.getColor() != null ? tile.getColor().toString() : "N/D";
+
+            System.out.printf("%-4d | %-15s | %-10d%n",
+                    pos,
+                    tile.getNickname() + " (" + colorString + ")",
+                    tile.getFoodBonus()
+            );
+            pos++;
+        }
+        System.out.println("=".repeat(56));
     }
 
     /**

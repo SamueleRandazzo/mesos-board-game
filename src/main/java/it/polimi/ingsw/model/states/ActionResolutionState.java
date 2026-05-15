@@ -127,6 +127,9 @@ public class ActionResolutionState extends GameState {
             throw new IllegalStateException("You have no lower row picks left!");
         }
 
+        context.executeLowerCardPick(player, pos);
+        context.notifyShowTribe(player.getNickname());
+
         lowerPicksLeft--;
 
         if (lowerPicksLeft == 0 && upperPicksLeft == 0) {
