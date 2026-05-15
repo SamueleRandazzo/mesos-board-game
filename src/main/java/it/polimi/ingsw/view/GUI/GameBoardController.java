@@ -88,8 +88,11 @@ public class GameBoardController extends SceneController {
     @FXML private ImageView shamansIcon;
     @FXML private Label shamansCount;
 
+    @FXML private ImageView buildingsIcon;
+    @FXML private Label buildingsCount;
+
     @FXML private AnchorPane tribeOverlay;
-    @FXML private FlowPane tribeCardsContainer;
+    @FXML private HBox tribeCardsContainer;
     @FXML private Button closeTribeButton;
 
     /**
@@ -134,6 +137,7 @@ public class GameBoardController extends SceneController {
         bindTribeIconClick(huntersIcon);
         bindTribeIconClick(inventorsIcon);
         bindTribeIconClick(shamansIcon);
+        bindTribeIconClick(buildingsIcon);
     }
 
     /**
@@ -375,6 +379,7 @@ public class GameBoardController extends SceneController {
 
         Map<String, List<CardDTO>> cols = tribe.getCharactersByColumn();
 
+        updateTribeSlot("BUILDING", tribe.getBuildingIds(), buildingsIcon, buildingsCount);
         updateTribeSlot("ARTIST", cols.get("ARTISTS"), artistsIcon, artistsCount);
         updateTribeSlot("GATHERER", cols.get("GATHERERS"), gatherersIcon, gatherersCount);
         updateTribeSlot("BUILDER", cols.get("BUILDERS"), buildersIcon, buildersCount);
@@ -654,28 +659,14 @@ public class GameBoardController extends SceneController {
         Map<String, List<CardDTO>> cols = lastTribe.getCharactersByColumn();
         if (cols != null) {
             for (Map.Entry<String, List<CardDTO>> entry : cols.entrySet()) {
+                String category = entry.getKey();
                 List<CardDTO> cards = entry.getValue();
-                if (cards == null) continue;
-
-                for (CardDTO dto : cards) {
-                    if (dto == null) continue;
-                    String path = LocalCardDictionary.getInstance().getImagePath(dto.getCardId());
-                    ImageView cardView = createImageView(path, 88, 128);
-                    tribeCardsContainer.getChildren().add(cardView);
-                }
+                tribeCardsContainer.getChildren().add(createTribeSection(category, cards));
             }
         }
 
-        // Buildings
-        List<CardDTO> buildings = lastTribe.getBuildingIds();
-        if (buildings != null) {
-            for (CardDTO dto : buildings) {
-                if (dto == null) continue;
-                String path = LocalCardDictionary.getInstance().getImagePath(dto.getCardId());
-                ImageView cardView = createImageView(path, 88, 128);
-                tribeCardsContainer.getChildren().add(cardView);
-            }
-        }
+        // Buildings section
+        tribeCardsContainer.getChildren().add(createTribeSection("BUILDINGS", lastTribe.getBuildingIds()));
 
         tribeOverlay.setManaged(true);
         tribeOverlay.setVisible(true);
@@ -744,6 +735,58 @@ public class GameBoardController extends SceneController {
             iconView.setImage(loaded.getImage());
             iconView.setOpacity(1.0);
         }
+    }
+
+    /**
+     * Creates one overlay section: a label plus an overlapped stack of card images.
+     */
+    private Node createTribeSection(String title, List<CardDTO> cards) {
+        VBox section = new VBox(6);
+
+        section.setMinWidth(CARD_WIDTH + 16);
+        section.setPrefWidth(CARD_WIDTH + 16);
+
+        Label label = new Label(title);
+        label.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2b2f32;");
+
+        Pane stack = createOverlappedCardStack(cards);
+
+        section.getChildren().addAll(label, stack);
+        return section;
+    }
+
+    /**
+     * Renders cards as an overlapped vertical stack where only a small top strip is visible.
+     */
+    private Pane createOverlappedCardStack(List<CardDTO> cards) {
+        final int stackOffsetPx = 22;
+
+        Pane pane = new Pane();
+        pane.setStyle("-fx-background-color: transparent; -fx-padding: 6;");
+
+        if (cards == null || cards.isEmpty()) {
+            pane.setPrefSize(CARD_WIDTH, CARD_HEIGHT);
+            return pane;
+        }
+
+        double height = CARD_HEIGHT + (double) (cards.size() - 1) * stackOffsetPx;
+        pane.setPrefSize(CARD_WIDTH, height);
+        pane.setMinSize(CARD_WIDTH, height);
+        pane.setMaxWidth(CARD_WIDTH);
+
+        for (int i = 0; i < cards.size(); i++) {
+            CardDTO dto = cards.get(i);
+            if (dto == null) continue;
+
+            String imagePath = LocalCardDictionary.getInstance().getImagePath(dto.getCardId());
+            ImageView view = createImageView(imagePath, CARD_WIDTH, CARD_HEIGHT);
+            view.setLayoutX(0);
+            view.setLayoutY((double) i * stackOffsetPx);
+
+            pane.getChildren().add(view);
+        }
+
+        return pane;
     }
 
 }
