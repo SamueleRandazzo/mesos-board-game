@@ -14,6 +14,16 @@ import it.polimi.ingsw.model.Player;
 public abstract class GameState {
 
     /**
+     * Handles the game start
+     *
+     * @param context   the current game context
+     * @throws IllegalStateException is start game is not allowed in this phase.
+     */
+    public void startGame(Game context) {
+        throw new IllegalStateException("Action not allowed: You cannot start a game in the current phase.");
+    }
+
+    /**
      * Handles the placement of a player's totem on the offer track.
      *
      * @param context   the current game context

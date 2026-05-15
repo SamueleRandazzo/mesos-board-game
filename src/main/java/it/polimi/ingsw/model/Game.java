@@ -136,8 +136,10 @@ public class Game {
         this.board = new Board(tribeDeck, era1Buildings);
 
         this.currentState = new SetupGameState();
+    }
 
-        initializeGame();
+    public void startGame() {
+        currentState.startGame(this);
     }
 
     public void initializeGame() {
@@ -151,8 +153,6 @@ public class Game {
 
         this.currentRound = 1;
         this.currentPlayerIndex = 0;
-
-        this.setState(new TotemPlacementState());
     }
 
     //region Listener

@@ -115,6 +115,17 @@ public class CLIView implements View {
         System.out.flush();
     }
 
+    /**
+     * Displays a critical, unrecoverable error message on the CLI and terminates the application.
+     * <p>
+     * This method clears the current terminal line using ANSI escape codes, prints the provided
+     * error message in bright red, and flushes the output stream to ensure immediate visibility.
+     * It then briefly pauses execution to allow the OS stream to settle before forcefully
+     * shutting down the JVM with an exit status of 1.
+     * </p>
+     *
+     * @param error the descriptive error message to be displayed before termination.
+     */
     @Override
     public void showFatalError(String error) {
         System.out.print("\r\033[K");
@@ -411,6 +422,17 @@ public class CLIView implements View {
         }
     }
 
+    /**
+     * Displays the current turn order details in a structured, tabular format on the CLI.
+     * <p>
+     * This method prints a formatted table containing the position, player nickname,
+     * associated color, and the specific food bonus for each tile. If the provided list
+     * is null or empty, an appropriate message is displayed instead.
+     * </p>
+     *
+     * @param turnOrderTiles the list of {@link TurnOrderTileDTO} objects representing the
+     *                       current turn order; can be null or empty.
+     */
     @Override
     public void displayTurnOrderTile(List<TurnOrderTileDTO> turnOrderTiles) {
         if (turnOrderTiles == null || turnOrderTiles.isEmpty()) {
@@ -470,6 +492,18 @@ public class CLIView implements View {
         }
     }
 
+    /**
+     * Displays the global leaderboard within a stylized box-framed layout on the CLI.
+     * <p>
+     * This method prints the "Global Hall of Fame", formatting the ranking entries into
+     * a table with columns for rank position, player nickname, and total accumulated points.
+     * If no ranking entries are present (or if the leaderboard data is null), it displays
+     * a centered placeholder message indicating that no records were found.
+     * </p>
+     *
+     * @param leaderboard the {@link GlobalLeaderboardDTO} object containing the list of
+     *                    player rankings to be displayed; can be null or contain an empty list.
+     */
     @Override
     public void displayGlobalLeaderboard(GlobalLeaderboardDTO leaderboard) {
         System.out.println("\n" + "╔" + "═".repeat(58) + "╗");

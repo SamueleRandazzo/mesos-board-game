@@ -41,7 +41,7 @@ public class Board {
     /** Draw pile for building cards of the current era. */
     private List<BuildingCard> buildingDeck;
 
-    /** Draw pile for tribe cards (Era I on top, Final Events at the bottom). */
+    /** Draw pile for tribe cards (Era 1 on top, Final Events at the bottom). */
     private List<TribeDeck> tribeDeck;
 
     // -------------------------------------------------------------------------
@@ -50,7 +50,7 @@ public class Board {
 
     /**
      * Creates the Board.
-     * Called once by Game during game setup (preparazione).
+     * Called once by Game during game setup.
      * <p>
      * After construction the rows are empty; Game must call
      * {@link #fillUpperRow(int)} and set up the initial lower row separately
@@ -207,7 +207,7 @@ public class Board {
         for (int i = 0; i < needed; i++) {
             if (tribeDeck.isEmpty())
                 break;
-            upperTribeCards.add(tribeDeck.remove(0));
+            upperTribeCards.add(tribeDeck.removeFirst());
         }
     }
 
@@ -219,7 +219,7 @@ public class Board {
             if (tribeDeck.isEmpty())
                 break;
 
-            TribeDeck card = tribeDeck.remove(0);
+            TribeDeck card = tribeDeck.removeFirst();
 
             if (card.isEvent()) {
                 upperTribeCards.add(card);

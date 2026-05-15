@@ -137,10 +137,11 @@ public class Lobby {
             currentGame = getGame(players, targetPlayers);
             GameController gameController = new GameController(currentGame);
 
+            currentGame.startGame();
+
             for (GameObserver o : remoteObservers) {
                 o.onGameStarted(gameController, targetPlayers);
                 o.onShowPlayersInfo(playersInfo);
-                //o.onDisplayTurnOrderTile(turnOrderTile);
             }
 
             for (Player p : players) {

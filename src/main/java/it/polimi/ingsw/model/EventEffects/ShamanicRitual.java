@@ -3,10 +3,8 @@ package it.polimi.ingsw.model.EventEffects;
 import it.polimi.ingsw.model.Game;
 import it.polimi.ingsw.model.Interfaces.EventEffect;
 import it.polimi.ingsw.model.Player;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.*;
 
 /**
  * Represents the Shamanic Ritual event effect in the game.
@@ -90,10 +88,8 @@ public class ShamanicRitual implements EventEffect {
         }
 
         // Determine maximum and minimum star values
-        for (int stars : shamanicStarsForPlayer.values()) {
-            if (stars > maxStars) maxStars = stars;
-            if (stars < minStars) minStars = stars;
-        }
+        maxStars = Collections.max(shamanicStarsForPlayer.values());
+        minStars = Collections.min(shamanicStarsForPlayer.values());
 
         // Identify players with max and min stars
         for (Map.Entry<Player, Integer> entry : shamanicStarsForPlayer.entrySet()) {
@@ -106,7 +102,7 @@ public class ShamanicRitual implements EventEffect {
 
         // Apply victory rewards
         for (Player pl : maxPlayers) {
-            boolean doubleReward = pl.getTribe().getShamanicAttr().isDoubleOnWinning();
+            boolean doubleReward = pl.getTribe().getShamanicAttr().isDoubleOnWinning() && maxPlayers.size() == 1;
             int reward = doubleReward ? victoryPrestigePoints * 2 : victoryPrestigePoints;
             pl.changePrestigePoints(reward);
             game.notifyEventMessage(pl, String.format("SHAMANIC RITUAL EVENT: You earn %d prestige points.", reward));
