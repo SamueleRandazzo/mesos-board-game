@@ -10,9 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.*;
 import it.polimi.ingsw.view.LocalCardDictionary;
 
@@ -32,6 +30,7 @@ public class GameBoardController extends SceneController {
     private BoardDTO lastBoard; //Last board because displayBoard and askCardChoose comes in different moments
     private boolean cardSelectionEnabled;
     private List<TurnOrderTileDTO> lastTurnOrderTile = null;
+    private TribeStatusDTO lastTribe;
 
     private final Map<String, Color> playersInfo = new LinkedHashMap<>();
 
@@ -49,8 +48,6 @@ public class GameBoardController extends SceneController {
             4, "/images/Map/Front/Start 4 Players.png",
             5, "/images/Map/Front/Start 5 Players.png"
     );
-
-
 
     @FXML
     private Label gameNotificationLabel;
@@ -73,6 +70,28 @@ public class GameBoardController extends SceneController {
     @FXML
     private StackPane turnOrderContainer;
 
+    @FXML private ImageView artistsIcon;
+    @FXML private Label artistsCount;
+
+    @FXML private ImageView gatherersIcon;
+    @FXML private Label gatherersCount;
+
+    @FXML private ImageView buildersIcon;
+    @FXML private Label buildersCount;
+
+    @FXML private ImageView huntersIcon;
+    @FXML private Label huntersCount;
+
+    @FXML private ImageView inventorsIcon;
+    @FXML private Label inventorsCount;
+
+    @FXML private ImageView shamansIcon;
+    @FXML private Label shamansCount;
+
+    @FXML private AnchorPane tribeOverlay;
+    @FXML private FlowPane tribeCardsContainer;
+    @FXML private Button closeTribeButton;
+
     /**
      * Initializes the board scene with disabled offer tiles and  cards.
      *
@@ -86,6 +105,45 @@ public class GameBoardController extends SceneController {
         // TODO: quando avremo i DTO delle carte, queste righe verranno riempite
         // con le carte reali presenti sopra e sotto le mappe.
         renderStaticCardBacks();
+
+        initializeTribeOverlay();
+
+        initializeTribeIconClicks();
+    }
+
+    /**
+     * Initializes the tribe overlay close action and base visibility state.
+     */
+    private void initializeTribeOverlay() {
+        if (tribeOverlay != null) {
+            tribeOverlay.setVisible(false);
+            tribeOverlay.setManaged(false);
+        }
+        if (closeTribeButton != null) {
+            closeTribeButton.setOnAction(e -> closeTribeOverlay());
+        }
+    }
+
+    /**
+     * Binds click handlers on tribe icons to open the tribe overlay.
+     */
+    private void initializeTribeIconClicks() {
+        bindTribeIconClick(artistsIcon);
+        bindTribeIconClick(gatherersIcon);
+        bindTribeIconClick(buildersIcon);
+        bindTribeIconClick(huntersIcon);
+        bindTribeIconClick(inventorsIcon);
+        bindTribeIconClick(shamansIcon);
+    }
+
+    /**
+     * Makes a tribe icon clickable and opens the tribe overlay on click.
+     */
+    private void bindTribeIconClick(ImageView icon) {
+        if (icon == null) return;
+        icon.setOnMouseClicked(e -> openTribeOverlay());
+        icon.setPickOnBounds(true);
+        icon.setStyle("-fx-cursor: hand;");
     }
 
     /**
@@ -107,6 +165,7 @@ public class GameBoardController extends SceneController {
         }
     }
 
+
     //Fino a che non abbiamo il DTO delle carte viene visualizzago solo il back
     private StackPane createCardBack() {
         StackPane card = new StackPane();
@@ -127,6 +186,7 @@ public class GameBoardController extends SceneController {
 
         return card;
     }
+
 
     //Write only on the state lines (white one)
     @Override
@@ -302,6 +362,26 @@ public class GameBoardController extends SceneController {
         if(lastTurnOrderTile != null) {
             displayTurnOrderTile(lastTurnOrderTile);
         }
+    }
+
+    /**
+     * Updates the fixed tribe icon slots by setting each counter to the current size
+     * of the corresponding category list contained in the received DTO
+     */
+    @Override
+    public void showTribe(TribeStatusDTO tribe) {
+
+        this.lastTribe = tribe;
+
+        Map<String, List<CardDTO>> cols = tribe.getCharactersByColumn();
+
+        updateTribeSlot("ARTIST", cols.get("ARTISTS"), artistsIcon, artistsCount);
+        updateTribeSlot("GATHERER", cols.get("GATHERERS"), gatherersIcon, gatherersCount);
+        updateTribeSlot("BUILDER", cols.get("BUILDERS"), buildersIcon, buildersCount);
+        updateTribeSlot("HUNTER", cols.get("HUNTERS"), huntersIcon, huntersCount);
+        updateTribeSlot("INVENTOR", cols.get("INVENTORS"), inventorsIcon, inventorsCount);
+        updateTribeSlot("SHAMAN", cols.get("SHAMANS"), shamansIcon, shamansCount);
+
     }
 
     /**
@@ -531,6 +611,85 @@ public class GameBoardController extends SceneController {
         return cardPane;
     }
 
+    /**
+     * Creates a single empty tribe slot with a fixed counter starting from zero.
+     *
+     */
+    private StackPane createEmptyTribeSlot(String category) {
+        VBox box = new VBox(4);
+        box.setAlignment(Pos.CENTER);
+
+        ImageView icon = createImageView("/images/Tribe/" + category + "_ICON.png", 44, 44);
+        icon.setOpacity(0.25);
+
+        Label counter = new Label("0");
+        counter.setStyle("-fx-font-weight: bold; -fx-text-fill: #2b2f32;");
+
+        Label title = new Label(category);
+        title.setStyle("-fx-font-size: 10px; -fx-text-fill: #2b2f32;");
+
+        box.getChildren().addAll(icon, counter, title);
+
+        StackPane wrapper = new StackPane(box);
+        wrapper.setStyle("""
+                -fx-background-color: #f7f3ea;
+                -fx-border-color: #c4bba4;
+                -fx-border-width: 1;
+                -fx-border-radius: 6;
+                -fx-background-radius: 6;
+                -fx-padding: 6;
+                """);
+
+        return wrapper;
+    }
+
+    /**
+     * Opens the in-scene tribe overlay and renders all owned cards.
+     */
+    private void openTribeOverlay() {
+        if (tribeOverlay == null || tribeCardsContainer == null || lastTribe == null) return;
+
+        tribeCardsContainer.getChildren().clear();
+
+        Map<String, List<CardDTO>> cols = lastTribe.getCharactersByColumn();
+        if (cols != null) {
+            for (Map.Entry<String, List<CardDTO>> entry : cols.entrySet()) {
+                List<CardDTO> cards = entry.getValue();
+                if (cards == null) continue;
+
+                for (CardDTO dto : cards) {
+                    if (dto == null) continue;
+                    String path = LocalCardDictionary.getInstance().getImagePath(dto.getCardId());
+                    ImageView cardView = createImageView(path, 88, 128);
+                    tribeCardsContainer.getChildren().add(cardView);
+                }
+            }
+        }
+
+        // Buildings
+        List<CardDTO> buildings = lastTribe.getBuildingIds();
+        if (buildings != null) {
+            for (CardDTO dto : buildings) {
+                if (dto == null) continue;
+                String path = LocalCardDictionary.getInstance().getImagePath(dto.getCardId());
+                ImageView cardView = createImageView(path, 88, 128);
+                tribeCardsContainer.getChildren().add(cardView);
+            }
+        }
+
+        tribeOverlay.setManaged(true);
+        tribeOverlay.setVisible(true);
+    }
+
+    /**
+     * Closes the in-scene tribe overlay.
+     */
+    private void closeTribeOverlay() {
+        if (tribeOverlay == null) return;
+        tribeOverlay.setVisible(false);
+        tribeOverlay.setManaged(false);
+    }
+
 
     /**
      * Modify the style of the cards, when "cardSelectionEnabled" is true the card id normal, when is false the card is visible but neutral
@@ -568,6 +727,23 @@ public class GameBoardController extends SceneController {
     -fx-opacity: 0.6;
     -fx-cursor: not-allowed;
     """;
+    }
+
+    /**
+     * Updates a single tribe slot with its icon and current count.
+     *
+     */
+    private void updateTribeSlot(String categoryKey, List<CardDTO> cards, ImageView iconView, Label countLabel) {
+
+        int count = (cards == null) ? 0 : cards.size();
+        countLabel.setText(String.valueOf(count));
+
+        String iconPath = "/images/Icons/" + categoryKey + "_ICON.png";
+        ImageView loaded = createImageView(iconPath, 40, 40);
+        if (loaded.getImage() != null) {
+            iconView.setImage(loaded.getImage());
+            iconView.setOpacity(1.0);
+        }
     }
 
 }
