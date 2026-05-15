@@ -26,4 +26,5 @@ module it.polimi.ingsw {
     opens it.polimi.ingsw.model to com.fasterxml.jackson.databind;
     opens it.polimi.ingsw.model.factories to com.fasterxml.jackson.databind;
     opens it.polimi.ingsw.network.DTO to com.fasterxml.jackson.databind;
+    opens it.polimi.ingsw.model.Enum to com.fasterxml.jackson.databind;
 }

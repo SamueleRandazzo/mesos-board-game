@@ -186,4 +186,19 @@ public class SocketVirtualView implements GameObserver {
             System.err.println("Serialization error: " + e.getMessage());
         }
     }
+
+    @Override
+    public void onDisplayTurnOrderTile(List<TurnOrderTileDTO> turnOrderTile) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String json = mapper.writeValueAsString(turnOrderTile);
+            String cleanedJson = json.replace("\n", "").replace("\r", "");
+            out.println("DISPLAY_TURN_ORDER_TILE " + cleanedJson);
+            out.flush();
+        } catch (Exception e) {
+            System.err.println("Serialization error: " + e.getMessage());
+        }
+    }
+
+
 }

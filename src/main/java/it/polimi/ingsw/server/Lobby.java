@@ -9,6 +9,7 @@ import it.polimi.ingsw.model.Game;
 import it.polimi.ingsw.model.Interfaces.TribeDeck;
 import it.polimi.ingsw.model.Player;
 import it.polimi.ingsw.model.factories.GameDataLoader;
+import it.polimi.ingsw.network.DTO.TurnOrderTileDTO;
 import it.polimi.ingsw.network.GameObserver;
 import it.polimi.ingsw.network.ModelToRemoteViewAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +33,7 @@ public class Lobby {
     private final List<Color> colors = new ArrayList<>();
     private final Map<String, GameObserver> playerObservers = new HashMap<>();
     private final Map<String, Color> playersInfo = new LinkedHashMap<>();
+    private final List<TurnOrderTileDTO> turnOrderTile = new ArrayList<>();
     private Game currentGame;
 
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -138,12 +140,10 @@ public class Lobby {
             currentGame = getGame(players, targetPlayers);
             GameController gameController = new GameController(currentGame);
 
-            List<String> playerOrders = players.stream().map(Player::getNickname).collect(Collectors.toList());
-
             for (GameObserver o : remoteObservers) {
                 o.onGameStarted(gameController, targetPlayers);
-                o.onShowPlayersOrder(playerOrders);
                 o.onShowPlayersInfo(playersInfo);
+                //o.onDisplayTurnOrderTile(turnOrderTile);
             }
 
             for (Player p : players) {
@@ -157,6 +157,8 @@ public class Lobby {
             currentGame.notifyOnShowBoard();
             currentGame.notifyOnShowOfferTrack();
             currentGame.notifyTotemPlacementTurnChanged();
+            currentGame.notifyDisplayTurnOrderTile();
+
         } else {
             for (GameObserver o : remoteObservers) {
                 o.onPlayerJoined(nicknames.size(), targetPlayers == -1 ? 0 : targetPlayers);

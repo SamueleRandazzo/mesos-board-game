@@ -143,4 +143,26 @@ public class ModelToRemoteViewAdapter implements GameEventListener {
             }).start();
         }
     }
+
+    @Override
+    public void onDisplayTurnOrderTile(List<TurnOrderTileDTO> turnOrderTile) {
+        for (GameObserver o : playerObservers.values()) {
+            try {
+                o.onDisplayTurnOrderTile(turnOrderTile);
+            } catch (RemoteException e) {
+                System.err.println("Network error sending turn order tile");
+            }
+        }
+    }
+
+    @Override
+    public void onShowPlayersOrder(List<String> playersOrder) {
+        for (GameObserver o : playerObservers.values()) {
+            try {
+                o.onShowPlayersOrder(playersOrder);
+            } catch (RemoteException e) {
+                System.err.println("Network error sending players order");
+            }
+        }
+    }
 }

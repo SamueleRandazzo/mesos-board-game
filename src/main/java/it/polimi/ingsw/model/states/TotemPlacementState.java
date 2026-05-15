@@ -40,12 +40,15 @@ public class TotemPlacementState extends GameState {
             //set the new order for Phase 2
             context.setTurnOrder(newOrder);
 
-            //Move to next state
-            context.setState(new ActionResolutionState(context));
+            context.notifyShowPlayerOrder();
 
             context.notifyOnShowBoard();
 
+            //Move to next state
+            context.setState(new ActionResolutionState(context));
+
             context.notifyActionResultTurnChanged();
+
         } else {
             context.notifyTotemPlacementTurnChanged();
         }

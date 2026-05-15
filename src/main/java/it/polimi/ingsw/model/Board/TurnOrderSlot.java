@@ -9,6 +9,7 @@ public class TurnOrderSlot {
 
     private final int foodModifier;
     private Player occupyingPlayer;
+    //TODO: L'ultima TurnOrderSlot da malus punti prestigio se non si ha cibo
 
     /** Constructor: create the single TurnOrderSlot with the bonus/malus of food.
      */

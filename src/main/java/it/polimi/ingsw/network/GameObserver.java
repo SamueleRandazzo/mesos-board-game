@@ -23,4 +23,5 @@ public interface GameObserver extends Remote {
     void ping() throws RemoteException;
     void onShowFatalError(String error) throws RemoteException;
     void onDisplayGlobalLeaderboard(GlobalLeaderboardDTO globalLeaderboard) throws RemoteException;
+    void onDisplayTurnOrderTile(List<TurnOrderTileDTO> turnOrderTile) throws RemoteException;
 }

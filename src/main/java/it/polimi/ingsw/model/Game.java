@@ -13,6 +13,7 @@ import it.polimi.ingsw.network.DTO.LeaderboardDTO;
 import it.polimi.ingsw.network.DTO.OfferTileDTO;
 import it.polimi.ingsw.network.DTO.PlayerRankDTO;
 import it.polimi.ingsw.network.DTO.TribeStatusDTO;
+import it.polimi.ingsw.network.DTO.TurnOrderTileDTO;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -40,7 +41,7 @@ public class Game {
 
     //region Constants
     /** Total number of rounds in a game of Mesos. */
-    private static final int TOTAL_ROUNDS = 1;
+    private static final int TOTAL_ROUNDS = 2;
     /** First era number. */
     private static final int FIRST_ERA = 1;
     //endregion
@@ -270,6 +271,41 @@ public class Game {
     public void notifyOnShowBoard() {
         for (GameEventListener l : listeners) {
             l.onShowBoard(this.board.toDTO());
+        }
+    }
+
+    /**
+     * Notifies listeners to build the static turn-order tile structure.
+     * The DTO contains all the information about the turnOrderTile of the game
+     */
+    public void notifyDisplayTurnOrderTile() {
+
+        List<TurnOrderTileDTO> turnOrderTile = new ArrayList<>();
+
+        for (int foodModifier : this.turnOrderTile.getFoodModifiers()) {
+            turnOrderTile.add(new TurnOrderTileDTO(
+                    null, //nickname is dynamic
+                    null, //color is handled via playersInfo
+                    0, //not use during the initialization of the game
+                    foodModifier,
+                    0 //TODO: gestire il caso in cui se non c'è cibo si tolgono 2 PP, se non è stato fatto in altre parti
+                    ));
+        }
+
+        for(GameEventListener l : listeners) {
+
+            l.onDisplayTurnOrderTile(turnOrderTile);
+        }
+
+    }
+
+    public void notifyShowPlayerOrder() {
+        List<String> playersOrder = roundTurnOrder.stream()
+                .map(Player::getNickname)
+                .toList();
+
+        for (GameEventListener l : listeners) {
+            l.onShowPlayersOrder(playersOrder);
         }
     }
 

@@ -53,4 +53,13 @@ public class TurnOrderTile {
                     .ifPresent(p -> slot.clean());
         }
     }
+
+    /*
+     * returns the foodBonus or malus of all slots
+     */
+    public List<Integer> getFoodModifiers() {
+        return slots.stream()
+                .map(TurnOrderSlot::getFoodModifier)
+                .collect(Collectors.toList());
+    }
 }

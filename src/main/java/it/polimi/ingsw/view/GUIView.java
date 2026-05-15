@@ -4,7 +4,6 @@ import it.polimi.ingsw.model.Enum.Color;
 import it.polimi.ingsw.network.DTO.*;
 import it.polimi.ingsw.network.NetworkManager;
 import it.polimi.ingsw.network.RemoteController;
-import it.polimi.ingsw.view.GUI.FatalErrorController;
 import it.polimi.ingsw.view.GUI.SceneController;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -188,6 +187,13 @@ public class GUIView implements View {
     @Override
     public void displayGlobalLeaderboard(GlobalLeaderboardDTO leaderboard) {
         Platform.runLater(() -> {
+        });
+    }
+
+    @Override
+    public void displayTurnOrderTile(List<TurnOrderTileDTO> turnOrderTile) {
+        Platform.runLater(() -> {
+            currentController.displayTurnOrderTile(turnOrderTile);
         });
     }
 }

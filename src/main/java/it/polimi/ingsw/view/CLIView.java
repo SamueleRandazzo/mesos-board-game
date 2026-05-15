@@ -411,6 +411,11 @@ public class CLIView implements View {
         }
     }
 
+    @Override
+    public void displayTurnOrderTile(List<TurnOrderTileDTO> turnOrderTile) {
+        //CLI doesn't need it
+    }
+
     /**
      * Helper method to center text within a given width for better CLI aesthetics.
      *

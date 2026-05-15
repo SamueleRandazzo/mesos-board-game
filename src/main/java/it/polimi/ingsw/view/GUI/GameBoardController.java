@@ -31,16 +31,26 @@ public class GameBoardController extends SceneController {
     private int totalPlayers;
     private BoardDTO lastBoard; //Last board because displayBoard and askCardChoose comes in different moments
     private boolean cardSelectionEnabled;
+    private List<TurnOrderTileDTO> lastTurnOrderTile = null;
 
     private final Map<String, Color> playersInfo = new LinkedHashMap<>();
 
     //TODO: Verificare le OfferTile effettive per ogni giocatore
     private static final Map<Integer, List<String>> OFFER_TILE_IMAGES = Map.of(
-            2, List.of("/images/Map/Front/Start 2 Players.png","/images/Map/Front/Font Map 2.png","/images/Map/Front/Font Map 3.png","/images/Map/Front/Font Map 5.png","/images/Map/Front/Font Map 6.png"),
-            3, List.of("/images/Map/Front/Start 3 Players.png","/images/Map/Front/Font Map 2.png","/images/Map/Front/Font Map 3.png","/images/Map/Front/Font Map 4.png","/images/Map/Front/Font Map 5.png","/images/Map/Front/Font Map 6.png"),
-            4, List.of("/images/Map/Front/Start 4 Players.png","/images/Map/Front/Font Map 2.png","/images/Map/Front/Font Map 3.png","/images/Map/Front/Font Map 4.png","/images/Map/Front/Font Map 5.png","/images/Map/Front/Font Map 6.png","/images/Map/Front/Font Map 7.png"),
-            5, List.of("/images/Map/Front/Start 5 Players.png","/images/Map/Front/Font Map 1.png","/images/Map/Front/Font Map 2.png","/images/Map/Front/Font Map 3.png","/images/Map/Front/Font Map 4.png","/images/Map/Front/Font Map 5.png","/images/Map/Front/Font Map 6.png","/images/Map/Front/Font Map 7.png")
+            2, List.of("/images/Map/Front/Font Map 2.png","/images/Map/Front/Font Map 3.png","/images/Map/Front/Font Map 5.png","/images/Map/Front/Font Map 6.png"),
+            3, List.of("/images/Map/Front/Font Map 2.png","/images/Map/Front/Font Map 3.png","/images/Map/Front/Font Map 4.png","/images/Map/Front/Font Map 5.png","/images/Map/Front/Font Map 6.png"),
+            4, List.of("/images/Map/Front/Font Map 2.png","/images/Map/Front/Font Map 3.png","/images/Map/Front/Font Map 4.png","/images/Map/Front/Font Map 5.png","/images/Map/Front/Font Map 6.png","/images/Map/Front/Font Map 7.png"),
+            5, List.of("/images/Map/Front/Font Map 1.png","/images/Map/Front/Font Map 2.png","/images/Map/Front/Font Map 3.png","/images/Map/Front/Font Map 4.png","/images/Map/Front/Font Map 5.png","/images/Map/Front/Font Map 6.png","/images/Map/Front/Font Map 7.png")
     );
+
+    private static final Map<Integer, String> TURN_ORDER_TILE_IMAGES = Map.of(
+            2, "/images/Map/Front/Start 2 Players.png",
+            3, "/images/Map/Front/Start 3 Players.png",
+            4, "/images/Map/Front/Start 4 Players.png",
+            5, "/images/Map/Front/Start 5 Players.png"
+    );
+
+
 
     @FXML
     private Label gameNotificationLabel;
@@ -59,6 +69,9 @@ public class GameBoardController extends SceneController {
 
     @FXML
     private Label gameLogLabel;
+
+    @FXML
+    private StackPane turnOrderContainer;
 
     /**
      * Initializes the board scene with disabled offer tiles and  cards.
@@ -137,7 +150,6 @@ public class GameBoardController extends SceneController {
         this.playersInfo.clear();
         this.playersInfo.putAll(playersInfo);
 
-        this.totalPlayers = playersInfo.size();
     }
 
     @Override
@@ -161,6 +173,8 @@ public class GameBoardController extends SceneController {
         });
     }
 
+
+
     /*
     Method that creates the offerTrack, is it called just one time at the start of the game beacuse the offerTrack will never change
      */
@@ -171,25 +185,56 @@ public class GameBoardController extends SceneController {
 
             List <String> map_images = OFFER_TILE_IMAGES.get(total);
 
-            // Index 0 is the static starting tile; offer tile DTOs start from index 1.
-            for (int i = 0; i < map_images.size(); i++){
-                String imagePath = map_images.get(i);
 
-                if (i == 0) {
-                    offerTrackContainer.getChildren().add(createStaticStartMapTile(imagePath));
-                } else {
-                OfferTileDTO tile = tiles.get(i - 1);
+            for (int i = 0; i < map_images.size(); i++) {
+
+                String imagePath = map_images.get(i);
+                OfferTileDTO tile = tiles.get(i);
+
                 offerTrackContainer.getChildren().add(createOfferTileButton(tile, imagePath));
-                }
+
             }
 
             setOfferTrackEnabled(false);
             });
+        }
+
+    /**
+     *
+      * Methot that creates the TurnOrerTile which is at the first position of the offerTrackContainer
+     * TODO: Forse sarebbe meglio creare un container apposta per la turnOrderTile
+     */
+    @Override
+    public void displayTurnOrderTile(List<TurnOrderTileDTO> turnOrderTile) {
+
+        this.lastTurnOrderTile = turnOrderTile;
+
+        Platform.runLater(() -> {
+
+            turnOrderContainer.getChildren().clear();
+
+            //if the conditions inside the if is true means that the number of player is not ready, the method will be re-called later
+            if(totalPlayers <= 0 ) {
+                return;
+            }
+
+            String imagePath = TURN_ORDER_TILE_IMAGES.get(totalPlayers);
+
+            if (imagePath == null) {
+                return;
+            }
+
+            //createStaticStartMapTile return a stackpane which is a static container, the player don't need to click on the turnOrderTile
+            StackPane startTile = createStaticStartMapTile(imagePath);
+
+            turnOrderContainer.getChildren().add(startTile);
+
+        });
     }
 
     /*
-    method that saves a new board when it comes from server and put it in "lastBoard", in this moment the player can't click it
-     */
+        method that saves a new board when it comes from server and put it in "lastBoard", in this moment the player can't click it
+         */
     public void displayBoardCards() {
         if (lastBoard == null) {
             renderStaticCardBacks();
@@ -250,8 +295,13 @@ public class GameBoardController extends SceneController {
     }
 
     @Override
-    public void setTotalPlayers (int totalPlayers) {
+    public void setTotalPlayers(int totalPlayers) {
         this.totalPlayers = totalPlayers;
+
+        //if lastTurnOrderTile is not null means that the methos displayTurnOrderTile was called when the number of player was not ready, so we have to re-call it
+        if(lastTurnOrderTile != null) {
+            displayTurnOrderTile(lastTurnOrderTile);
+        }
     }
 
     /**

@@ -90,4 +90,9 @@ public class ClientObserver implements GameObserver {
     public void onDisplayGlobalLeaderboard(GlobalLeaderboardDTO leaderboard) throws RemoteException {
         view.displayGlobalLeaderboard(leaderboard);
     }
+
+    @Override
+    public void onDisplayTurnOrderTile(List<TurnOrderTileDTO> turnOrderTile) throws RemoteException {
+        view.displayTurnOrderTile(turnOrderTile);
+    }
 }
