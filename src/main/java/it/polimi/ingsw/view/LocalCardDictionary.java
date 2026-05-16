@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * Client-side Dictionary.
  * Converts card IDs received from the server's DTOs into human-readable descriptions
- * by fetching data from local JSON configuration files.
+ * by fetching data from local JSON configuration files. It mimics the physical card layout.
  */
 public class LocalCardDictionary {
 
@@ -19,31 +19,44 @@ public class LocalCardDictionary {
     private final Map<String, String> cardDescriptions;
     private final Map<String, String> cardImagePaths;
 
+    /** Template map defining how JSON keys should be formatted into printable strings. */
     private static final Map<String, String> DESCRIPTION_TEMPLATE = new LinkedHashMap<>();
     static {
-        DESCRIPTION_TEMPLATE.put("prestigePoints", " (PP: %s)");
-        DESCRIPTION_TEMPLATE.put("foodCost", " [Cost: %s Food]");
-        DESCRIPTION_TEMPLATE.put("effectType", " [%s]");
-        DESCRIPTION_TEMPLATE.put("buildingDiscount", " [Building Discount: %s]");
-        DESCRIPTION_TEMPLATE.put("inventionIcon", " [%s]");
-        DESCRIPTION_TEMPLATE.put("shamanStars", " [Stars: %s]");
-        DESCRIPTION_TEMPLATE.put("prestigePerHunter", " [PP per Hunter: %s]");
-        DESCRIPTION_TEMPLATE.put("prestigeLossPerUnfed", " [VP loss per Unfed: %s]");
-        DESCRIPTION_TEMPLATE.put("majorityPrestigeGain", " [Majority VP gain: %s]");
-        DESCRIPTION_TEMPLATE.put("minorityPrestigeLoss", " [Minority VP gain: %s]");
-        DESCRIPTION_TEMPLATE.put("minArtists", " [Min artists for bonus: %s]");
-        DESCRIPTION_TEMPLATE.put("prestigeLossIfBelow", " [VP loss if below: %s]");
-        DESCRIPTION_TEMPLATE.put("prestigePerArtistIfAbove", " [VP gain per artists: %s]");
+        // Clean formatting simulating a physical card layout
+        DESCRIPTION_TEMPLATE.put("foodCost", " | Cost: %s Food");
+        DESCRIPTION_TEMPLATE.put("prestigePoints", " | %s PP");
+        DESCRIPTION_TEMPLATE.put("buildingDiscount", " | -%s Build Cost");
+        DESCRIPTION_TEMPLATE.put("inventionIcon", " | %s");
+        DESCRIPTION_TEMPLATE.put("shamanStars", " | %s Stars");
+
+        // Event specific formatting
+        DESCRIPTION_TEMPLATE.put("prestigePerHunter", " | +%s PP per Hunter");
+        DESCRIPTION_TEMPLATE.put("prestigeLossPerUnfed", " | -%s PP per Unfed");
+        DESCRIPTION_TEMPLATE.put("majorityPrestigeGain", " | Majority: +%s PP");
+        DESCRIPTION_TEMPLATE.put("minorityPrestigeLoss", " | Minority: -%s PP");
+        DESCRIPTION_TEMPLATE.put("minArtists", " | Req. %s Artists:");
+        DESCRIPTION_TEMPLATE.put("prestigeLossIfBelow", " -%s PP if below");
+        DESCRIPTION_TEMPLATE.put("prestigePerArtistIfAbove", " +%s PP per Artist");
+
+        // Building specific effects
+        DESCRIPTION_TEMPLATE.put("effectType", " | Effect: %s");
     }
 
+    /** Translator map replacing raw internal JSON constants with user-friendly text. */
     private static final Map<String, String> VALUE_TRANSLATOR = new HashMap<>();
     static {
-        // Traduzioni per le icone delle invenzioni
+        // Invention Icons
         VALUE_TRANSLATOR.put("BREAD", "Bread");
         VALUE_TRANSLATOR.put("LEATHER", "Leather");
         VALUE_TRANSLATOR.put("POTTERY", "Pottery");
 
-        // Traduzioni per gli effetti degli edifici
+        // Event Names (No "Event" prefix as requested)
+        VALUE_TRANSLATOR.put("HUNT", "Hunt");
+        VALUE_TRANSLATOR.put("SUSTENANCE", "Sustenance");
+        VALUE_TRANSLATOR.put("SHAMANIC_RITUAL", "Shamanic Ritual");
+        VALUE_TRANSLATOR.put("CAVE_PAINTINGS", "Cave Paintings");
+
+        // Building Effects
         VALUE_TRANSLATOR.put("COMPLETE_SET_FOOD", "Complete Set Food Reward");
         VALUE_TRANSLATOR.put("DOUBLE_MAJORITY_REWARD", "Double Majority Reward");
         VALUE_TRANSLATOR.put("TURN_ORDER_BONUS", "Turn Order Bonus");
@@ -51,18 +64,20 @@ public class LocalCardDictionary {
         VALUE_TRANSLATOR.put("SUSTENANCE_DISCOUNT", "Sustenance Discount");
         VALUE_TRANSLATOR.put("INVENTOR_PAIR_FOOD", "Inventor Pair Food Reward");
         VALUE_TRANSLATOR.put("EXTRA_SHAMAN_ICONS", "Extra Shaman Icons");
-
-        // Aggiungi qui qualsiasi altro valore strano dal JSON che vuoi far comparire bello pulito!
     }
 
     private LocalCardDictionary() {
         cardDescriptions = new HashMap<>();
         cardImagePaths = new HashMap<>();
-        
+
         loadDictionary();
         loadImagesDictionary();
     }
 
+    /**
+     * Retrieves the singleton instance of the dictionary.
+     * @return the LocalCardDictionary instance.
+     */
     public static LocalCardDictionary getInstance() {
         if (instance == null) {
             instance = new LocalCardDictionary();
@@ -71,11 +86,10 @@ public class LocalCardDictionary {
     }
 
     /**
-     * Loads the JSON files from the resources folder.
+     * Loads card data from the JSON files located in the resources folder.
      */
     private void loadDictionary() {
         ObjectMapper mapper = new ObjectMapper();
-        // These paths must match the location of your JSON files in the resources folder
         String[] jsonFiles = {
                 "/cards/tribe_cards.json",
                 "/cards/buildings_era1.json",
@@ -101,13 +115,12 @@ public class LocalCardDictionary {
             }
         }
     }
-    
-    //Translation from json to PNG in order to upload the images
+
+    /**
+     * Translates JSON IDs into PNG file paths for graphical interfaces.
+     */
     private void loadImagesDictionary() {
-        
         ObjectMapper mapper = new ObjectMapper();
-        
-        //Rules to translate from Json to PNG
         Map<String, String> rules = new LinkedHashMap<>();
         rules.put("/cards/tribe_cards.json", "/images/Cards/Front/Card ");
         rules.put("/cards/buildings_era1.json", "/images/Houses/Front/House Age 1.");
@@ -116,25 +129,19 @@ public class LocalCardDictionary {
         rules.put("/cards/event_cards.json", "/images/Events/Front/Event ");
 
         for (Map.Entry<String, String> rule : rules.entrySet()) {
-            String jsonFilePath = rule.getKey();     // Es. "/cards/buildings_era1.json"
-            String imagePrefix = rule.getValue();    // Es. "/images/Houses/Front/House Age 1."
+            String jsonFilePath = rule.getKey();
+            String imagePrefix = rule.getValue();
 
             try (InputStream is = getClass().getResourceAsStream(jsonFilePath)) {
                 if (is != null) {
                     JsonNode root = mapper.readTree(is);
-
-                    int imageIndex = 1; // Name of files starts from one for each new JSON
-
+                    int imageIndex = 1;
                     for (JsonNode node : root) {
                         if (node.has("id")) {
-                            String cardId = node.get("id").asText(); // Es. "building_3"
-                            
+                            String cardId = node.get("id").asText();
                             String fullImagePath = imagePrefix + imageIndex + ".png";
-
-                            //Save in the GUI Map
                             cardImagePaths.put(cardId, fullImagePath);
-
-                            imageIndex++; // next card
+                            imageIndex++;
                         }
                     }
                 }
@@ -142,35 +149,58 @@ public class LocalCardDictionary {
                 System.err.println("Impossible to translate images from: " + jsonFilePath);
             }
         }
-        
     }
 
+    /**
+     * Retrieves the image path for a given card ID.
+     * @param cardId the ID of the card.
+     * @return the local file path to the card's image.
+     */
     public String getImagePath(String cardId) {
         if (cardId == null) return "[Empty]";
         return cardImagePaths.get(cardId);
     }
 
     /**
-     * Builds a summary string based on the card's JSON properties.
-     * Extracts useful info to print on the CLI for the player.
+     * Builds a comprehensive, formatted string describing a card based on its JSON properties.
+     * @param node the JSON node representing the card.
+     * @return the formatted description string.
      */
     private String buildDescription(JsonNode node) {
         String subtype = node.has("subtype") ? node.get("subtype").asText().toUpperCase() : "EVENT";
-        StringBuilder desc = new StringBuilder(subtype);
+        StringBuilder desc = new StringBuilder();
 
+        // 1. Header Generation
+        if (subtype.equals("EVENT")) {
+            // Events only show their name (e.g., "Hunt", "Sustenance")
+            if (node.has("effectType")) {
+                desc.append(VALUE_TRANSLATOR.getOrDefault(node.get("effectType").asText(), node.get("effectType").asText()));
+            } else {
+                desc.append("Event");
+            }
+        } else if (subtype.equals("INVENTOR")) {
+            // Inventors show type first (e.g., "Leather Inventor")
+            String icon = node.has("inventionIcon") ? node.get("inventionIcon").asText() : "";
+            desc.append(VALUE_TRANSLATOR.getOrDefault(icon, icon)).append(" Inventor");
+        } else {
+            // Default subtypes (GATHERER, SHAMAN, BUILDER, ARTIST, HUNTER, BUILDING)
+            desc.append(subtype);
+        }
+
+        // 2. Body Generation (Properties)
         DESCRIPTION_TEMPLATE.forEach((key, format) -> {
+            // Prevent duplication since these are already handled in the header
+            if (subtype.equals("INVENTOR") && key.equals("inventionIcon")) return;
+            if (subtype.equals("EVENT") && key.equals("effectType")) return;
+
             if (node.has(key)) {
-                // 1. Prende il valore crudo dal JSON (es. "COMPLETE_SET_FOOD")
                 String rawValue = node.get(key).asText();
-
-                // 2. Cerca la traduzione. Se non la trova, lascia il valore crudo originale.
                 String translatedValue = VALUE_TRANSLATOR.getOrDefault(rawValue, rawValue);
-
-                // 3. Inserisce la parola bella al posto del %s
                 desc.append(String.format(format, translatedValue));
             }
         });
 
+        // 3. Immediate Food Bonus Check
         if (node.has("immediateFood") && node.get("immediateFood").asInt() == 1) {
             desc.append(" | +1 Food");
         }
@@ -179,12 +209,12 @@ public class LocalCardDictionary {
     }
 
     /**
-     * Returns the formatted card details, or the raw ID if not found in the JSON.
+     * Fetches the human-readable details of a card given its ID.
+     * @param cardId the internal server ID of the card.
+     * @return the formatted details string, or the raw ID if not found.
      */
     public String getCardDetails(String cardId) {
         if (cardId == null) return "[Empty]";
         return cardDescriptions.getOrDefault(cardId, "ID: " + cardId);
     }
-
-
 }

@@ -20,14 +20,21 @@ import static it.polimi.ingsw.exception.CustomException.cleanRemoteException;
  * <p>
  * This class handles all user interactions through the console, following the MVC pattern.
  * It displays the game state to the user and forwards user inputs to the server
- * via the {@link NetworkManager}.
+ * via the {@link NetworkManager}. All visuals are constrained to standard ASCII.
  */
 public class CLIView implements View {
     private final BufferedReader reader;
     private final NetworkManager network;
     private BoardDTO lastBoard;
-    /** Map containing the most recent tribe status DTO for each player in the game, indexed by nickname. */
     private final Map<String, TribeStatusDTO> allTribes = new java.util.concurrent.ConcurrentHashMap<>();
+
+    /** * Local map used to translate dynamic user-friendly letters ('A', 'B', 'C')
+     * into server-expected regex coordinates ('T0', 'L1', 'B0', 'G1').
+     */
+    private volatile Map<String, String> letterToCodeMap = new java.util.concurrent.ConcurrentHashMap<>();
+
+    /** Stores the last error message to ensure it survives console clearing events. */
+    private volatile String lastErrorMessage = null;
 
     private static final String RESET = "\u001B[0m";
     private static final String BOLD = "\u001B[1m";
@@ -39,28 +46,24 @@ public class CLIView implements View {
     private static final String CYAN = "\u001B[36m";
 
     private static final String CLEAR_SCREEN = "\033[H\033[2J";
-    private static final int LEFT_COLUMN_WIDTH = 60;
+    private static final int LEFT_COLUMN_WIDTH = 75; // Increased width to fit full card descriptions smoothly
     private volatile List<OfferTileDTO> lastOfferTrack = null;
 
     private String myNickname = "MY_NICKNAME_HERE";
 
     /**
      * Clears the terminal screen reliably across different operating systems.
-     * Uses native commands for Windows and ANSI escape codes for Unix-like systems.
      */
     private void clearConsole() {
         try {
             String os = System.getProperty("os.name").toLowerCase();
             if (os.contains("win")) {
-                // Native clear screen for Windows CMD / PowerShell
                 new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
             } else {
-                // ANSI clear screen for Linux / macOS
                 System.out.print(CLEAR_SCREEN);
                 System.out.flush();
             }
         } catch (Exception e) {
-            // Ultimate fallback for unsupported IDE consoles: print 50 empty lines
             for (int i = 0; i < 50; i++) {
                 System.out.println();
             }
@@ -68,37 +71,57 @@ public class CLIView implements View {
     }
 
     /**
-     * Adds spaces to the right of a string to reach the target width.
-     * It ignores hidden ANSI color codes to keep the layout perfectly aligned.
+     * Adds spaces to the right of a string to reach the target width, ignoring ANSI color codes.
      */
     private String padRightAnsi(String s, int width) {
         String clean = s.replaceAll("\u001B\\[[;\\d]*m", "");
         int visibleLen = clean.length();
-
         if (visibleLen >= width) {
             return s;
         }
         return s + " ".repeat(width - visibleLen);
     }
 
-
+    /**
+     * Colorizes the card string based on its content type.
+     */
     private String colorizeCard(String details, boolean isBuildingRow) {
         if (isBuildingRow) {
-            return BLUE + "  " + details + RESET;
+            return BLUE + details + RESET; // Buildings in Blue
         }
-        if (details.toUpperCase().startsWith("EVENT")) {
-            return PURPLE + "  " + details + RESET;
+        if (details.startsWith("Hunt") || details.startsWith("Sustenance") ||
+                details.startsWith("Shamanic Ritual") || details.startsWith("Cave Paintings") ||
+                details.startsWith("Event")) {
+            return PURPLE + details + RESET; // Events in Purple
         }
-        return CYAN + "  " + details + RESET;
+        return CYAN + details + RESET; // Characters in Cyan
     }
 
     /**
-     * Builds the layout lines for the left side of the screen (My Tribe, Board & Offers).
+     * Generates sequential letters (A, B... Z, AA, AB...) for indexing cards.
+     */
+    private String getLetterLabel(int index) {
+        int quotient = index / 26;
+        int remainder = index % 26;
+        char letter = (char) ('A' + remainder);
+        if (quotient == 0) {
+            return String.valueOf(letter);
+        } else {
+            return String.valueOf((char) ('A' + quotient - 1)) + letter;
+        }
+    }
+
+    /**
+     * Builds the left column of the CLI containing the User's Tribe, the Board, and the Offers.
+     * Dynamically assigns selection letters to draftable cards in a thread-safe manner.
      */
     private List<String> buildLeftColumn() {
         List<String> lines = new java.util.ArrayList<>();
+        Map<String, String> tempLetterMap = new java.util.concurrent.ConcurrentHashMap<>();
+        int letterIndex = 0;
 
-        lines.add(YELLOW + BOLD + "=".repeat(15) + " MY TRIBE " + "=".repeat(15) + RESET);
+        // 1. MY TRIBE
+        lines.add(YELLOW + BOLD + "=".repeat(20) + " MY TRIBE " + "=".repeat(20) + RESET);
         if (myNickname != null && allTribes.containsKey(myNickname)) {
             lines.addAll(formatTribeBlock(myNickname, allTribes.get(myNickname), true));
         } else {
@@ -106,28 +129,78 @@ public class CLIView implements View {
             lines.add("");
         }
 
-        // 2. LA BOARD CENTRALE
-        lines.add(YELLOW + BOLD + "=".repeat(17) + " BOARD " + "=".repeat(17) + RESET);
+        // 2. CENTRAL BOARD
+        lines.add(YELLOW + BOLD + "=".repeat(22) + " BOARD " + "=".repeat(22) + RESET);
         lines.add("");
 
         if (lastBoard != null) {
+            // --- UPPER TRIBE ROW (Server code: T) ---
             lines.add("Upper Tribe Row:");
-            lastBoard.getUpperTribeRow().forEach(c -> lines.add(colorizeCard(LocalCardDictionary.getInstance().getCardDetails(c.getCardId()), false)));
+            for (int i = 0; i < lastBoard.getUpperTribeRow().size(); i++) {
+                CardDTO c = lastBoard.getUpperTribeRow().get(i);
+                String details = LocalCardDictionary.getInstance().getCardDetails(c.getCardId());
 
+                boolean isEvent = details.startsWith("Hunt") || details.startsWith("Sustenance") ||
+                        details.startsWith("Shamanic Ritual") || details.startsWith("Cave Paintings") ||
+                        details.startsWith("Event");
+                if (isEvent) {
+                    lines.add("      - " + colorizeCard(details, false));
+                } else {
+                    String letterStr = getLetterLabel(letterIndex++);
+                    lines.add("  [" + letterStr + "] " + colorizeCard(details, false));
+                    tempLetterMap.put(letterStr, "T" + i);
+                }
+            }
+
+            // --- LOWER TRIBE ROW (Server code: L) ---
             lines.add("\nLower Tribe Row:");
-            lastBoard.getLowerTribeRow().forEach(c -> lines.add(colorizeCard(LocalCardDictionary.getInstance().getCardDetails(c.getCardId()), false)));
+            for (int i = 0; i < lastBoard.getLowerTribeRow().size(); i++) {
+                CardDTO c = lastBoard.getLowerTribeRow().get(i);
+                String details = LocalCardDictionary.getInstance().getCardDetails(c.getCardId());
 
+                boolean isEvent = details.startsWith("Hunt") || details.startsWith("Sustenance") ||
+                        details.startsWith("Shamanic Ritual") || details.startsWith("Cave Paintings") ||
+                        details.startsWith("Event");
+                if (isEvent) {
+                    lines.add("      - " + colorizeCard(details, false));
+                } else {
+                    String letterStr = getLetterLabel(letterIndex++);
+                    lines.add("  [" + letterStr + "] " + colorizeCard(details, false));
+                    tempLetterMap.put(letterStr, "L" + i);
+                }
+            }
+
+            // --- UPPER BUILDINGS (Server code: B) ---
             lines.add(BLUE + "\nUpper Buildings:" + RESET);
-            lastBoard.getUpperBuildingRow().forEach(c -> lines.add(colorizeCard(LocalCardDictionary.getInstance().getCardDetails(c.getCardId()), true)));
+            for (int i = 0; i < lastBoard.getUpperBuildingRow().size(); i++) {
+                CardDTO c = lastBoard.getUpperBuildingRow().get(i);
+                String details = LocalCardDictionary.getInstance().getCardDetails(c.getCardId());
+                String letterStr = getLetterLabel(letterIndex++);
 
+                lines.add("  [" + letterStr + "] " + colorizeCard(details, true));
+                tempLetterMap.put(letterStr, "B" + i);
+            }
+
+            // --- LOWER BUILDINGS (Server code: G) ---
             lines.add(BLUE + "\nLower Buildings:" + RESET);
-            lastBoard.getLowerBuildingRow().forEach(c -> lines.add(colorizeCard(LocalCardDictionary.getInstance().getCardDetails(c.getCardId()), true)));
+            for (int i = 0; i < lastBoard.getLowerBuildingRow().size(); i++) {
+                CardDTO c = lastBoard.getLowerBuildingRow().get(i);
+                String details = LocalCardDictionary.getInstance().getCardDetails(c.getCardId());
+                String letterStr = getLetterLabel(letterIndex++);
+
+                lines.add("  [" + letterStr + "] " + colorizeCard(details, true));
+                tempLetterMap.put(letterStr, "G" + i);
+            }
         } else {
             lines.add(" Waiting for board data...");
         }
 
+        // Atomically replace the map to prevent Race Conditions during input reading
+        this.letterToCodeMap = tempLetterMap;
+
         lines.add("");
-        lines.add(YELLOW + BOLD + "=".repeat(16) + " OFFERS " + "=".repeat(16) + RESET);
+        // 3. OFFERS
+        lines.add(YELLOW + BOLD + "=".repeat(21) + " OFFERS " + "=".repeat(21) + RESET);
         lines.add("");
 
         if (lastOfferTrack != null) {
@@ -144,7 +217,7 @@ public class CLIView implements View {
     }
 
     /**
-     * Builds the layout lines for the right side of the screen (Opponents).
+     * Builds the right column of the CLI containing Opponents' Tribes.
      */
     private List<String> buildRightColumn() {
         List<String> lines = new java.util.ArrayList<>();
@@ -167,7 +240,8 @@ public class CLIView implements View {
     }
 
     /**
-     * Formats a single tribe block into a list of strings.
+     * Formats a single tribe status into a list of displayable strings.
+     * Extracts and prints every single card detail explicitly.
      */
     private List<String> formatTribeBlock(String playerName, TribeStatusDTO t, boolean isMe) {
         List<String> lines = new java.util.ArrayList<>();
@@ -176,27 +250,45 @@ public class CLIView implements View {
 
         lines.add("");
         lines.add(headerColor + title + playerName.toUpperCase() + RESET);
-        lines.add(String.format("   " + GREEN + "[Food] %d" + RESET + " | " + YELLOW + "[VP] %d" + RESET + " | " + YELLOW + "[Stars] %d" + RESET + " | " + CYAN + "[Sust] -%d" + RESET + " | " + BLUE + "[Build] -%d" + RESET,
+        lines.add(String.format("   " + GREEN + "[Food] %d" + RESET + " | " + YELLOW + "[PP] %d" + RESET + " | " + YELLOW + "[Stars] %d" + RESET + " | " + CYAN + "[Sust] -%d" + RESET + " | " + BLUE + "[Build] -%d" + RESET,
                 t.getCurrentFood(), t.getTotalPrestigePoints(), t.getShamanStars(), t.getTotalSustenanceDiscount(), t.getTotalBuildingsFoodDiscount()));
 
+        // --- CHARACTERS ---
         lines.add(CYAN + "   CHARACTERS:" + RESET);
+        boolean hasChars = false;
         if (t.getCharactersByColumn() != null) {
-            t.getCharactersByColumn().forEach((category, cardDTOs) -> {
+            for (List<CardDTO> cardDTOs : t.getCharactersByColumn().values()) {
                 if (cardDTOs != null && !cardDTOs.isEmpty()) {
-                    lines.add(String.format("     " + CYAN + "%s" + RESET + " (%d)", category, cardDTOs.size()));
+                    for (CardDTO c : cardDTOs) {
+                        String details = LocalCardDictionary.getInstance().getCardDetails(c.getCardId());
+                        lines.add("     - " + colorizeCard(details, false));
+                        hasChars = true;
+                    }
                 }
-            });
+            }
+        }
+        if (!hasChars) {
+            lines.add(CYAN + "     None" + RESET);
         }
 
-        int buildingsCount = (t.getBuildingIds() != null) ? t.getBuildingIds().size() : 0;
-        lines.add(BLUE + "   BUILDINGS: " + RESET + buildingsCount + " built.");
-        lines.add("   " + "-".repeat(50));
+        // --- BUILDINGS ---
+        lines.add(BLUE + "   BUILDINGS:" + RESET);
+        if (t.getBuildingIds() != null && !t.getBuildingIds().isEmpty()) {
+            for (CardDTO c : t.getBuildingIds()) { // <-- Corretto: itera su CardDTO
+                String details = LocalCardDictionary.getInstance().getCardDetails(c.getCardId()); // <-- Corretto: estrae l'id
+                lines.add("     - " + colorizeCard(details, true));
+            }
+        } else {
+            lines.add(BLUE + "     None built." + RESET);
+        }
+
+        lines.add("   " + "-".repeat(60));
 
         return lines;
     }
 
     /**
-     * Master rendering function. Clears the screen and zips the two columns together.
+     * Master rendering function. Clears the console and visually zips the left and right columns.
      */
     private synchronized void renderDashboard() {
         clearConsole();
@@ -208,18 +300,19 @@ public class CLIView implements View {
         for (int i = 0; i < maxLines; i++) {
             String lLine = (i < left.size()) ? left.get(i) : "";
             String paddedLeft = padRightAnsi(lLine, LEFT_COLUMN_WIDTH);
-
             String rLine = (i < right.size()) ? right.get(i) : "";
 
             System.out.println(paddedLeft + YELLOW + " | " + RESET + rLine);
         }
         System.out.println("\n");
+
+        // Appends the error message to the bottom of the board so it doesn't get cleared
+        if (lastErrorMessage != null) {
+            System.out.println(RED + BOLD + "[ERROR]: " + lastErrorMessage + RESET);
+            lastErrorMessage = null;
+        }
     }
 
-    /**
-     * Constructs a new CLIView.
-     * * @param network the network manager used to communicate with the server.
-     */
     public CLIView(NetworkManager network) {
         this.network = network;
         this.reader = new BufferedReader(new InputStreamReader(System.in));
@@ -244,13 +337,64 @@ public class CLIView implements View {
     }
 
     /**
-     * Displays the login screen and handles the nickname and color selection process.
-     * This method blocks until a valid login request has been sent to the server.
+     * Safely translates the user's flexible input into a clean, single-space separated
+     * string of coordinates for the server backend (e.g., converts "A" into "T0").
+     * * @param input the raw string inputted by the user
+     * @return the perfectly formatted payload string ready for the server
      */
+    private String translateInputToServerCode(String input) {
+        // If the user inputs legacy coordinates with numbers (e.g., "T0" or "T0, G1")
+        if (input.matches(".*\\d.*")) {
+            return input.replaceAll("[,;]", " ").replaceAll("\\s+", " ").trim();
+        }
+
+        StringBuilder translated = new StringBuilder();
+
+        // Iterates through every character to extract the letters flawlessly
+        for (char c : input.toCharArray()) {
+            if (Character.isLetter(c)) {
+                String letter = String.valueOf(c);
+                if (letterToCodeMap.containsKey(letter)) {
+                    translated.append(letterToCodeMap.get(letter)).append(" ");
+                } else {
+                    translated.append(letter).append(" "); // Fallback if letter not found
+                }
+            }
+        }
+
+        return translated.toString().trim();
+    }
+
+    /**
+     * Prompts the user to choose a card. Forwards the choice immediately to the server
+     * as soon as ENTER is pressed. If multiple cards must be picked during a turn,
+     * the server will process the first pick, update the board, and prompt this method again.
+     */
+    @Override
+    public void askCardChoose() {
+        clearInputBuffer();
+
+        System.out.print("Enter your choice (e.g. A) or manual code (e.g. T0): ");
+        String input = readLine().trim().toUpperCase();
+
+        // Translates the chosen letter into the server format immediately
+        String serverCode = translateInputToServerCode(input);
+
+        try {
+            // Forwards the immediate selection straight to the server Model
+            network.cardSelection(serverCode);
+        } catch (Exception e) {
+            showError(handleNetworkError(e));
+            if (lastBoard != null) {
+                displayBoard(lastBoard);
+                askCardChoose();
+            }
+        }
+    }
+
     @Override
     public void showLogin() {
         System.out.println("=== WELCOME TO MESOS ===");
-
         System.out.print("Enter your nickname: ");
         String nickname = readLine();
 
@@ -275,20 +419,11 @@ public class CLIView implements View {
         }
     }
 
-    /**
-     * Updates the UI to show the current number of players connected to the lobby.
-     * * @param current the current number of players in the lobby.
-     * @param total   the total number of players required to start the game.
-     */
     @Override
     public void showLobby(int current, int total) {
         System.out.println("Lobby Update: " + current + "/" + total + " players.");
     }
 
-    /**
-     * Notifies the user that the game has started.
-     * * @param controller the remote controller provided by the server to handle game actions.
-     */
     @Override
     public void startGame(RemoteController controller, int totalPlayers) {
         network.setController(controller);
@@ -296,41 +431,25 @@ public class CLIView implements View {
     }
 
     /**
-     * Displays an error message to the user.
-     * @param error the error message to display.
+     * Stores and displays an error message reliably to the user.
      */
     @Override
     public void showError(String error) {
-        System.out.println("\u001B[31m" + error + "\u001B[0m");
+        this.lastErrorMessage = error;
+        // Prints it immediately in case a screen refresh doesn't immediately follow
+        System.out.println(RED + BOLD + "[ERROR]: " + error + RESET);
         System.out.flush();
     }
 
-    /**
-     * Displays a critical, unrecoverable error message on the CLI and terminates the application.
-     * <p>
-     * This method clears the current terminal line using ANSI escape codes, prints the provided
-     * error message in bright red, and flushes the output stream to ensure immediate visibility.
-     * It then briefly pauses execution to allow the OS stream to settle before forcefully
-     * shutting down the JVM with an exit status of 1.
-     * </p>
-     *
-     * @param error the descriptive error message to be displayed before termination.
-     */
     @Override
     public void showFatalError(String error) {
         System.out.print("\r\033[K");
-        System.out.println("\u001B[31m" + error + "\u001B[0m");
+        System.out.println(RED + BOLD + "[FATAL ERROR]: " + error + RESET);
         System.out.flush();
-
-        try { Thread.sleep(100); } catch (InterruptedException ignored) {}
-
+        try { Thread.sleep(3000); } catch (InterruptedException ignored) {}
         System.exit(1);
     }
 
-    /**
-     * Prompts the host player to set the maximum number of players for the game session.
-     * Only the first player to join (the host) will trigger this method.
-     */
     @Override
     public void askMaxPlayers() {
         System.out.print("You are the host! How many players do you want (2-5)? ");
@@ -347,20 +466,9 @@ public class CLIView implements View {
         }
     }
 
-    /**
-     * Prompts the user to select an offer tile for totem placement.
-     * <p>
-     * This method clears the input buffer, reads the user's choice from the console,
-     * and communicates the selection to the server. It includes recursive error
-     * handling for invalid numerical input or network-related issues.
-     * </p>
-     *
-     * @throws NumberFormatException if the user input is not a valid integer
-     */
     @Override
     public void askTotemPlacement() {
         clearInputBuffer();
-
         System.out.print("Choose the offer tile: ");
         try {
             int tileIndex = Integer.parseInt(readLine());
@@ -374,11 +482,6 @@ public class CLIView implements View {
         }
     }
 
-    /**
-     * Formats and prints the offer track table to the console.
-     * It displays indices, bonuses, and the occupancy status of each tile.
-     * @param tiles the list of data transfer objects containing tile information.
-     */
     @Override
     public void displayOfferTrack(List<OfferTileDTO> tiles) {
         this.lastOfferTrack = tiles;
@@ -395,55 +498,22 @@ public class CLIView implements View {
         }
     }
 
-    /**
-     * Displays a generic message to the user via the standard output.
-     *
-     * @param message the string message to be printed
-     */
     @Override
     public void showMessage(String message) {
         System.out.println(message);
     }
 
-    /**
-     * Displays the current turn order of the players.
-     * The list is formatted as a numbered vertical list for better readability in the terminal.
-     *
-     * @param playersOrder the list of player nicknames in their respective turn order
-     */
     @Override
     public void showPlayersOrder(List<String> playersOrder) {
         String orderMessage = IntStream.range(0, playersOrder.size())
                 .mapToObj(i -> (i + 1) + ". " + playersOrder.get(i))
                 .collect(Collectors.joining("\n"));
-
-        String finalMessage = "Players order is:\n" + orderMessage;
-
-        System.out.println(finalMessage);
+        System.out.println("Players order is:\n" + orderMessage);
     }
 
-    /**
-     * Provides information about player-color associations.
-     * <p>
-     * Note: This implementation is empty as the CLI version of the game
-     * does not currently utilize player colors for its display logic.
-     * </p>
-     *
-     * @param playersInfo a map associating player nicknames with their chosen {@code Color}
-     */
     @Override
-    public void showPlayersInfo(Map<String,Color> playersInfo) {
-        //CLI does not need to know player color
-    }
+    public void showPlayersInfo(Map<String,Color> playersInfo) {}
 
-    /**
-     * Stores the received tribe status into a global map and prints a formatted,
-     * colorful layout of all active players' tribes onto the console.
-     * Uses the local card dictionary to translate unique identifiers into readable descriptions.
-     *
-     * @param nickname the nickname of the player owning the tribe
-     * @param tribe    the updated TribeStatusDTO object
-     */
     @Override
     public void showTribe(String nickname, TribeStatusDTO tribe) {
         if (nickname != null && tribe != null) {
@@ -452,134 +522,46 @@ public class CLIView implements View {
         }
     }
 
-    /**
-     * Renders the current state of the game board to the console.
-     * <p>
-     * This method updates the local cache of the board state and prints a formatted
-     * representation of the four main card rows: Upper Tribe, Lower Tribe,
-     * Upper Building, and Lower Building.
-     * </p>
-     *
-     * @param board the {@code BoardDTO} containing the current state of all card rows
-     * to be displayed
-     */
     public void displayBoard(BoardDTO board) {
         this.lastBoard = board;
         renderDashboard();
     }
 
-    /**
-     * Helper method to format and print a single row of cards.
-     */
-    private void printRow(String label, List<CardDTO> row, String prefix) {
-        System.out.println(label + ":");
-        if (row == null || row.isEmpty()) {
-            System.out.println("  [Empty]");
-            return;
-        }
-        for (int i = 0; i < row.size(); i++) {
-            String id = row.get(i).getCardId();
-            String description = LocalCardDictionary.getInstance().getCardDetails(id);
-            System.out.printf("  [%s%d] %s%n", prefix, i, description);
-        }
-    }
-
-    /**
-     * Prompts the user to choose a card.
-     * It actively reprints the entire board state using the LocalCardDictionary
-     * so the user has all available options directly above the input prompt.
-     */
-    @Override
-    public void askCardChoose() {
-        clearInputBuffer();
-
-        System.out.println("Format: [Row Prefix][Index] (e.g., T0 for first Upper Tribe, G2 for third Lower Building)");
-        System.out.print("Enter your choice: ");
-        String cardPosition = readLine().trim().toUpperCase();
-
-        try {
-            // Forwards the input (e.g., "T0") to the NetworkManager regex parser
-            network.cardSelection(cardPosition);
-        } catch (Exception e) {
-            showError(handleNetworkError(e));
-
-            if (lastBoard != null) {
-                displayBoard(lastBoard);
-                askCardChoose();
-            }
-        }
-    }
-
-    /**
-     * Displays the final game rankings in the terminal.
-     * The leaderboard includes the position, player nickname, prestige points, and food amount.
-     * Winners are highlighted with special formatting.
-     *
-     * @param leaderboard the DTO containing the final standings and victory status
-     */
     @Override
     public void displayLeaderboard(LeaderboardDTO leaderboard, String globalRank) {
         System.out.println("\n" + "=".repeat(60));
         System.out.println(centerText("FINAL LEADERBOARD", 60));
         System.out.println("=".repeat(60));
-
-        // Table Header: %-5s (Position), %-20s (Nickname), %-12s (Prestige), %-8s (Food)
-        String header = String.format("%-5s | %-20s | %-12s | %-8s", "POS", "PLAYER", "PRESTIGE", "FOOD");
-        System.out.println(header);
+        System.out.println(String.format("%-5s | %-20s | %-12s | %-8s", "POS", "PLAYER", "PRESTIGE", "FOOD"));
         System.out.println("-".repeat(60));
 
         for (PlayerRankDTO entry : leaderboard.getRankings()) {
             String posString = entry.getPosition() + ".";
-            String name = entry.getNickname();
-
-            String row = String.format("%-5s | %-20s | %-12d | %-8d",
-                    posString,
-                    name,
-                    entry.getPrestigePoints(),
-                    entry.getFoodAmount());
-
-            System.out.println(row);
+            System.out.println(String.format("%-5s | %-20s | %-12d | %-8d", posString, entry.getNickname(), entry.getPrestigePoints(), entry.getFoodAmount()));
         }
-
         System.out.println("-".repeat(60));
 
-        // Final Message
         if (leaderboard.isSharedVictory()) {
             System.out.println(" It's a draw! Victory is shared among the leaders.");
         } else if (!leaderboard.getRankings().isEmpty()) {
-            String winnerName = leaderboard.getRankings().getFirst().getNickname();
-            System.out.println(" PLAYER  " + winnerName + " is the winner!");
+            System.out.println(" PLAYER  " + leaderboard.getRankings().getFirst().getNickname() + " is the winner!");
         }
-
         System.out.println("=".repeat(60) + "\n");
 
         if (globalRank != null) {
             showMessage("\n--- GLOBAL RANKING ---");
             showMessage(globalRank);
-
             System.out.println("If you want to see the global leaderboard digit 'GLOBAL_LEADERBOARD'.");
             askGlobalLeaderboard(leaderboard.getRankings().size());
         }
     }
 
-    /**
-     * Displays the current turn order details in a structured, tabular format on the CLI.
-     * <p>
-     * This method prints a formatted table containing the position, player nickname,
-     * associated color, and the specific food bonus for each tile. If the provided list
-     * is null or empty, an appropriate message is displayed instead.
-     * </p>
-     *
-     * @param turnOrderTiles the list of {@link TurnOrderTileDTO} objects representing the
-     * current turn order; can be null or empty.
-     */
     @Override
     public void displayTurnOrderTile(List<TurnOrderTileDTO> turnOrderTiles) {
         if (turnOrderTiles == null || turnOrderTiles.isEmpty()) {
             System.out.println("\n[TURN ORDER TILE]: No data available.");
             return;
         }
-
         System.out.println("=".repeat(56));
         System.out.println(centerText("TURN ORDER TILE", 56));
         System.out.println("=".repeat(56));
@@ -588,33 +570,17 @@ public class CLIView implements View {
 
         int pos = 1;
         for (TurnOrderTileDTO tile : turnOrderTiles) {
-            String colorString = tile.getColor() != null ? tile.getColor().toString() : "N/D";
-
-            System.out.printf("%-4d | %-15s | %-10d%n",
-                    pos,
-                    tile.getNickname() + " (" + colorString + ")",
-                    tile.getFoodBonus()
-            );
+            System.out.printf("%-4d | %-15s | %-10d%n", pos, tile.getNickname() + " (" + (tile.getColor() != null ? tile.getColor().toString() : "N/D") + ")", tile.getFoodBonus());
             pos++;
         }
         System.out.println("=".repeat(56));
     }
 
-    /**
-     * Helper method to center text within a given width for better CLI aesthetics.
-     *
-     * @param text The string to center
-     * @param width The total width of the line
-     * @return The centered string padded with spaces
-     */
     private String centerText(String text, int width) {
         if (text.length() >= width) return text;
-
         int totalPadding = width - text.length();
         int leftPadding = totalPadding / 2;
-        int rightPadding = totalPadding - leftPadding;
-
-        return " ".repeat(leftPadding) + text + " ".repeat(rightPadding);
+        return " ".repeat(leftPadding) + text + " ".repeat(totalPadding - leftPadding);
     }
 
     private void askGlobalLeaderboard(int targetPlayers) {
@@ -632,43 +598,22 @@ public class CLIView implements View {
         }
     }
 
-    /**
-     * Displays the global leaderboard within a stylized box-framed layout on the CLI.
-     * <p>
-     * This method prints the "Global Hall of Fame", formatting the ranking entries into
-     * a table with columns for rank position, player nickname, and total accumulated points.
-     * If no ranking entries are present (or if the leaderboard data is null), it displays
-     * a centered placeholder message indicating that no records were found.
-     * </p>
-     *
-     * @param leaderboard the {@link GlobalLeaderboardDTO} object containing the list of
-     * player rankings to be displayed; can be null or contain an empty list.
-     */
     @Override
     public void displayGlobalLeaderboard(GlobalLeaderboardDTO leaderboard) {
         System.out.println("\n" + "+" + "-".repeat(58) + "+");
         System.out.println("|" + centerText("GLOBAL HALL OF FAME", 58) + "|");
         System.out.println("+" + "-".repeat(58) + "+");
-
-
-        String header = String.format("  %-6s  %-25s  %15s", "RANK", "NICKNAME", "TOTAL POINTS");
-        System.out.println("|" + String.format("%-58s", header) + "|");
+        System.out.println("|" + String.format("%-58s", String.format("  %-6s  %-25s  %15s", "RANK", "NICKNAME", "TOTAL POINTS")) + "|");
         System.out.println("+" + "-".repeat(58) + "+");
 
         List<GlobalPlayerRankDTO> entries = leaderboard.getRankings();
-
         if (entries == null || entries.isEmpty()) {
             System.out.println("|" + centerText("No records found for this player count.", 58) + "|");
         } else {
             for (GlobalPlayerRankDTO entry : entries) {
-                String row = String.format("  #%-5d  %-25s  %15d",
-                        entry.getRank(),
-                        entry.getNickname(),
-                        entry.getTotalPoints());
-                System.out.println("|" + String.format("%-58s", row) + "|");
+                System.out.println("|" + String.format("%-58s", String.format("  #%-5d  %-25s  %15d", entry.getRank(), entry.getNickname(), entry.getTotalPoints())) + "|");
             }
         }
-
         System.out.println("+" + "-".repeat(58) + "+\n");
     }
 }
