@@ -250,7 +250,7 @@ public class GameBoardController extends SceneController {
                 playerLabel.setStyle("""
                         -fx-font-size: 14px;
                         -fx-font-weight: bold;
-                        -fx-text-fill: #2b2f32;
+                        -fx-text-fill: WHITE;
                         -fx-background-color: rgba(255,255,255,0.45);
                         -fx-background-radius: 5;
                         -fx-padding: 8 10 8 10;

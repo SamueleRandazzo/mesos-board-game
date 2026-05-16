@@ -1,27 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.layout.StackPane?>
 
-<VBox alignment="CENTER" prefHeight="400.0" prefWidth="600.0" spacing="30.0"
-      xmlns="http://javafx.com/javafx/17"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="it.polimi.ingsw.view.GUI.LobbyController">
-    <children>
-        <Label text="WAITING LOBBY">
+<StackPane prefHeight="720.0" prefWidth="1280.0"
+           style="-fx-background-color: radial-gradient(center 50% 50%, radius 80%, #1b5e20 0%, #124116 60%, #0b290e 100%), linear-gradient(from 0% 0% to 100% 100%, rgba(255,255,255,0.03), rgba(0,0,0,0.1));"
+           xmlns="http://javafx.com/javafx/17"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="it.polimi.ingsw.view.GUI.LobbyController">
+
+    <VBox alignment="CENTER" spacing="35.0"
+          maxWidth="450.0" maxHeight="350.0"
+          style="-fx-background-color: rgba(20, 20, 20, 0.75); -fx-background-radius: 18; -fx-border-color: rgba(244, 213, 141, 0.3); -fx-border-radius: 18; -fx-border-width: 1.5;">
+
+        <padding>
+            <Insets top="40.0" bottom="40.0" left="30.0" right="30.0"/>
+        </padding>
+
+        <VBox alignment="CENTER" spacing="5.0">
+            <Label text="WAITING LOBBY" textFill="#f4d58d">
+                <font>
+                    <Font name="System Bold" size="28.0"/>
+                </font>
+            </Label>
+            <VBox maxWidth="120.0" minHeight="2.0" style="-fx-background-color: #f4d58d; -fx-opacity: 0.5;"/>
+        </VBox>
+
+        <ProgressIndicator prefHeight="90.0" prefWidth="90.0"
+                           style="-fx-progress-color: #f4d58d; -fx-text-fill: white;"/>
+
+        <Label fx:id="lobbyStatusLabel" text="Waiting for other players..." textFill="#e0e0e0">
             <font>
-                <Font name="System Bold" size="24.0" />
+                <Font name="System Italic" size="16.0"/>
             </font>
         </Label>
+    </VBox>
 
-        <ProgressIndicator prefHeight="80.0" prefWidth="80.0" />
-
-        <Label fx:id="lobbyStatusLabel" text="Waiting for other players..." textFill="#727272">
-            <font>
-                <Font size="16.0" />
-            </font>
-        </Label>
-    </children>
-</VBox>
+</StackPane>

@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.event.ActionEvent;
+import javafx.scene.control.ListCell;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,11 +18,34 @@ public class SetPlayersController extends SceneController {
     private ComboBox<Integer> numPlayersCombo;
 
     public void initialize() {
-
         numPlayersCombo.setItems(FXCollections.observableArrayList(NUMBER_OF_PLAYERS));
-
-        //Set a default number of player in order to avoid to handle the case where players doesn't select the total number of player of the game
         numPlayersCombo.setValue(NUMBER_OF_PLAYERS.getFirst());
+
+        numPlayersCombo.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item.toString());
+                    setStyle("-fx-text-fill: white; -fx-background-color: #2b2b2b;");
+                }
+            }
+        });
+
+        numPlayersCombo.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item.toString());
+                    setStyle("-fx-text-fill: white;");
+                }
+            }
+        });
     }
 
     @FXML

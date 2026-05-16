@@ -9,42 +9,37 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.image.Image?>
 
 <StackPane fx:id="rootStack"
            prefHeight="720.0" prefWidth="1280.0"
-           style="-fx-background-color: #f2efe6;"
+           style="-fx-background-color:
+                  linear-gradient(from 0% 0% to 100% 0%, repeat, #3e2723 0%, #4e342e 25%, #3e2723 50%, #4e342e 75%, #3e2723 100%),
+                  linear-gradient(from 0% 0% to 0% 100%, rgba(0,0,0,0.1), rgba(0,0,0,0.3)),
+                  radial-gradient(center 50% 50%, radius 75%, transparent 40%, rgba(0,0,0,0.5) 100%);"
            xmlns="http://javafx.com/javafx/17"
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="it.polimi.ingsw.view.GUI.GameBoardController">
 
-    <!-- layout principale -->
-    <BorderPane fx:id="mainLayout">
+    <BorderPane fx:id="mainLayout" style="-fx-background-color: transparent;">
         <top>
-            <VBox alignment="CENTER_LEFT" spacing="4.0"
-                  style="-fx-background-color: #243447; -fx-border-color: #182534; -fx-border-width: 0 0 2 0;">
+            <VBox alignment="CENTER" spacing="2.0"
+                  style="-fx-background-color: rgba(43, 43, 43, 0.85); -fx-border-color: #1a1a1a; -fx-border-width: 0 0 2 0;">
                 <padding>
-                    <Insets bottom="12.0" left="24.0" right="24.0" top="12.0" />
+                    <Insets bottom="6.0" left="24.0" right="24.0" top="6.0" />
                 </padding>
-                <Label text="MESOS" textFill="#f4d58d">
-                    <font>
-                        <Font name="System Bold" size="24.0" />
-                    </font>
-                </Label>
 
-                <Label fx:id="gameNotificationLabel" text="Waiting for the game to start..." textFill="WHITE">
+                <Label fx:id="gameNotificationLabel" text="Waiting for the game to start..." textFill="#f4d58d">
                     <font>
-                        <Font name="System" size="15.0" />
+                        <Font name="System Bold" size="14.0" />
                     </font>
                 </Label>
                 <Label fx:id="gameLogLabel" text="" textFill="#ffb3a7">
                     <font>
-                        <Font name="System Bold Italic" size="13.0" />
+                        <Font name="System Bold Italic" size="12.0" />
                     </font>
                 </Label>
             </VBox>
@@ -52,19 +47,18 @@
 
         <right>
             <VBox prefWidth="240.0" spacing="14.0"
-                  style="-fx-background-color: #ded8c6; -fx-border-color: #c4bba4; -fx-border-width: 0 0 0 1;"
+                  style="-fx-background-color: rgba(20, 20, 20, 0.45); -fx-border-color: rgba(255,255,255,0.1); -fx-border-width: 0 0 0 1;"
                   BorderPane.alignment="CENTER">
                 <padding>
                     <Insets bottom="18.0" left="16.0" right="16.0" top="18.0" />
                 </padding>
-                <Label text="Players" textFill="#2b2f32">
+                <Label text="Players" textFill="WHITE">
                     <font>
                         <Font name="System Bold" size="18.0" />
                     </font>
                 </Label>
                 <VBox fx:id="playersContainer" spacing="8.0" />
 
-                <!-- Pocket Rules (back + front) -->
                 <VBox alignment="CENTER" spacing="8.0">
                     <ImageView fitWidth="150" preserveRatio="true" smooth="true">
                         <image>
@@ -87,59 +81,55 @@
                     <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
                 </padding>
 
-                <!-- Riga carte sopra le mappe -->
                 <HBox fx:id="upperCardsContainer"
                       alignment="CENTER"
                       spacing="10.0" />
 
-                <!-- Riga centrale: Tracciato completo -->
                 <HBox alignment="CENTER" spacing="6.0">
                     <StackPane fx:id="firstDeckCardContainer" />
                     <StackPane fx:id="turnOrderContainer" />
                     <HBox fx:id="offerTrackContainer" alignment="CENTER" spacing="6.0" />
                 </HBox>
 
-                <!-- Riga carte sotto le mappe -->
                 <HBox fx:id="lowerCardsContainer"
                       alignment="CENTER"
                       spacing="10.0" />
 
-                <!-- Tribe icons (6 slot fissi) -->
-                <HBox alignment="CENTER" spacing="14.0">
+                <HBox alignment="CENTER" spacing="14.0"
+                      style="-fx-background-color: rgba(0,0,0,0.4); -fx-background-radius: 10; -fx-padding: 10;">
                     <VBox alignment="CENTER" spacing="6.0">
                         <ImageView fx:id="artistsIcon" fitWidth="40" fitHeight="40" preserveRatio="true" />
-                        <Label fx:id="artistsCount" text="0" />
+                        <Label fx:id="artistsCount" text="0" textFill="WHITE" style="-fx-font-weight: bold;" />
                     </VBox>
                     <VBox alignment="CENTER" spacing="4.0">
                         <ImageView fx:id="gatherersIcon" fitWidth="40" fitHeight="40" preserveRatio="true" />
-                        <Label fx:id="gatherersCount" text="0" />
+                        <Label fx:id="gatherersCount" text="0" textFill="WHITE" style="-fx-font-weight: bold;" />
                     </VBox>
                     <VBox alignment="CENTER" spacing="4.0">
                         <ImageView fx:id="buildersIcon" fitWidth="40" fitHeight="40" preserveRatio="true" />
-                        <Label fx:id="buildersCount" text="0" />
+                        <Label fx:id="buildersCount" text="0" textFill="WHITE" style="-fx-font-weight: bold;" />
                     </VBox>
                     <VBox alignment="CENTER" spacing="4.0">
                         <ImageView fx:id="huntersIcon" fitWidth="40" fitHeight="40" preserveRatio="true" />
-                        <Label fx:id="huntersCount" text="0" />
+                        <Label fx:id="huntersCount" text="0" textFill="WHITE" style="-fx-font-weight: bold;" />
                     </VBox>
                     <VBox alignment="CENTER" spacing="4.0">
                         <ImageView fx:id="inventorsIcon" fitWidth="40" fitHeight="40" preserveRatio="true" />
-                        <Label fx:id="inventorsCount" text="0" />
+                        <Label fx:id="inventorsCount" text="0" textFill="WHITE" style="-fx-font-weight: bold;" />
                     </VBox>
                     <VBox alignment="CENTER" spacing="4.0">
                         <ImageView fx:id="shamansIcon" fitWidth="40" fitHeight="40" preserveRatio="true" />
-                        <Label fx:id="shamansCount" text="0" />
+                        <Label fx:id="shamansCount" text="0" textFill="WHITE" style="-fx-font-weight: bold;" />
                     </VBox>
                     <VBox alignment="CENTER" spacing="4.0">
                         <ImageView fx:id="buildingsIcon" fitWidth="40" fitHeight="40" preserveRatio="true" />
-                        <Label fx:id="buildingsCount" text="0" />
+                        <Label fx:id="buildingsCount" text="0" textFill="WHITE" style="-fx-font-weight: bold;" />
                     </VBox>
                 </HBox>
             </VBox>
         </center>
     </BorderPane>
 
-    <!-- overlay tribe (inizialmente chiuso) -->
     <AnchorPane fx:id="tribeOverlay"
                 visible="false" managed="false"
                 style="-fx-background-color: rgba(0,0,0,0.45);">
@@ -165,5 +155,3 @@
     </AnchorPane>
 
 </StackPane>
-
-

@@ -5,31 +5,45 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" prefHeight="400.0" prefWidth="600.0" spacing="20.0"
-      style="-fx-background-color: #f4f4f4;"
-      xmlns="http://javafx.com/javafx/17"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="it.polimi.ingsw.view.GUI.SetPlayersController">
+<StackPane prefHeight="720.0" prefWidth="1280.0"
+           style="-fx-background-color: radial-gradient(center 50% 50%, radius 80%, #1b5e20 0%, #124116 60%, #0b290e 100%), linear-gradient(from 0% 0% to 100% 100%, rgba(255,255,255,0.03), rgba(0,0,0,0.1));"
+           xmlns="http://javafx.com/javafx/17"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="it.polimi.ingsw.view.GUI.SetPlayersController">
 
-    <children>
-        <Label text="Game Configuration">
+    <VBox alignment="CENTER" spacing="30.0"
+          maxWidth="500.0" maxHeight="400.0"
+          style="-fx-background-color: rgba(20, 20, 20, 0.75); -fx-background-radius: 18; -fx-border-color: rgba(244, 213, 141, 0.3); -fx-border-radius: 18; -fx-border-width: 1.5;">
+
+        <padding>
+            <Insets top="40.0" bottom="40.0" left="35.0" right="35.0"/>
+        </padding>
+
+        <VBox alignment="CENTER" spacing="5.0">
+            <Label text="GAME CONFIGURATION" textFill="#f4d58d">
+                <font>
+                    <Font name="System Bold" size="26.0"/>
+                </font>
+            </Label>
+            <VBox maxWidth="140.0" minHeight="2.0" style="-fx-background-color: #f4d58d; -fx-opacity: 0.5;"/>
+        </VBox>
+
+        <Label text="You are the first player. Choose how many opponents to wait for:"
+               textFill="#e0e0e0" wrapText="true" alignment="CENTER" textAlignment="CENTER">
             <font>
-                <Font name="System Bold" size="24.0" />
+                <Font name="System Italic" size="14.0"/>
             </font>
         </Label>
 
-        <Label text="You are the first player. Choose how many opponents to wait for:" textFill="#616161" />
+        <ComboBox fx:id="numPlayersCombo" prefWidth="180.0" promptText="Select..."
+                  style="-fx-background-color: #2b2b2b; -fx-text-fill: white; -fx-border-color: rgba(244, 213, 141, 0.4); -fx-border-radius: 5; -fx-background-radius: 5; -fx-font-size: 14px; -fx-cursor: hand;"/>
 
-        <ComboBox fx:id="numPlayersCombo" prefWidth="150.0" promptText="Select..." />
+        <Button mnemonicParsing="false" onAction="#handleConfirm" prefWidth="180.0" prefHeight="40.0"
+                style="-fx-background-color: #f4d58d; -fx-text-fill: #1a1a1a; -fx-font-weight: bold; -fx-font-size: 14px; -fx-background-radius: 8; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 4);"
+                text="CREATE LOBBY"/>
+    </VBox>
 
-        <Button mnemonicParsing="false" onAction="#handleConfirm" prefWidth="120.0"
-                style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"
-                text="CREATE LOBBY" />
-    </children>
-
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-    </padding>
-</VBox>
+</StackPane>
