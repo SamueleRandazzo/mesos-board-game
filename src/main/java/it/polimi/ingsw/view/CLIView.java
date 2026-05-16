@@ -29,6 +29,25 @@ public class CLIView implements View {
     /** Map containing the most recent tribe status DTO for each player in the game, indexed by nickname. */
     private final Map<String, TribeStatusDTO> allTribes = new java.util.concurrent.ConcurrentHashMap<>();
 
+    private static final String RESET = "\u001B[0m";
+    private static final String BOLD = "\u001B[1m";
+    private static final String RED = "\u001B[31m";
+    private static final String GREEN = "\u001B[32m";
+    private static final String YELLOW = "\u001B[33m";
+    private static final String BLUE = "\u001B[34m";
+    private static final String PURPLE = "\u001B[35m";
+    private static final String CYAN = "\u001B[36m";
+    private static final String CLEAR_SCREEN = "\033[H\033[2J";
+
+    /**
+     * Clears the terminal screen.
+     * Note: This works perfectly on native terminals (Linux, macOS, Windows Terminal).
+     * It might not work perfectly inside some older IDE consoles unless ANSI support is enabled.
+     */
+    private void clearConsole() {
+        System.out.print(CLEAR_SCREEN);
+        System.out.flush();
+    }
     /**
      * Constructs a new CLIView.
      * * @param network the network manager used to communicate with the server.
@@ -264,8 +283,8 @@ public class CLIView implements View {
     }
 
     /**
-     * Stores the received tribe status into a global map and prints a formatted layout
-     * of all active players' tribes onto the console.
+     * Stores the received tribe status into a global map and prints a formatted,
+     * colorful layout of all active players' tribes onto the console.
      * Uses the local card dictionary to translate unique identifiers into readable descriptions.
      *
      * @param nickname the nickname of the player owning the tribe
@@ -280,23 +299,33 @@ public class CLIView implements View {
         // Store or update the local state for this specific player
         allTribes.put(nickname, tribe);
 
-        // Print the global status dashboard
-        System.out.println("\n" + "═".repeat(20) + " GLOBAL TRIBE STATUS " + "═".repeat(20));
+        // Clear the screen to create a static dashboard effect
+        clearConsole();
+
+        // Print the global status dashboard header
+        System.out.println(CYAN + BOLD + "\n" + "═".repeat(25) + " 🌍 GLOBAL TRIBE STATUS 🌍 " + "═".repeat(25) + RESET);
 
         for (Map.Entry<String, TribeStatusDTO> entry : allTribes.entrySet()) {
             String playerName = entry.getKey();
             TribeStatusDTO t = entry.getValue();
 
-            System.out.println("\n👉 PLAYER: " + playerName.toUpperCase());
-            System.out.printf("   [FOOD: %d] | [PRESTIGE: %d] | [STARS: %d] | [SUSTENANCE DISCOUNT: %d] | [BUILDINGS DISCOUNT: %d]%n",
+            // Player Name header
+            System.out.println("\n" + YELLOW + BOLD + "👉 PLAYER: " + playerName.toUpperCase() + RESET);
+
+            // Resources Bar with Emojis and Colors
+            System.out.printf("   " + GREEN + "🍖 %d" + RESET + "  |  " +
+                            YELLOW + "🏆 %d" + RESET + "  |  " +
+                            PURPLE + "✨ %d" + RESET + "  |  " +
+                            CYAN + "🌿 -%d" + RESET + "  |  " +
+                            RED + "🔨 -%d" + RESET + "%n",
                     t.getCurrentFood(),
                     t.getTotalPrestigePoints(),
                     t.getShamanStars(),
                     t.getTotalSustenanceDiscount(),
                     t.getTotalBuildingsFoodDiscount());
 
-            // Print character cards organized by their respective UI columns
-            System.out.println("   CHARACTERS:");
+            // Print character cards
+            System.out.println(BLUE + BOLD + "   CHARACTERS:" + RESET);
             if (t.getCharactersByColumn() != null) {
                 t.getCharactersByColumn().forEach((category, cardDTOs) -> {
                     if (cardDTOs != null && !cardDTOs.isEmpty()) {
@@ -304,7 +333,7 @@ public class CLIView implements View {
                                 .map(dto -> LocalCardDictionary.getInstance().getCardDetails(dto.getCardId()))
                                 .collect(Collectors.joining(", "));
 
-                        System.out.printf("     %-12s: %s%n", category, joinedDetails);
+                        System.out.printf("     " + CYAN + "%-12s" + RESET + ": %s%n", category, joinedDetails);
                     }
                 });
             }
@@ -314,13 +343,13 @@ public class CLIView implements View {
                 String buildingsStr = t.getBuildingIds().stream()
                         .map(dto -> LocalCardDictionary.getInstance().getCardDetails(dto.getCardId()))
                         .collect(Collectors.joining(" | "));
-                System.out.println("   BUILDINGS: " + buildingsStr);
+                System.out.println(BLUE + BOLD + "   BUILDINGS: " + RESET + buildingsStr);
             } else {
-                System.out.println("   BUILDINGS: [None]");
+                System.out.println(BLUE + BOLD + "   BUILDINGS: " + RESET + "[None]");
             }
-            System.out.println("   " + "-".repeat(54));
+            System.out.println(CYAN + "   " + "─".repeat(60) + RESET);
         }
-        System.out.println("═".repeat(61) + "\n");
+        System.out.println(CYAN + BOLD + "═".repeat(77) + "\n" + RESET);
     }
 
     /**
@@ -335,6 +364,7 @@ public class CLIView implements View {
      *              to be displayed
      */
     public void displayBoard(BoardDTO board) {
+        clearConsole();
         this.lastBoard = board;
         System.out.println("\n======================== BOARD ========================");
 
