@@ -497,7 +497,9 @@ public class Tribe {
                 currentFood,
                 totalSustenanceFoodDiscount,
                 totalBuildingDiscount,
-                stars
+                stars,
+                this.extraCardFromUpper,
+                this.extraFoodFromBonus
         );
     }
 

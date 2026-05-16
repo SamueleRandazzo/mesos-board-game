@@ -2,6 +2,7 @@ package it.polimi.ingsw.view.GUI;
 
 import it.polimi.ingsw.model.Enum.Color;
 import it.polimi.ingsw.network.DTO.*;
+import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -16,7 +17,6 @@ import javafx.scene.layout.*;
 import javafx.scene.*;
 import it.polimi.ingsw.view.LocalCardDictionary;
 import javafx.util.Duration;
-
 import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -117,6 +117,30 @@ public class GameBoardController extends SceneController {
     @FXML private HBox tribeCardsContainer;
     @FXML private Button closeTribeButton;
 
+    @FXML
+    private Label totalPrestigePointsLabel;
+
+    @FXML
+    private Label currentFoodLabel;
+
+    @FXML
+    private Label totalSustenanceDiscountLabel;
+
+    @FXML
+    private Label totalBuildingsFoodDiscountLabel;
+
+    @FXML
+    private Label shamanStarsLabel;
+
+    @FXML
+    private Label extraCardFromUpperLabel;
+
+    @FXML
+    private Label extraFoodFromBonusLabel;
+
+    @FXML
+    private VBox toastContainer;
+
     /**
      * Initializes the board scene with disabled offer tiles and  cards.
      *
@@ -134,6 +158,21 @@ public class GameBoardController extends SceneController {
         initializeTribeOverlay();
 
         initializeTribeIconClicks();
+
+        initializePlayerStats();
+    }
+
+    /**
+     * Initializes the player statistics
+     */
+    private void initializePlayerStats() {
+        totalPrestigePointsLabel.setText("0");
+        currentFoodLabel.setText("0");
+        totalSustenanceDiscountLabel.setText("0");
+        totalBuildingsFoodDiscountLabel.setText("0");
+        shamanStarsLabel.setText("0");
+        updateBooleanLabel(extraCardFromUpperLabel, false);
+        updateBooleanLabel(extraFoodFromBonusLabel, false);
     }
 
     /**
@@ -448,6 +487,13 @@ public class GameBoardController extends SceneController {
         updateTribeSlot("INVENTOR", cols.get("INVENTORS"), inventorsIcon, inventorsCount);
         updateTribeSlot("SHAMAN", cols.get("SHAMANS"), shamansIcon, shamansCount);
 
+        totalPrestigePointsLabel.setText(String.valueOf(tribe.getTotalPrestigePoints()));
+        currentFoodLabel.setText(String.valueOf(tribe.getCurrentFood()));
+        totalSustenanceDiscountLabel.setText(String.valueOf(tribe.getTotalSustenanceDiscount()));
+        totalBuildingsFoodDiscountLabel.setText(String.valueOf(tribe.getTotalBuildingsFoodDiscount()));
+        shamanStarsLabel.setText(String.valueOf(tribe.getShamanStars()));
+        updateBooleanLabel(extraCardFromUpperLabel, tribe.hasExtraCardFromUpper());
+        updateBooleanLabel(extraFoodFromBonusLabel, tribe.hasExtraFoodFromBonus());
     }
 
     /**
@@ -550,8 +596,6 @@ public class GameBoardController extends SceneController {
         this.cardSelectionEnabled = enabled;
         displayBoardCards(); // Re-render cards to apply style changes
     }
-
-
 
     /**
      * Updates the top notification label.
@@ -715,6 +759,8 @@ public class GameBoardController extends SceneController {
 
         tribeCardsContainer.getChildren().clear();
 
+        tribeCardsContainer.setAlignment(Pos.TOP_CENTER);
+
         Map<String, List<CardDTO>> cols = lastTribe.getCharactersByColumn();
         if (cols != null) {
             for (Map.Entry<String, List<CardDTO>> entry : cols.entrySet()) {
@@ -800,13 +846,14 @@ public class GameBoardController extends SceneController {
      * Creates one overlay section: a label plus an overlapped stack of card images.
      */
     private Node createTribeSection(String title, List<CardDTO> cards) {
-        VBox section = new VBox(6);
-
+        VBox section = new VBox(12);
+        section.setAlignment(Pos.TOP_CENTER);
         section.setMinWidth(CARD_WIDTH + 16);
         section.setPrefWidth(CARD_WIDTH + 16);
 
-        Label label = new Label(title);
-        label.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2b2f32;");
+        Label label = new Label(title.toUpperCase());
+        label.setTextFill(javafx.scene.paint.Color.WHITE);
+        label.setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-letter-spacing: 0.5px;");
 
         Pane stack = createOverlappedCardStack(cards);
 
@@ -818,10 +865,10 @@ public class GameBoardController extends SceneController {
      * Renders cards as an overlapped vertical stack where only a small top strip is visible.
      */
     private Pane createOverlappedCardStack(List<CardDTO> cards) {
-        final int stackOffsetPx = 22;
+        final int stackOffsetPx = 24;
 
         Pane pane = new Pane();
-        pane.setStyle("-fx-background-color: transparent; -fx-padding: 6;");
+        pane.setStyle("-fx-background-color: transparent;");
 
         if (cards == null || cards.isEmpty()) {
             pane.setPrefSize(CARD_WIDTH, CARD_HEIGHT);
@@ -848,4 +895,64 @@ public class GameBoardController extends SceneController {
         return pane;
     }
 
+    /**
+     * Updates a boolean status label with a green checkmark or a red cross.
+     */
+    private void updateBooleanLabel(Label label, boolean isActive) {
+        if (isActive) {
+            label.setText("✓");
+            label.setTextFill(javafx.scene.paint.Color.web("#4caf50")); // Verde JavaFX
+        } else {
+            label.setText("✕");
+            label.setTextFill(javafx.scene.paint.Color.web("#f44336")); // Rosso JavaFX
+        }
+    }
+
+    /**
+     * Displays a toast-style notification in the top-right corner.
+     * Stacks vertically and automatically disappears after 5 seconds.
+     *
+     * @param message The text message to display inside the toast
+     */
+    @Override
+    public void showToast(String message) {
+        HBox toast = new HBox();
+        toast.setPadding(new javafx.geometry.Insets(10, 16, 10, 16));
+        toast.setSpacing(10);
+        toast.setAlignment(Pos.CENTER_LEFT);
+
+        toast.setStyle(
+                "-fx-background-color: rgba(33, 25, 22, 0.9);" +
+                        "-fx-background-radius: 8;" +
+                        "-fx-border-color: #f4d58d;" +
+                        "-fx-border-width: 1;" +
+                        "-fx-border-radius: 8;" +
+                        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 4);"
+        );
+
+        Label label = new Label(message);
+        label.setTextFill(javafx.scene.paint.Color.WHITE);
+        label.setStyle("-fx-font-weight: bold; -fx-font-size: 12px;");
+        label.setWrapText(true);
+
+        Label icon = new Label("🔔");
+        icon.setStyle("-fx-font-size: 14px;");
+
+        toast.getChildren().addAll(icon, label);
+
+        toast.setMouseTransparent(true);
+
+        toastContainer.getChildren().addFirst(toast);
+
+        FadeTransition fadeOut = new FadeTransition(javafx.util.Duration.millis(500), toast);
+        fadeOut.setFromValue(1.0);
+        fadeOut.setToValue(0.0);
+
+        fadeOut.setOnFinished(e -> toastContainer.getChildren().remove(toast));
+
+        Timeline timeline = new Timeline(
+                new KeyFrame(javafx.util.Duration.seconds(5), event -> fadeOut.play())
+        );
+        timeline.play();
+    }
 }

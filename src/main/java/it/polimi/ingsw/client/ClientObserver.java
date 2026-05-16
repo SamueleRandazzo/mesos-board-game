@@ -102,4 +102,9 @@ public class ClientObserver implements GameObserver {
     public void onDisplayTurnOrderTile(List<TurnOrderTileDTO> turnOrderTile) throws RemoteException {
         view.displayTurnOrderTile(turnOrderTile);
     }
+
+    @Override
+    public void onShowEventMessage(String message) throws RemoteException {
+        view.showEventMessage(message);
+    }
 }

@@ -23,6 +23,7 @@ public interface GameObserver extends Remote {
     void onShowFatalError(String error) throws RemoteException;
     void onDisplayGlobalLeaderboard(GlobalLeaderboardDTO globalLeaderboard) throws RemoteException;
     void onDisplayTurnOrderTile(List<TurnOrderTileDTO> turnOrderTile) throws RemoteException;
+    void onShowEventMessage(String message) throws RemoteException;
 
     /**
      * Notifies the client about the updated status of a specific player's tribe.

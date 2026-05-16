@@ -616,4 +616,10 @@ public class CLIView implements View {
         }
         System.out.println("+" + "-".repeat(58) + "+\n");
     }
+
+    // CLI print event message as normal message
+    @Override
+    public void showEventMessage(String message) {
+        showMessage(message);
+    }
 }

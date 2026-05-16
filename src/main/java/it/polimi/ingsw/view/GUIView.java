@@ -200,4 +200,11 @@ public class GUIView implements View {
             currentController.displayTurnOrderTile(turnOrderTile);
         });
     }
+
+    @Override
+    public void showEventMessage(String message) {
+        Platform.runLater(() -> {
+            currentController.showToast(message);
+        });
+    }
 }

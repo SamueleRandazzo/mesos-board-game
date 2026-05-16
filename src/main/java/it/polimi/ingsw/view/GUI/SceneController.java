@@ -30,6 +30,7 @@ public abstract class SceneController {
     public void displayLeaderboard(LeaderboardDTO leaderboard, String globalRankMessage) {};
     public void displayTurnOrderTile(List<TurnOrderTileDTO> turnOrderTile) {};
     public void displayGlobalLeaderboard(GlobalLeaderboardDTO globalLeaderboard) {};
+    public void showToast(String msg) {}
 
     String handleNetworkError(Exception e) {
         if (e instanceof RemoteException) {

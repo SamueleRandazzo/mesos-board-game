@@ -207,5 +207,12 @@ public class SocketVirtualView implements GameObserver {
         }
     }
 
-
+    @Override
+    public void onShowEventMessage(String message) throws RemoteException {
+        try {
+            out.println("EVENT_MESSAGE " + message);
+        } catch (Exception e) {
+            System.err.println("Serialization error: " + e.getMessage());
+        }
+    }
 }

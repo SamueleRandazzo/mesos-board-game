@@ -34,6 +34,8 @@ public class TribeStatusDTO implements Serializable {
     private int totalSustenanceDiscount;
     private int totalBuildingsFoodDiscount;
     private int shamanStars;
+    private boolean extraCardFromUpper;
+    private boolean extraFoodFromBonus;
 
     /**
      * Default constructor for serialization frameworks.
@@ -59,7 +61,9 @@ public class TribeStatusDTO implements Serializable {
             int currentFood,
             int totalSustenanceDiscount,
             int totalBuildingsFoodDiscount,
-            int shamanStars) {
+            int shamanStars,
+            boolean extraCardFromUpper,
+            boolean extraFoodFromBonus) {
 
         this.charactersByColumn = charactersByColumn;
         this.buildingIds = List.copyOf(buildingIds);
@@ -68,6 +72,8 @@ public class TribeStatusDTO implements Serializable {
         this.totalSustenanceDiscount = totalSustenanceDiscount;
         this.totalBuildingsFoodDiscount = totalBuildingsFoodDiscount;
         this.shamanStars = shamanStars;
+        this.extraCardFromUpper = extraCardFromUpper;
+        this.extraFoodFromBonus = extraFoodFromBonus;
     }
 
     /**
@@ -121,5 +127,19 @@ public class TribeStatusDTO implements Serializable {
      */
     public int getShamanStars() {
         return shamanStars;
+    }
+
+    /**
+     * @return Extra card from upper row flag
+     */
+    public boolean hasExtraCardFromUpper() {
+        return extraCardFromUpper;
+    }
+
+    /**
+     * @return Extra food from turn order tile flag
+     */
+    public boolean hasExtraFoodFromBonus() {
+        return extraFoodFromBonus;
     }
 }
