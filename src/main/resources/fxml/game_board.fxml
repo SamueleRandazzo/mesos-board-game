@@ -94,6 +94,7 @@
 
                 <!-- Riga centrale: Tracciato completo -->
                 <HBox alignment="CENTER" spacing="6.0">
+                    <StackPane fx:id="firstDeckCardContainer" />
                     <StackPane fx:id="turnOrderContainer" />
                     <HBox fx:id="offerTrackContainer" alignment="CENTER" spacing="6.0" />
                 </HBox>

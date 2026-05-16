@@ -2,6 +2,8 @@ package it.polimi.ingsw.view.GUI;
 
 import it.polimi.ingsw.model.Enum.Color;
 import it.polimi.ingsw.network.DTO.*;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -13,6 +15,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.*;
 import it.polimi.ingsw.view.LocalCardDictionary;
+import javafx.util.Duration;
 
 import java.net.URL;
 import java.util.LinkedHashMap;
@@ -49,6 +52,13 @@ public class GameBoardController extends SceneController {
             5, "/images/Map/Front/Start 5 Players.png"
     );
 
+    private static final Map<Integer, String> BACK_CARD_ERA = Map.of(
+            1,"/images/Cards/Back/Back Card Age 1.png",
+            2,"/images/Cards/Back/Back Card Age 2.png",
+            3,"/images/Cards/Back/Back Card Age 3.png"
+    );
+
+
     @FXML
     private Label gameNotificationLabel;
 
@@ -69,6 +79,9 @@ public class GameBoardController extends SceneController {
 
     @FXML
     private StackPane turnOrderContainer;
+
+    @FXML
+    private StackPane firstDeckCardContainer;
 
     @FXML private ImageView artistsIcon;
     @FXML private Label artistsCount;
@@ -206,6 +219,16 @@ public class GameBoardController extends SceneController {
             if(!cardSelectionEnabled) {
                 setCardSelectionEnabled(true);
             }
+
+            Timeline timeline = new Timeline(new KeyFrame(
+                    Duration.seconds(3),
+                    ae -> {
+                        setNotification("", true);
+                    }
+            ));
+
+            timeline.setCycleCount(1);
+            timeline.play();
         });
     }
 
@@ -313,6 +336,13 @@ public class GameBoardController extends SceneController {
 
         renderCardRow(lowerCardsContainer, lastBoard.getLowerTribeRow(), "L");
         renderCardRow(lowerCardsContainer, lastBoard.getLowerBuildingRow(), "G");
+
+        String imagePath = BACK_CARD_ERA.get(lastBoard.getFirstCardEra());
+        if (imagePath == null) {
+            return;
+        }
+        StackPane startTile = createStaticStartMapTile(imagePath);
+        firstDeckCardContainer.getChildren().add(startTile);
     }
 
     /**
@@ -502,15 +532,13 @@ public class GameBoardController extends SceneController {
             return;
         }
 
-        if(error) {
-            // Errors go to the red bold label
-            gameLogLabel.setText("Error: " + msg);
+        if (error) {
+            String errorMsg = msg.isEmpty() ? msg : "Error: " + msg;
+            gameLogLabel.setText(errorMsg);
         } else {
 
             gameNotificationLabel.setText(msg);
-            gameNotificationLabel.setTextFill(error
-                    ? javafx.scene.paint.Color.web("#ffb3a7")
-                    : javafx.scene.paint.Color.WHITE);
+            gameNotificationLabel.setTextFill(javafx.scene.paint.Color.WHITE);
 
         }
     }

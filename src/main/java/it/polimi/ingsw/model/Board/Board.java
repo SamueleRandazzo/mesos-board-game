@@ -331,8 +331,9 @@ public class Board {
         List<CardDTO> lowerTribe = getIdsFromTribeList(this.lowerTribeCards);
         List<CardDTO> upperBuildings = getIdsFromBuildingList(this.upperBuildingCards);
         List<CardDTO> lowerBuildings = getIdsFromBuildingList(this.lowerBuildingCards);
+        int firstCardEra = tribeDeck.isEmpty() ? 0 : tribeDeck.getFirst().getEra();
 
-        return new BoardDTO(upperTribe, lowerTribe, upperBuildings, lowerBuildings);
+        return new BoardDTO(upperTribe, lowerTribe, upperBuildings, lowerBuildings, firstCardEra);
     }
 
     /**

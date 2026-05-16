@@ -20,6 +20,7 @@ public class BoardDTO implements Serializable {
     private List<CardDTO> lowerTribeRow;
     private List<CardDTO> upperBuildingRow;
     private List<CardDTO> lowerBuildingRow;
+    private int firstCardEra;
 
     /**
      * Default constructor for serialization frameworks.
@@ -38,11 +39,13 @@ public class BoardDTO implements Serializable {
     public BoardDTO(List<CardDTO> upperTribeRow,
                     List<CardDTO> lowerTribeRow,
                     List<CardDTO> upperBuildingRow,
-                    List<CardDTO> lowerBuildingRow) {
+                    List<CardDTO> lowerBuildingRow,
+                    int firstCardEra) {
         this.upperTribeRow = List.copyOf(upperTribeRow);
         this.lowerTribeRow = List.copyOf(lowerTribeRow);
         this.upperBuildingRow = List.copyOf(upperBuildingRow);
         this.lowerBuildingRow = List.copyOf(lowerBuildingRow);
+        this.firstCardEra = firstCardEra;
     }
 
     /**
@@ -71,5 +74,9 @@ public class BoardDTO implements Serializable {
      */
     public List<CardDTO> getLowerBuildingRow() {
         return Collections.unmodifiableList(lowerBuildingRow);
+    }
+
+    public int getFirstCardEra() {
+        return firstCardEra;
     }
 }
