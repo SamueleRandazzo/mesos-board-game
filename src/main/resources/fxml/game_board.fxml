@@ -129,6 +129,10 @@
                         <ImageView fx:id="shamansIcon" fitWidth="40" fitHeight="40" preserveRatio="true" />
                         <Label fx:id="shamansCount" text="0" />
                     </VBox>
+                    <VBox alignment="CENTER" spacing="4.0">
+                        <ImageView fx:id="buildingsIcon" fitWidth="40" fitHeight="40" preserveRatio="true" />
+                        <Label fx:id="buildingsCount" text="0" />
+                    </VBox>
                 </HBox>
             </VBox>
         </center>
@@ -152,10 +156,7 @@
                 </top>
                 <center>
                     <ScrollPane fitToWidth="true">
-                        <content>
-                            <FlowPane fx:id="tribeCardsContainer" hgap="10" vgap="10" prefWrapLength="860"
-                                      style="-fx-padding: 12;"/>
-                        </content>
+                        <HBox fx:id="tribeCardsContainer" spacing="18.0" style="-fx-padding: 12;" />
                     </ScrollPane>
                 </center>
             </BorderPane>
