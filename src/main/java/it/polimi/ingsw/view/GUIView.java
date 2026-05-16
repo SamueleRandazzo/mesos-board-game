@@ -19,6 +19,7 @@ public class GUIView implements View {
     private Stage stage;
     private SceneController currentController;
     private int totalPlayers;
+    private String myNickname;
 
     public GUIView(NetworkManager network, Stage stage) {
         this.network = network;
@@ -156,7 +157,7 @@ public class GUIView implements View {
     public void showTribe(String nickname, TribeStatusDTO tribe) {
         Platform.runLater(() -> {
             if (currentController != null) {
-                currentController.showTribe(tribe);
+                currentController.showTribe(nickname, tribe);
             }
         });
     }
@@ -206,5 +207,12 @@ public class GUIView implements View {
         Platform.runLater(() -> {
             currentController.showToast(message);
         });
+    }
+
+
+    public String getMyNickname() { return myNickname; }
+
+    public void setMyNickname(String myNickname) {
+        this.myNickname = myNickname;
     }
 }

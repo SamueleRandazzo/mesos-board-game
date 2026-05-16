@@ -26,7 +26,7 @@ public abstract class SceneController {
     public void setTotalPlayers(int totalPlayers) {}
     public void setPlayersInfo(Map<String, Color> playersInfo) {}
     public void displayBoard(BoardDTO board) {};
-    public void showTribe(TribeStatusDTO tribe) {};
+    public void showTribe(String playerNickname, TribeStatusDTO tribe) {};
     public void displayLeaderboard(LeaderboardDTO leaderboard, String globalRankMessage) {};
     public void displayTurnOrderTile(List<TurnOrderTileDTO> turnOrderTile) {};
     public void displayGlobalLeaderboard(GlobalLeaderboardDTO globalLeaderboard) {};

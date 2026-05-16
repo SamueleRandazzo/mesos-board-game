@@ -10,7 +10,6 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -34,7 +33,8 @@ public class GameBoardController extends SceneController {
     private BoardDTO lastBoard; //Last board because displayBoard and askCardChoose comes in different moments
     private boolean cardSelectionEnabled;
     private List<TurnOrderTileDTO> lastTurnOrderTile = null;
-    private TribeStatusDTO lastTribe;
+    private TribeStatusDTO myTribe;
+    private Map<String, TribeStatusDTO> otherPlayerTribes = new LinkedHashMap<>();
 
     private final Map<String, Color> playersInfo = new LinkedHashMap<>();
 
@@ -117,30 +117,18 @@ public class GameBoardController extends SceneController {
     @FXML private HBox tribeCardsContainer;
     @FXML private Button closeTribeButton;
 
-    @FXML
-    private Label totalPrestigePointsLabel;
+    @FXML private Label totalPrestigePointsLabel;
 
-    @FXML
-    private Label currentFoodLabel;
+    @FXML private Label currentFoodLabel;
+    @FXML private Label totalSustenanceDiscountLabel;
+    @FXML private Label totalBuildingsFoodDiscountLabel;
+    @FXML private Label shamanStarsLabel;
+    @FXML private Label extraCardFromUpperLabel;
+    @FXML private Label extraFoodFromBonusLabel;
 
-    @FXML
-    private Label totalSustenanceDiscountLabel;
+    @FXML private VBox toastContainer;
 
-    @FXML
-    private Label totalBuildingsFoodDiscountLabel;
-
-    @FXML
-    private Label shamanStarsLabel;
-
-    @FXML
-    private Label extraCardFromUpperLabel;
-
-    @FXML
-    private Label extraFoodFromBonusLabel;
-
-    @FXML
-    private VBox toastContainer;
-
+    @FXML private Label tribeOverlayTitle;
     /**
      * Initializes the board scene with disabled offer tiles and  cards.
      *
@@ -206,7 +194,7 @@ public class GameBoardController extends SceneController {
      */
     private void bindTribeIconClick(ImageView icon) {
         if (icon == null) return;
-        icon.setOnMouseClicked(e -> openTribeOverlay());
+        icon.setOnMouseClicked(e -> openTribeOverlay("YOUR TRIBE", myTribe));
         icon.setPickOnBounds(true);
         icon.setStyle("-fx-cursor: hand;");
     }
@@ -300,6 +288,8 @@ public class GameBoardController extends SceneController {
                 playerImageView.setPreserveRatio(true);
                 playerImageView.setSmooth(true);
 
+                playerImageView.setMouseTransparent(true);
+
                 try {
                     Color playerColor = playersInfo.get(nickname);
                     String imagePath = PLAYER_TOTEM.get(playerColor);
@@ -311,20 +301,35 @@ public class GameBoardController extends SceneController {
 
                 Label playerLabel = new Label((i + 1) + ". " + nickname);
                 playerLabel.setStyle("""
-                    -fx-font-size: 14px;
-                    -fx-font-weight: bold;
-                    -fx-text-fill: WHITE;
-                    """);
+                -fx-font-size: 14px;
+                -fx-font-weight: bold;
+                -fx-text-fill: WHITE;
+                """);
+
+                playerLabel.setMouseTransparent(true);
 
                 HBox playerRow = new HBox(10);
                 playerRow.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
                 playerRow.setMaxWidth(Double.MAX_VALUE);
 
-                playerRow.setStyle("""
-                    -fx-background-color: rgba(255,255,255,0.15);
-                    -fx-background-radius: 5;
-                    -fx-padding: 6 10 6 10;
-                    """);
+                playerRow.setPickOnBounds(true);
+
+                String baseStyle = """
+                -fx-background-color: rgba(255,255,255,0.15);
+                -fx-background-radius: 5;
+                -fx-padding: 6 10 6 10;
+                -fx-cursor: hand;
+                """;
+                playerRow.setStyle(baseStyle);
+
+                playerRow.setOnMouseEntered(e -> playerRow.setStyle(baseStyle + "-fx-background-color: rgba(255,255,255,0.3);"));
+                playerRow.setOnMouseExited(e -> playerRow.setStyle(baseStyle));
+
+                playerRow.setOnMouseClicked(event -> {
+                    if (event.getButton() == javafx.scene.input.MouseButton.PRIMARY) {
+                        handlePlayerClick(nickname);
+                    }
+                });
 
                 playerRow.getChildren().addAll(playerImageView, playerLabel);
                 playersContainer.getChildren().add(playerRow);
@@ -332,7 +337,19 @@ public class GameBoardController extends SceneController {
         });
     }
 
-    /*
+    private void handlePlayerClick(String clickedNickname) {
+        if (clickedNickname.equals(view.getMyNickname())) {
+            return;
+        }
+
+        TribeStatusDTO tribe = otherPlayerTribes.get(clickedNickname);
+
+        if (tribe != null) {
+            openTribeOverlay(clickedNickname + "'S TRIBE", tribe);
+        }
+    }
+
+    /**
     Method that creates the offerTrack, is it called just one time at the start of the game beacuse the offerTrack will never change
      */
     @Override
@@ -473,9 +490,13 @@ public class GameBoardController extends SceneController {
      * of the corresponding category list contained in the received DTO
      */
     @Override
-    public void showTribe(TribeStatusDTO tribe) {
+    public void showTribe(String playerNickname, TribeStatusDTO tribe) {
+        if (!playerNickname.equals(view.getMyNickname())) {
+            otherPlayerTribes.put(playerNickname, tribe);
+            return;
+        }
 
-        this.lastTribe = tribe;
+        this.myTribe = tribe;
 
         Map<String, List<CardDTO>> cols = tribe.getCharactersByColumn();
 
@@ -494,6 +515,8 @@ public class GameBoardController extends SceneController {
         shamanStarsLabel.setText(String.valueOf(tribe.getShamanStars()));
         updateBooleanLabel(extraCardFromUpperLabel, tribe.hasExtraCardFromUpper());
         updateBooleanLabel(extraFoodFromBonusLabel, tribe.hasExtraFoodFromBonus());
+
+        initializeTribeIconClicks();
     }
 
     /**
@@ -754,14 +777,18 @@ public class GameBoardController extends SceneController {
     /**
      * Opens the in-scene tribe overlay and renders all owned cards.
      */
-    private void openTribeOverlay() {
-        if (tribeOverlay == null || tribeCardsContainer == null || lastTribe == null) return;
+    private void openTribeOverlay(String titleText, TribeStatusDTO tribe) {
+        if (tribeOverlay == null || tribeCardsContainer == null || tribe == null) return;
+
+        if (tribeOverlayTitle != null) {
+            tribeOverlayTitle.setText("🎪 " + titleText.toUpperCase());
+        }
 
         tribeCardsContainer.getChildren().clear();
 
         tribeCardsContainer.setAlignment(Pos.TOP_CENTER);
 
-        Map<String, List<CardDTO>> cols = lastTribe.getCharactersByColumn();
+        Map<String, List<CardDTO>> cols = tribe.getCharactersByColumn();
         if (cols != null) {
             for (Map.Entry<String, List<CardDTO>> entry : cols.entrySet()) {
                 String category = entry.getKey();
@@ -771,7 +798,7 @@ public class GameBoardController extends SceneController {
         }
 
         // Buildings section
-        tribeCardsContainer.getChildren().add(createTribeSection("BUILDINGS", lastTribe.getBuildingIds()));
+        tribeCardsContainer.getChildren().add(createTribeSection("BUILDINGS", tribe.getBuildingIds()));
 
         tribeOverlay.setManaged(true);
         tribeOverlay.setVisible(true);

@@ -97,6 +97,7 @@ public class LoginController extends SceneController {
 
         try {
             network.login(selectedColor, nickname);
+            view.setMyNickname(nickname);
         } catch (Exception e) {
             showErrorMessage(handleNetworkError(e));
         }
