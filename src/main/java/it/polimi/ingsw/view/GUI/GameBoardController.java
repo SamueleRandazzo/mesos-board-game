@@ -21,6 +21,7 @@ import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class GameBoardController extends SceneController {
 
@@ -56,6 +57,14 @@ public class GameBoardController extends SceneController {
             1,"/images/Cards/Back/Back Card Age 1.png",
             2,"/images/Cards/Back/Back Card Age 2.png",
             3,"/images/Cards/Back/Back Card Age 3.png"
+    );
+
+    private static final Map<Color, String> PLAYER_TOTEM = Map.of(
+            Color.BLACK,"/images/Characters/Player black.png",
+            Color.BLUE,"/images/Characters/Player blue.png",
+            Color.RED,"/images/Characters/Player red.png",
+            Color.WHITE,"/images/Characters/Player white.png",
+            Color.YELLOW,"/images/Characters/Player yellow.png"
     );
 
 
@@ -236,7 +245,6 @@ public class GameBoardController extends SceneController {
     public void setPlayersInfo(Map<String, Color> playersInfo) {
         this.playersInfo.clear();
         this.playersInfo.putAll(playersInfo);
-
     }
 
     @Override
@@ -245,22 +253,45 @@ public class GameBoardController extends SceneController {
             playersContainer.getChildren().clear();
 
             for (int i = 0; i < order.size(); i++) {
-                Label playerLabel = new Label((i + 1) + ". " + order.get(i));
-                playerLabel.setMaxWidth(Double.MAX_VALUE);
+                String nickname = order.get(i);
+
+                ImageView playerImageView = new ImageView();
+                playerImageView.setFitWidth(30);
+                playerImageView.setFitHeight(30);
+                playerImageView.setPreserveRatio(true);
+                playerImageView.setSmooth(true);
+
+                try {
+                    Color playerColor = playersInfo.get(nickname);
+                    String imagePath = PLAYER_TOTEM.get(playerColor);
+                    Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
+                    playerImageView.setImage(image);
+                } catch (Exception e) {
+                    System.err.println("Image loading error for player: " + nickname);
+                }
+
+                Label playerLabel = new Label((i + 1) + ". " + nickname);
                 playerLabel.setStyle("""
-                        -fx-font-size: 14px;
-                        -fx-font-weight: bold;
-                        -fx-text-fill: WHITE;
-                        -fx-background-color: rgba(255,255,255,0.45);
-                        -fx-background-radius: 5;
-                        -fx-padding: 8 10 8 10;
-                        """);
-                playersContainer.getChildren().add(playerLabel);
+                    -fx-font-size: 14px;
+                    -fx-font-weight: bold;
+                    -fx-text-fill: WHITE;
+                    """);
+
+                HBox playerRow = new HBox(10);
+                playerRow.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+                playerRow.setMaxWidth(Double.MAX_VALUE);
+
+                playerRow.setStyle("""
+                    -fx-background-color: rgba(255,255,255,0.15);
+                    -fx-background-radius: 5;
+                    -fx-padding: 6 10 6 10;
+                    """);
+
+                playerRow.getChildren().addAll(playerImageView, playerLabel);
+                playersContainer.getChildren().add(playerRow);
             }
         });
     }
-
-
 
     /*
     Method that creates the offerTrack, is it called just one time at the start of the game beacuse the offerTrack will never change

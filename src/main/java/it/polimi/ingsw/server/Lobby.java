@@ -76,6 +76,7 @@ public class Lobby {
         colors.add(color);
         remoteObservers.add(observer);
         playerObservers.put(nickname, observer);
+        playersInfo.put(nickname, color);
 
         if (!healthCheckStarted)
             startNetworkHealthCheck();
@@ -92,6 +93,7 @@ public class Lobby {
                         colors.remove(color);
                         remoteObservers.remove(observer);
                         playerObservers.remove(nickname);
+                        playersInfo.remove(nickname);
                     }
                 }
             }).start();
@@ -161,6 +163,7 @@ public class Lobby {
             currentGame.addListener(adapter);
 
             currentGame.notifyDisplayTurnOrderTile();
+            currentGame.notifyShowPlayerOrder();
             currentGame.notifyOnShowBoard();
             currentGame.notifyOnShowOfferTrack();
             currentGame.notifyTotemPlacementTurnChanged();
@@ -196,6 +199,7 @@ public class Lobby {
                 remoteObservers.remove(index);
                 playerObservers.remove(nickname);
                 nicknames.remove(nickname);
+                playersInfo.remove(nickname);
             }
         }
 
@@ -221,6 +225,7 @@ public class Lobby {
         this.colors.clear();
         this.remoteObservers.clear();
         this.playerObservers.clear();
+        this.playersInfo.clear();
         this.targetPlayers = -1;
     }
 

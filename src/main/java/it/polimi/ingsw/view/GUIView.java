@@ -11,7 +11,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,9 +18,7 @@ public class GUIView implements View {
     private final NetworkManager network;
     private Stage stage;
     private SceneController currentController;
-    private List<OfferTileDTO> lastTiles;
     private int totalPlayers;
-    private final Map<String, Color> playersInfo = new LinkedHashMap<>();
 
     public GUIView(NetworkManager network, Stage stage) {
         this.network = network;
@@ -59,17 +56,6 @@ public class GUIView implements View {
         }
     }
 
-    public void showPlayersInfo(Map<String, Color> playersInfo) {
-        this.playersInfo.clear();
-        this.playersInfo.putAll(playersInfo);
-
-        Platform.runLater(() -> {
-            if (currentController != null) {
-                currentController.setPlayersInfo(playersInfo);
-            }
-        });
-    }
-
     @Override
     public void showLogin() {
         loadScene("login.fxml");
@@ -105,6 +91,13 @@ public class GUIView implements View {
     }
 
     @Override
+    public void showPlayersInfo(Map<String, Color> playersInfo) {
+        Platform.runLater(() -> {
+            currentController.setPlayersInfo(playersInfo);
+        });
+    }
+
+    @Override
     public void askMaxPlayers() {
         loadScene("set_players.fxml");
     }
@@ -118,7 +111,6 @@ public class GUIView implements View {
 
     @Override
     public void displayOfferTrack(List<OfferTileDTO> tiles) {
-        this.lastTiles = tiles;
         Platform.runLater(() -> {
             currentController.displayOfferTrack(tiles, totalPlayers);
         });
