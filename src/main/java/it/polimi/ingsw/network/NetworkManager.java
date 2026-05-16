@@ -22,6 +22,7 @@ public abstract class NetworkManager {
     public abstract void setTotalPlayers(int n) throws Exception;
     public abstract void tileSelection(int tileIndex) throws Exception;
     public abstract void seeGlobalLeaderboard(int targetPlayers) throws Exception;
+    public abstract void seeOtherPlayerTribe(String nickname) throws Exception;
 
     public void setController(RemoteController controller) {
 

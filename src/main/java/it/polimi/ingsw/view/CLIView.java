@@ -10,6 +10,8 @@ import java.io.InputStreamReader;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -27,6 +29,18 @@ public class CLIView implements View {
     private final NetworkManager network;
     private BoardDTO lastBoard;
     private final Map<String, TribeStatusDTO> allTribes = new java.util.concurrent.ConcurrentHashMap<>();
+
+    /**
+     * Thread-safe blocking queue to synchronize the background reader thread
+     * with standard blocking requests like askCardChoose or askTotemPlacement.
+     */
+    private final BlockingQueue<String> inputQueue = new LinkedBlockingQueue<>();
+
+    /**
+     * Flag used to track whether the interface is actively prompting the user for a game decision.
+     * When false, inputs are filtered as background actions (like commands).
+     */
+    private volatile boolean isGamePromptActive = false;
 
     /** * Local map used to translate dynamic user-friendly letters ('A', 'B', 'C')
      * into server-expected regex coordinates ('T0', 'L1', 'B0', 'G1').
@@ -50,6 +64,106 @@ public class CLIView implements View {
     private volatile List<OfferTileDTO> lastOfferTrack = null;
 
     private String myNickname = "MY_NICKNAME_HERE";
+
+    /**
+     * Instantiates the CLI View and immediately initializes a daemon thread
+     * to constantly capture terminal keyboard inputs asynchronously.
+     */
+    public CLIView(NetworkManager network) {
+        this.network = network;
+        this.reader = new BufferedReader(new InputStreamReader(System.in));
+
+        // Start the background listening thread immediately
+        Thread inputListener = new Thread(this::asynchronousInputLoop);
+        inputListener.setDaemon(true);
+        inputListener.start();
+    }
+
+    /**
+     * Infinite loop executed in background. Safely intercept every single string
+     * written by the user and routes it through the central parser.
+     */
+    private void asynchronousInputLoop() {
+        try {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty()) continue;
+
+                processGlobalInput(line);
+            }
+        } catch (IOException e) {
+            // Background stream reader terminated
+        }
+    }
+
+    /**
+     * Centralized message hub. Discriminates whether the typed text is a universal command
+     * or a standard game action intended to answer a running prompt.
+     */
+    private void processGlobalInput(String input) {
+        if (input.startsWith("/")) {
+            handleSystemCommand(input);
+            return;
+        }
+
+        if (isGamePromptActive) {
+            inputQueue.offer(input);
+        } else {
+            System.out.println(YELLOW + "System idle or waiting for your turn. Type /help to see commands." + RESET);
+        }
+    }
+
+    /**
+     * Parses and processes custom terminal text utility commands starting with a slash '/'.
+     */
+    private void handleSystemCommand(String fullCommand) {
+        String[] parts = fullCommand.split(" ", 2);
+        String command = parts[0].toLowerCase();
+
+        switch (command) {
+            case "/help":
+                System.out.println(CYAN + "\n--- AVAILABLE SYSTEM COMMANDS ---" + RESET);
+                System.out.println(" /help              - Displays this list of utilities.");
+                System.out.println(" /view <nickname>   - Show <nickname> tribe\n");
+                break;
+
+            case "/view":
+                if (parts.length < 2 || parts[1].trim().isEmpty()) {
+                    System.out.println(RED + "Usage: /view <nickname>" + RESET);
+                    break;
+                }
+                String targetPlayer = parts[1].trim();
+                System.out.println(YELLOW + "Requesting tribe data for '" + targetPlayer + "'..." + RESET);
+                try {
+                    network.seeOtherPlayerTribe(targetPlayer);
+                } catch (Exception ex) {
+                    showError(handleNetworkError(ex));
+                }
+                break;
+
+            default:
+                System.out.println(RED + "Unknown command. Use /help for assistance." + RESET);
+                break;
+        }
+    }
+
+    /**
+     * Overrides the synchronous reading logic. Instead of blocking the whole application thread
+     * waiting for an I/O hook, it safely awaits a token pushed into the queue by the async listener.
+     */
+    private String readLine() {
+        try {
+            return inputQueue.take();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return "";
+        }
+    }
+
+    private void clearInputBuffer() {
+        inputQueue.clear();
+    }
 
     /**
      * Clears the terminal screen reliably across different operating systems.
@@ -216,9 +330,11 @@ public class CLIView implements View {
         return lines;
     }
 
+    /*
     /**
      * Builds the right column of the CLI containing Opponents' Tribes.
-     */
+     *
+    /*
     private List<String> buildRightColumn() {
         List<String> lines = new java.util.ArrayList<>();
         lines.add(YELLOW + BOLD + "=".repeat(15) + " OPPONENTS " + "=".repeat(15) + RESET);
@@ -237,7 +353,7 @@ public class CLIView implements View {
         }
 
         return lines;
-    }
+    }*/
 
     /**
      * Formats a single tribe status into a list of displayable strings.
@@ -274,8 +390,8 @@ public class CLIView implements View {
         // --- BUILDINGS ---
         lines.add(BLUE + "   BUILDINGS:" + RESET);
         if (t.getBuildingIds() != null && !t.getBuildingIds().isEmpty()) {
-            for (CardDTO c : t.getBuildingIds()) { // <-- Corretto: itera su CardDTO
-                String details = LocalCardDictionary.getInstance().getCardDetails(c.getCardId()); // <-- Corretto: estrae l'id
+            for (CardDTO c : t.getBuildingIds()) {
+                String details = LocalCardDictionary.getInstance().getCardDetails(c.getCardId());
                 lines.add("     - " + colorizeCard(details, true));
             }
         } else {
@@ -293,16 +409,18 @@ public class CLIView implements View {
     private synchronized void renderDashboard() {
         clearConsole();
         List<String> left = buildLeftColumn();
-        List<String> right = buildRightColumn();
+        //List<String> right = buildRightColumn();
 
-        int maxLines = Math.max(left.size(), right.size());
+        //int maxLines = Math.max(left.size(), right.size());
+        int maxLines = left.size();
 
         for (int i = 0; i < maxLines; i++) {
             String lLine = (i < left.size()) ? left.get(i) : "";
             String paddedLeft = padRightAnsi(lLine, LEFT_COLUMN_WIDTH);
-            String rLine = (i < right.size()) ? right.get(i) : "";
+            // rLine = (i < right.size()) ? right.get(i) : "";
 
-            System.out.println(paddedLeft + YELLOW + " | " + RESET + rLine);
+            // System.out.println(paddedLeft + YELLOW + " | " + RESET + rLine);
+            System.out.println(paddedLeft + YELLOW + " | " + RESET);
         }
         System.out.println("\n");
 
@@ -313,52 +431,21 @@ public class CLIView implements View {
         }
     }
 
-    public CLIView(NetworkManager network) {
-        this.network = network;
-        this.reader = new BufferedReader(new InputStreamReader(System.in));
-    }
-
-    private void clearInputBuffer() {
-        try {
-            while (reader.ready()) {
-                readLine();
-            }
-        } catch (IOException e) {
-            // Silence
-        }
-    }
-
-    private String readLine() {
-        try {
-            return reader.readLine();
-        } catch (IOException e) {
-            return "";
-        }
-    }
-
     /**
      * Safely translates the user's flexible input into a clean, single-space separated
      * string of coordinates for the server backend (e.g., converts "A" into "T0").
-     * * @param input the raw string inputted by the user
-     * @return the perfectly formatted payload string ready for the server
      */
     private String translateInputToServerCode(String input) {
-        // If the user inputs legacy coordinates with numbers (e.g., "T0" or "T0, G1")
         if (input.matches(".*\\d.*")) {
             return input.replaceAll("[,;]", " ").replaceAll("\\s+", " ").trim();
         }
 
         StringBuilder translated = new StringBuilder();
 
-        // Iterates through every character to extract the letters flawlessly
         for (char c : input.toCharArray()) {
             if (Character.isLetter(c)) {
                 String letter = String.valueOf(c);
-                if (letterToCodeMap.containsKey(letter)) {
-                    translated.append(letterToCodeMap.get(letter)).append(" ");
-                } else {
-                    translated.append(letter).append(" "); // Fallback if letter not found
-                }
+                translated.append(letterToCodeMap.getOrDefault(letter, letter)).append(" ");
             }
         }
 
@@ -366,22 +453,21 @@ public class CLIView implements View {
     }
 
     /**
-     * Prompts the user to choose a card. Forwards the choice immediately to the server
-     * as soon as ENTER is pressed. If multiple cards must be picked during a turn,
-     * the server will process the first pick, update the board, and prompt this method again.
+     * Prompts the user to choose a card. Forwards the choice immediately to the server.
      */
     @Override
     public void askCardChoose() {
         clearInputBuffer();
+        isGamePromptActive = true;
 
         System.out.print("Enter your choice (e.g. A) or manual code (e.g. T0): ");
         String input = readLine().trim().toUpperCase();
 
-        // Translates the chosen letter into the server format immediately
+        isGamePromptActive = false;
+
         String serverCode = translateInputToServerCode(input);
 
         try {
-            // Forwards the immediate selection straight to the server Model
             network.cardSelection(serverCode);
         } catch (Exception e) {
             showError(handleNetworkError(e));
@@ -394,6 +480,8 @@ public class CLIView implements View {
 
     @Override
     public void showLogin() {
+        isGamePromptActive = true;
+
         System.out.println("=== WELCOME TO MESOS ===");
         System.out.print("Enter your nickname: ");
         String nickname = readLine();
@@ -409,6 +497,8 @@ public class CLIView implements View {
             }
         }
         this.myNickname = nickname;
+
+        isGamePromptActive = false;
 
         try {
             System.out.println("Login request sent. Waiting for server confirmation...");
@@ -436,7 +526,6 @@ public class CLIView implements View {
     @Override
     public void showError(String error) {
         this.lastErrorMessage = error;
-        // Prints it immediately in case a screen refresh doesn't immediately follow
         System.out.println(RED + BOLD + "[ERROR]: " + error + RESET);
         System.out.flush();
     }
@@ -452,15 +541,19 @@ public class CLIView implements View {
 
     @Override
     public void askMaxPlayers() {
+        isGamePromptActive = true;
         System.out.print("You are the host! How many players do you want (2-5)? ");
         try {
             String input = readLine();
             int n = Integer.parseInt(input);
+            isGamePromptActive = false;
             network.setTotalPlayers(n);
         } catch (NumberFormatException e) {
+            isGamePromptActive = false;
             showError("Insert a valid number!");
             askMaxPlayers();
         } catch (Exception e) {
+            isGamePromptActive = false;
             showError(handleNetworkError(e));
             askMaxPlayers();
         }
@@ -469,14 +562,19 @@ public class CLIView implements View {
     @Override
     public void askTotemPlacement() {
         clearInputBuffer();
+        isGamePromptActive = true;
+
         System.out.print("Choose the offer tile: ");
         try {
             int tileIndex = Integer.parseInt(readLine());
+            isGamePromptActive = false;
             network.tileSelection(tileIndex);
         } catch (NumberFormatException e) {
+            isGamePromptActive = false;
             showError("Insert a valid number!");
             askTotemPlacement();
         } catch (Exception e) {
+            isGamePromptActive = false;
             showError(handleNetworkError(e));
             askTotemPlacement();
         }
@@ -584,16 +682,19 @@ public class CLIView implements View {
     }
 
     private void askGlobalLeaderboard(int targetPlayers) {
+        isGamePromptActive = true;
         try {
             boolean ok = false;
             while (!ok) {
                 String choice = readLine().trim().toLowerCase();
                 if (choice.equalsIgnoreCase("GLOBAL_LEADERBOARD")) {
+                    isGamePromptActive = false;
                     network.seeGlobalLeaderboard(targetPlayers);
                     ok = true;
                 }
             }
         } catch (Exception e) {
+            isGamePromptActive = false;
             askGlobalLeaderboard(targetPlayers);
         }
     }
@@ -617,7 +718,6 @@ public class CLIView implements View {
         System.out.println("+" + "-".repeat(58) + "+\n");
     }
 
-    // CLI print event message as normal message
     @Override
     public void showEventMessage(String message) {
         showMessage(message);

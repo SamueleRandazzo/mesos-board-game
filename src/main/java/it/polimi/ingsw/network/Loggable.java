@@ -11,4 +11,5 @@ public interface Loggable extends Remote {
     void setTargetPlayers(int num) throws RemoteException;
     void ping() throws RemoteException;
     void getGlobalLeaderboard(int targetPlayers, GameObserver observer) throws RemoteException;
+    void seeOtherPlayerTribe(String nickname, GameObserver observer) throws RemoteException;
 }

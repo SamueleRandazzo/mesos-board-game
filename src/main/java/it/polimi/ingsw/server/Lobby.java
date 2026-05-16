@@ -259,4 +259,12 @@ public class Lobby {
             });
         }
     }
+
+    public TribeStatusDTO getTribeStatusByNickname(String nickname) {
+        return currentGame.getPlayers().stream()
+                .filter(p -> p.getNickname().equals(nickname))
+                .findFirst()
+                .map(p -> p.getTribe().toDTO())
+                .orElse(null);
+    }
 }

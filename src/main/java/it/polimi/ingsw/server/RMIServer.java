@@ -4,6 +4,7 @@ import it.polimi.ingsw.database.MatchDAO;
 import it.polimi.ingsw.model.Enum.Color;
 import it.polimi.ingsw.network.DTO.GlobalLeaderboardDTO;
 import it.polimi.ingsw.network.DTO.GlobalPlayerRankDTO;
+import it.polimi.ingsw.network.DTO.TribeStatusDTO;
 import it.polimi.ingsw.network.GameObserver;
 import it.polimi.ingsw.network.Loggable;
 import java.rmi.RemoteException;
@@ -44,9 +45,29 @@ public class RMIServer extends UnicastRemoteObject implements Loggable {
     public void getGlobalLeaderboard(int targetPlayers, GameObserver observer) throws RemoteException {
         try {
             List<GlobalPlayerRankDTO> ranks = MatchDAO.getLeaderboard(targetPlayers);
-            GlobalLeaderboardDTO leaderbaord = new GlobalLeaderboardDTO(ranks);
+            GlobalLeaderboardDTO leaderboard = new GlobalLeaderboardDTO(ranks);
 
-            observer.onDisplayGlobalLeaderboard(leaderbaord);
+            observer.onDisplayGlobalLeaderboard(leaderboard);
+        } catch (Exception e) {
+            throw new RemoteException(e.getMessage());
+        }
+    }
+
+    /**
+     * Fetches a specific player's tribe status from the active match/lobby
+     * and asynchronously notifies ONLY the requesting client via observer.
+     */
+    @Override
+    public void seeOtherPlayerTribe(String nickname, GameObserver observer) throws RemoteException {
+        try {
+            TribeStatusDTO tribe = lobby.getTribeStatusByNickname(nickname);
+
+            if (tribe == null) {
+                throw new Exception("Player not found.");
+            }
+
+            observer.onShowTribe(nickname, tribe);
+
         } catch (Exception e) {
             throw new RemoteException(e.getMessage());
         }
