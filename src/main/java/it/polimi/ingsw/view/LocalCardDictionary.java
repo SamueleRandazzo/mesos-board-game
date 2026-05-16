@@ -21,19 +21,38 @@ public class LocalCardDictionary {
 
     private static final Map<String, String> DESCRIPTION_TEMPLATE = new LinkedHashMap<>();
     static {
-        DESCRIPTION_TEMPLATE.put("prestigePoints", " (VP: %s)");
+        DESCRIPTION_TEMPLATE.put("prestigePoints", " (PP: %s)");
         DESCRIPTION_TEMPLATE.put("foodCost", " [Cost: %s Food]");
-        DESCRIPTION_TEMPLATE.put("effectType", " [Effect: %s]");
+        DESCRIPTION_TEMPLATE.put("effectType", " [%s]");
         DESCRIPTION_TEMPLATE.put("buildingDiscount", " [Building Discount: %s]");
-        DESCRIPTION_TEMPLATE.put("inventionIcon", " [Icon: %s]");
+        DESCRIPTION_TEMPLATE.put("inventionIcon", " [%s]");
         DESCRIPTION_TEMPLATE.put("shamanStars", " [Stars: %s]");
-        DESCRIPTION_TEMPLATE.put("prestigePerHunter", " [VP per Hunter: %s]");
+        DESCRIPTION_TEMPLATE.put("prestigePerHunter", " [PP per Hunter: %s]");
         DESCRIPTION_TEMPLATE.put("prestigeLossPerUnfed", " [VP loss per Unfed: %s]");
         DESCRIPTION_TEMPLATE.put("majorityPrestigeGain", " [Majority VP gain: %s]");
         DESCRIPTION_TEMPLATE.put("minorityPrestigeLoss", " [Minority VP gain: %s]");
         DESCRIPTION_TEMPLATE.put("minArtists", " [Min artists for bonus: %s]");
         DESCRIPTION_TEMPLATE.put("prestigeLossIfBelow", " [VP loss if below: %s]");
         DESCRIPTION_TEMPLATE.put("prestigePerArtistIfAbove", " [VP gain per artists: %s]");
+    }
+
+    private static final Map<String, String> VALUE_TRANSLATOR = new HashMap<>();
+    static {
+        // Traduzioni per le icone delle invenzioni
+        VALUE_TRANSLATOR.put("BREAD", "Bread");
+        VALUE_TRANSLATOR.put("LEATHER", "Leather");
+        VALUE_TRANSLATOR.put("POTTERY", "Pottery");
+
+        // Traduzioni per gli effetti degli edifici
+        VALUE_TRANSLATOR.put("COMPLETE_SET_FOOD", "Complete Set Food Reward");
+        VALUE_TRANSLATOR.put("DOUBLE_MAJORITY_REWARD", "Double Majority Reward");
+        VALUE_TRANSLATOR.put("TURN_ORDER_BONUS", "Turn Order Bonus");
+        VALUE_TRANSLATOR.put("IGNORE_MINORITY_PENALTY", "Ignore Minority Penalty");
+        VALUE_TRANSLATOR.put("SUSTENANCE_DISCOUNT", "Sustenance Discount");
+        VALUE_TRANSLATOR.put("INVENTOR_PAIR_FOOD", "Inventor Pair Food Reward");
+        VALUE_TRANSLATOR.put("EXTRA_SHAMAN_ICONS", "Extra Shaman Icons");
+
+        // Aggiungi qui qualsiasi altro valore strano dal JSON che vuoi far comparire bello pulito!
     }
 
     private LocalCardDictionary() {
@@ -141,12 +160,19 @@ public class LocalCardDictionary {
 
         DESCRIPTION_TEMPLATE.forEach((key, format) -> {
             if (node.has(key)) {
-                desc.append(String.format(format, node.get(key).asText()));
+                // 1. Prende il valore crudo dal JSON (es. "COMPLETE_SET_FOOD")
+                String rawValue = node.get(key).asText();
+
+                // 2. Cerca la traduzione. Se non la trova, lascia il valore crudo originale.
+                String translatedValue = VALUE_TRANSLATOR.getOrDefault(rawValue, rawValue);
+
+                // 3. Inserisce la parola bella al posto del %s
+                desc.append(String.format(format, translatedValue));
             }
         });
 
         if (node.has("immediateFood") && node.get("immediateFood").asInt() == 1) {
-            desc.append(" [Food Icon]");
+            desc.append(" | +1 Food");
         }
 
         return desc.toString().trim();

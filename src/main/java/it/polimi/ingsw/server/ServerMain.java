@@ -15,12 +15,12 @@ public class ServerMain {
         // String serverIp = "127.0.0.1";
         //System.setProperty("java.rmi.server.hostname", serverIp);
 
-        if (args.length < 2) {
+        if (args.length < 3) {
             System.err.println("WARNING: DB credential not provided");
             System.err.println("Ranking functionality disabled.");
         } else {
-            String dbUser = args[0];
-            String dbPass = args[1];
+            String dbUser = args[1];
+            String dbPass = args[2];
 
             DatabaseManager.init(dbUser, dbPass);
         }
