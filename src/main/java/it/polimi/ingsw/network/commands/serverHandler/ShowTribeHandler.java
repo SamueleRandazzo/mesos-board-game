@@ -16,33 +16,28 @@ import it.polimi.ingsw.view.View;
 public class ShowTribeHandler implements ServerCommandHandler {
 
     /**
-     * Executes the command to display the player tribe.
+     * Handles the SHOW_TRIBE command received from the server via socket.
+     * Extracts the player's nickname and deserializes the JSON payload into a TribeStatusDTO,
+     * then forwards both to the view.
      *
-     * @param args   An array containing the command arguments. The first element (args[0])
-     * must be the JSON string representing the serialized TribeStatusDTO.
-     * @param view   The active {@link View} instance used to interact with the user interface.
-     * @param mapper The Jackson {@link ObjectMapper} used to parse the JSON string.
+     * @param args   the command arguments, where args[0] is the nickname and args[1] is the JSON string
+     * @param view   the active view instance to be updated
+     * @param mapper the Jackson ObjectMapper used to parse the JSON string
      */
     @Override
     public void handle(String[] args, View view, ObjectMapper mapper) {
         try {
-            // Ensure the arguments are present to prevent IndexOutOfBoundsException
-            if (args == null || args.length == 0) {
+            if (args == null || args.length < 2) {
                 return;
             }
 
-            // Extract the JSON string from the arguments
-            String jsonPayload = args[0];
+            String nickname = args[0];
+            String jsonPayload = args[1];
 
-            // Deserialize the JSON into a TribeStatusDTO object
-            TribeStatusDTO tribe = mapper.readValue(jsonPayload, new TypeReference<TribeStatusDTO>() {
-            });
+            TribeStatusDTO tribe = mapper.readValue(jsonPayload, new com.fasterxml.jackson.core.type.TypeReference<TribeStatusDTO>() {});
 
-            // Forward the updated board to the View so it can be printed to the user
-            view.showTribe(tribe);
-
+            view.showTribe(nickname, tribe);
         } catch (Exception e) {
-            // If the JSON is malformed or missing, alert the user without crashing the client
             view.showError("Server data error: unable to show the tribe");
         }
     }

@@ -98,15 +98,22 @@ public class SocketVirtualView implements GameObserver {
         out.println("PLAYERS_INFO " + payload);
     }
 
+    /**
+     * Sends the updated tribe status of a specific player over the socket connection.
+     * The message format follows the protocol: SHOW_TRIBE [nickname] [jsonPayload].
+     *
+     * @param nickname the nickname of the player who owns the tribe
+     * @param tribe    the updated TribeStatusDTO object
+     */
     @Override
-    public void onShowTribe(TribeStatusDTO tribe) {
+    public void onShowTribe(String nickname, TribeStatusDTO tribe) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(tribe);
+            String cleanedJson = json.replace("\n", "").replace("\r", "");
 
-            String cleanedJson = json.replace(" ", "").replace("\n", "").replace("\r", "");
-
-            out.println("SHOW_TRIBE " + cleanedJson);
+            out.println("SHOW_TRIBE " + nickname + " " + cleanedJson);
+            out.flush();
         } catch (Exception e) {
             System.err.println("Serialization error: " + e.getMessage());
         }

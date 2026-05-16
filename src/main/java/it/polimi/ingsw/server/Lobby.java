@@ -9,6 +9,7 @@ import it.polimi.ingsw.model.Game;
 import it.polimi.ingsw.model.Interfaces.TribeDeck;
 import it.polimi.ingsw.model.Player;
 import it.polimi.ingsw.model.factories.GameDataLoader;
+import it.polimi.ingsw.network.DTO.TribeStatusDTO;
 import it.polimi.ingsw.network.GameObserver;
 import it.polimi.ingsw.network.ModelToRemoteViewAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -144,9 +145,16 @@ public class Lobby {
                 o.onShowPlayersInfo(playersInfo);
             }
 
+            // Broadcast the initial tribe status of every player to all connected observers
             for (Player p : players) {
-                GameObserver o = playerObservers.get(p.getNickname());
-                o.onShowTribe(p.getTribe().toDTO());
+                TribeStatusDTO tribeDTO = p.getTribe().toDTO();
+                for (GameObserver o : remoteObservers) {
+                    try {
+                        o.onShowTribe(p.getNickname(), tribeDTO);
+                    } catch (RemoteException e) {
+                        System.err.println("Error distributing initial tribe of " + p.getNickname());
+                    }
+                }
             }
 
             ModelToRemoteViewAdapter adapter = new ModelToRemoteViewAdapter(this.playerObservers);

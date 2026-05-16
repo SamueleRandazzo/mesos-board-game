@@ -61,9 +61,16 @@ public class ClientObserver implements GameObserver {
         view.showPlayersInfo(playersInfo);
     }
 
+    /**
+     * Receives the tribe status update from the server via RMI and forwards it to the view.
+     *
+     * @param nickname the nickname of the player owning the tribe
+     * @param tribe    the updated TribeStatusDTO object
+     * @throws RemoteException if a remote communication error occurs
+     */
     @Override
-    public void onShowTribe(TribeStatusDTO tribe) throws RemoteException  {
-        view.showTribe(tribe);
+    public void onShowTribe(String nickname, TribeStatusDTO tribe) throws RemoteException {
+        view.showTribe(nickname, tribe);
     }
 
     @Override

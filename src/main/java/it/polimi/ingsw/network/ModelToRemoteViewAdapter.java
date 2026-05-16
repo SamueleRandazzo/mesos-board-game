@@ -83,7 +83,7 @@ public class ModelToRemoteViewAdapter implements GameEventListener {
         }
     }
 
-    @Override
+    /*@Override
     public void onShowTribe(String playerNickname, TribeStatusDTO tribe) {
         GameObserver activeObs = playerObservers.get(playerNickname);
         if (activeObs != null) {
@@ -91,6 +91,24 @@ public class ModelToRemoteViewAdapter implements GameEventListener {
                 activeObs.onShowTribe(tribe);
             } catch (RemoteException e) {
                 System.err.println("Network error with: " + playerNickname);
+            }
+        }
+    }*/
+
+    /**
+     * Receives the updated tribe status from the Model and broadcasts it to ALL connected clients.
+     * This allows every player to track the status of opponents' tribes in real time.
+     *
+     * @param playerNickname the nickname of the player whose tribe has changed
+     * @param tribe          the updated TribeStatusDTO
+     */
+    @Override
+    public void onShowTribe(String playerNickname, TribeStatusDTO tribe) {
+        for (Map.Entry<String, GameObserver> entry : playerObservers.entrySet()) {
+            try {
+                entry.getValue().onShowTribe(playerNickname, tribe);
+            } catch (RemoteException e) {
+                System.err.println("Network error sending tribe of " + playerNickname + " to " + entry.getKey());
             }
         }
     }
@@ -165,4 +183,5 @@ public class ModelToRemoteViewAdapter implements GameEventListener {
             }
         }
     }
+
 }

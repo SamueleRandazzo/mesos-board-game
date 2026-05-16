@@ -17,11 +17,19 @@ public interface GameObserver extends Remote {
     void onShowPlayersOrder(List<String> playersOrder) throws RemoteException;
     void onDisplayOfferTrack(List<OfferTileDTO> tiles) throws RemoteException;
     void onShowPlayersInfo(Map<String, Color> playersInfo) throws RemoteException;
-    void onShowTribe(TribeStatusDTO tribe) throws RemoteException;
     void onDisplayBoard(BoardDTO board) throws RemoteException;
     void onDisplayLeaderboard(LeaderboardDTO leaderboard, String globalRank) throws RemoteException;
     void ping() throws RemoteException;
     void onShowFatalError(String error) throws RemoteException;
     void onDisplayGlobalLeaderboard(GlobalLeaderboardDTO globalLeaderboard) throws RemoteException;
     void onDisplayTurnOrderTile(List<TurnOrderTileDTO> turnOrderTile) throws RemoteException;
+
+    /**
+     * Notifies the client about the updated status of a specific player's tribe.
+     *
+     * @param nickname the nickname of the player owning the tribe
+     * @param tribe    the updated DTO representing the tribe status
+     * @throws RemoteException if a network error occurs during the RMI call
+     */
+    void onShowTribe(String nickname, TribeStatusDTO tribe) throws RemoteException;
 }

@@ -26,6 +26,8 @@ public class CLIView implements View {
     private final BufferedReader reader;
     private final NetworkManager network;
     private BoardDTO lastBoard;
+    /** Map containing the most recent tribe status DTO for each player in the game, indexed by nickname. */
+    private final Map<String, TribeStatusDTO> allTribes = new java.util.concurrent.ConcurrentHashMap<>();
 
     /**
      * Constructs a new CLIView.
@@ -262,45 +264,63 @@ public class CLIView implements View {
     }
 
     /**
-     * Displays the tribe's state in the CLI.
-     * It organizes characters by category and shows calculated totals and buildings.
+     * Stores the received tribe status into a global map and prints a formatted layout
+     * of all active players' tribes onto the console.
+     * Uses the local card dictionary to translate unique identifiers into readable descriptions.
      *
-     * @param tribe The DTO containing the tribe's data.
+     * @param nickname the nickname of the player owning the tribe
+     * @param tribe    the updated TribeStatusDTO object
      */
-    public void showTribe(TribeStatusDTO tribe) {
-        // 1. Display Resources and Totals
-        System.out.printf("\n[FOOD: %d] | [PRESTIGE: %d] | [STARS: %d] | [SUSTENANCE DISCOUNT: %d] | [BUILDINGS DISCOUNT: %d]%n",
-                tribe.getCurrentFood(),
-                tribe.getTotalPrestigePoints(),
-                tribe.getShamanStars(),
-                tribe.getTotalSustenanceDiscount(),
-                tribe.getTotalBuildingsFoodDiscount());
-
-        System.out.println("\n" + "=".repeat(22) + " YOUR TRIBE " + "=".repeat(22));
-
-        // 2. Display Character Columns
-        System.out.println(" CHARACTERS:");
-        tribe.getCharactersByColumn().forEach((category, cardDTOs) -> {
-            if (!cardDTOs.isEmpty()) {
-                String joinedIds = cardDTOs.stream()
-                        .map(dto -> LocalCardDictionary.getInstance().getCardDetails(dto.getCardId()))
-                        .collect(Collectors.joining(", "));
-
-                System.out.printf("  %-12s: %s%n", category, joinedIds);
-            }
-        });
-
-        System.out.println("-".repeat(56));
-
-        // 3. Display Buildings Column
-        System.out.println(" BUILDINGS:");
-        for (int i = 0; i < tribe.getBuildingIds().size(); i++) {
-            System.out.print(tribe.getBuildingIds().get(i));
-            if (i < tribe.getBuildingIds().size() - 1) System.out.print(" | ");
-            if ((i + 1) % 4 == 0) System.out.print("\n");
+    @Override
+    public void showTribe(String nickname, TribeStatusDTO tribe) {
+        if (nickname == null || tribe == null) {
+            return;
         }
 
-        System.out.println("=".repeat(56) + "\n");
+        // Store or update the local state for this specific player
+        allTribes.put(nickname, tribe);
+
+        // Print the global status dashboard
+        System.out.println("\n" + "═".repeat(20) + " GLOBAL TRIBE STATUS " + "═".repeat(20));
+
+        for (Map.Entry<String, TribeStatusDTO> entry : allTribes.entrySet()) {
+            String playerName = entry.getKey();
+            TribeStatusDTO t = entry.getValue();
+
+            System.out.println("\n👉 PLAYER: " + playerName.toUpperCase());
+            System.out.printf("   [FOOD: %d] | [PRESTIGE: %d] | [STARS: %d] | [SUSTENANCE DISCOUNT: %d] | [BUILDINGS DISCOUNT: %d]%n",
+                    t.getCurrentFood(),
+                    t.getTotalPrestigePoints(),
+                    t.getShamanStars(),
+                    t.getTotalSustenanceDiscount(),
+                    t.getTotalBuildingsFoodDiscount());
+
+            // Print character cards organized by their respective UI columns
+            System.out.println("   CHARACTERS:");
+            if (t.getCharactersByColumn() != null) {
+                t.getCharactersByColumn().forEach((category, cardDTOs) -> {
+                    if (cardDTOs != null && !cardDTOs.isEmpty()) {
+                        String joinedDetails = cardDTOs.stream()
+                                .map(dto -> LocalCardDictionary.getInstance().getCardDetails(dto.getCardId()))
+                                .collect(Collectors.joining(", "));
+
+                        System.out.printf("     %-12s: %s%n", category, joinedDetails);
+                    }
+                });
+            }
+
+            // Print constructed building cards
+            if (t.getBuildingIds() != null && !t.getBuildingIds().isEmpty()) {
+                String buildingsStr = t.getBuildingIds().stream()
+                        .map(dto -> LocalCardDictionary.getInstance().getCardDetails(dto.getCardId()))
+                        .collect(Collectors.joining(" | "));
+                System.out.println("   BUILDINGS: " + buildingsStr);
+            } else {
+                System.out.println("   BUILDINGS: [None]");
+            }
+            System.out.println("   " + "-".repeat(54));
+        }
+        System.out.println("═".repeat(61) + "\n");
     }
 
     /**
@@ -531,4 +551,6 @@ public class CLIView implements View {
 
         System.out.println("╚" + "═".repeat(58) + "╝\n");
     }
+
+
 }

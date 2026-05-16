@@ -152,10 +152,20 @@ public class GUIView implements View {
         });
     }
 
+    /**
+     * Updates the tribe display for the GUI.
+     * This method adapts to the new interface signature by accepting the player's nickname,
+     * ensuring compatibility without altering the underlying JavaFX scene controller logic.
+     *
+     * @param nickname the nickname of the player owning the tribe
+     * @param tribe    the updated TribeStatusDTO object
+     */
     @Override
-    public void showTribe(TribeStatusDTO tribe) {
+    public void showTribe(String nickname, TribeStatusDTO tribe) {
         Platform.runLater(() -> {
+            if (currentController != null) {
                 currentController.showTribe(tribe);
+            }
         });
     }
 

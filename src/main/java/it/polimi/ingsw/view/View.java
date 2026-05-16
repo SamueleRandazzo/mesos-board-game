@@ -18,10 +18,17 @@ public interface View {
     void showPlayersOrder(List<String> playersOrder);
     void displayOfferTrack(List<OfferTileDTO> tiles);
     void showPlayersInfo(Map<String, Color> playersInfo);
-    void showTribe(TribeStatusDTO tribe);
     void displayBoard(BoardDTO board);
     void displayLeaderboard(LeaderboardDTO leaderboard, String globalRank);
     void showFatalError(String error);
     void displayGlobalLeaderboard(GlobalLeaderboardDTO globalLeaderboard);
     void displayTurnOrderTile(List<TurnOrderTileDTO> turnOrderTile);
+
+    /**
+     * Displays the updated status of a specific player's tribe.
+     *
+     * @param nickname the nickname of the player owning the tribe
+     * @param tribe    the updated DTO representing the tribe status
+     */
+    void showTribe(String nickname, TribeStatusDTO tribe);
 }
