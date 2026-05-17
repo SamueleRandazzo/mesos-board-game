@@ -24,28 +24,67 @@ import java.util.stream.Collectors;
 
 import it.polimi.ingsw.database.*;
 
+/**
+ * Manages the pre-game phases, matchmaking, and lifecycle of a game session.
+ * <p>
+ * The {@code Lobby} class handles player registrations, unique nicknames and colors validation,
+ * game persistence recovery, network health checks, and match initialization or termination.
+ * </p>
+ */
 public class Lobby {
 
+    /** Maximum allowed players in a single match. */
     private static final int MAX_PLAYERS = 5;
+
+    /** Minimum required players to start a match. */
     private static final int MIN_PLAYERS = 2;
 
+    /** The expected number of players required to start the game, chosen by the host. Initialized to -1. */
     private int targetPlayers = -1;
+
+    /** List of active remote view observers for broadcasting updates. */
     private final List<GameObserver> remoteObservers = new ArrayList<>();
+
+    /** List of nicknames currently registered in the lobby. */
     private final List<String> nicknames = new ArrayList<>();
+
+    /** List of colors chosen by the players in the lobby. */
     private final List<Color> colors = new ArrayList<>();
+
+    /** Maps each player's nickname to their specific {@link GameObserver}. */
     private final Map<String, GameObserver> playerObservers = new HashMap<>();
+
+    /** Keeps a map of nicknames and corresponding {@link Color} in insertion order. */
     private final Map<String, Color> playersInfo = new LinkedHashMap<>();
+
+    /** The instance of the current running or loading {@link Game}. */
     private Game currentGame;
+
+    /** Manager responsible for saving and loading game states. */
     private final PersistenceManager persistenceManager;
 
+    /** Scheduler for periodic network health checks. */
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+
+    /** Flag indicating whether the network health check routine has been initialized. */
     private boolean healthCheckStarted = false;
+
+    /** Thread pool for executing asynchronous ping tasks to clients. */
     private final ExecutorService pingExecutor = Executors.newCachedThreadPool();
 
+    /**
+     * Constructs a default {@code Lobby} initializing a new {@link PersistenceManager}.
+     */
     public Lobby() {
         this(new PersistenceManager());
     }
 
+    /**
+     * Constructs a {@code Lobby} with a specific {@link PersistenceManager}.
+     * If a saved game state exists, it automatically recovers and loads the previous game configuration.
+     *
+     * @param persistenceManager the persistence manager used to handle game saves
+     */
     public Lobby(PersistenceManager persistenceManager) {
         this.persistenceManager = persistenceManager;
 
@@ -62,12 +101,14 @@ public class Lobby {
     }
 
     /**
-     * Handles player login requests. Adds players to the lobby and manages
-     * the start of the countdown or the game.
-     * @param color the chosen color for the player's pieces.
-     * @param nickname the unique name chosen by the player.
-     * @param observer the remote observer for client-side updates.
-     * @throws RemoteException if the game is full or the server is unreachable.
+     * Handles player login requests. Adds a player to the lobby, registers their unique criteria,
+     * triggers database synchronization, and handles host setup or game initialization conditions.
+     *
+     * @param nickname the unique name chosen by the player
+     * @param color the chosen color for the player's pieces
+     * @param observer the remote observer for client-side view updates
+     * @throws Exception if the lobby is full, the host hasn't set the size yet,
+     *                   or if the nickname/color is already taken.
      */
     public synchronized void addPlayer(String nickname, Color color, GameObserver observer) throws Exception {
         if (targetPlayers != -1 && nicknames.size() >= targetPlayers) {
@@ -132,6 +173,13 @@ public class Lobby {
         }
     }
 
+    /**
+     * Sets the expected number of players for the upcoming match.
+     * Called by the host client.
+     *
+     * @param num the desired number of players
+     * @throws Exception if the number of players is outside the bounds of {@link #MIN_PLAYERS} and {@link #MAX_PLAYERS}
+     */
     public void setTargetPlayers(int num) throws Exception {
         if (num < MIN_PLAYERS || num > MAX_PLAYERS) {
             throw new CustomException.InvalidTargetPlayersNumberException(MIN_PLAYERS, MAX_PLAYERS);
@@ -149,6 +197,13 @@ public class Lobby {
         }).start();
     }
 
+    /**
+     * Evaluates if the match is ready to start or resume.
+     * Checks if all reconnected players match a saved game criteria to resume it;
+     * otherwise, boots a brand new game session, triggers decks setup, and notifies all observers.
+     *
+     * @throws Exception if an error occurs during game generation or network broadcasting
+     */
     private synchronized void checkStartCondition() throws Exception {
         if (targetPlayers != -1 && nicknames.size() == targetPlayers) {
 
@@ -218,6 +273,14 @@ public class Lobby {
         }
     }
 
+    /**
+     * Factory method helper that loads static configurations (decks, building cards, offer tracks)
+     * and instantiates a new {@link Game} instance using {@link GameDataLoader}.
+     *
+     * @param players active players participating in the game
+     * @param targetPlayers the specified capacity of the game
+     * @return an initialized {@link Game} reference
+     */
     private static @NotNull Game getGame(List<Player> players, int targetPlayers) {
         GameDataLoader loader = new GameDataLoader();
 
@@ -230,6 +293,12 @@ public class Lobby {
         return new Game(players, decks, era1Buildings, era2Buildings, era3Buildings, offerTrack);
     }
 
+    /**
+     * Resumes an existing game loaded via persistence. Re-attaches listeners,
+     * re-maps network views, and updates clients with the state current status.
+     *
+     * @throws RemoteException if network distribution fails due to connection loss
+     */
     private void resumeRecoveredGame() throws RemoteException {
         System.out.println("Game resuming!");
 
@@ -265,6 +334,12 @@ public class Lobby {
         System.out.println("[PERSISTENCE] All players reconnected. Game resumed.");
     }
 
+    /**
+     * Handles the intentional or accidental disconnection of a specific player.
+     * Safely unregisters client references before terminating the game.
+     *
+     * @param nickname the nickname of the player who disconnected
+     */
     public void handleDisconnection(String nickname) {
         if (nickname == null || !nicknames.contains(nickname)) {
             return;
@@ -285,6 +360,12 @@ public class Lobby {
         terminateGame(nickname);
     }
 
+    /**
+     * Executes a fatal termination sequence for the active game session due to an unexpected user disconnect.
+     * Notifies all remaining clients, sets internal game state flags, and wipes local session pools.
+     *
+     * @param disconnectedNickname the nickname of the player whose disconnection triggered the shutdown
+     */
     private void terminateGame(String disconnectedNickname) {
         System.err.println("FATAL: Player " + disconnectedNickname + " disconnected. Terminating match.");
 
@@ -308,6 +389,10 @@ public class Lobby {
         this.targetPlayers = -1;
     }
 
+    /**
+     * Starts the periodic network health check routine.
+     * Runs a heartbeat ping task at fixed intervals to verify connected clients.
+     */
     public void startNetworkHealthCheck() {
         Runnable healthCheckTask = () -> {
             try {
@@ -321,6 +406,10 @@ public class Lobby {
         scheduler.scheduleAtFixedRate(healthCheckTask, 5, 5, TimeUnit.SECONDS);
     }
 
+    /**
+     * Iterates through copies of registered player observers to ping each remote connection asynchronously.
+     * Automatically triggers {@link #handleDisconnection(String)} if a {@link RemoteException} occurs.
+     */
     private void checkConnections() {
         List<Map.Entry<String, GameObserver>> observersCopy;
         synchronized (this) {
