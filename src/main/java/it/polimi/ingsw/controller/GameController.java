@@ -2,6 +2,7 @@ package it.polimi.ingsw.controller;
 
 import it.polimi.ingsw.model.Game;
 import it.polimi.ingsw.network.RemoteController;
+import it.polimi.ingsw.persistence.PersistenceManager;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import java.util.Map;
  */
 public class GameController extends UnicastRemoteObject implements RemoteController {
     private Game game;
+    private final PersistenceManager persistenceManager;
     private final Map<String, RemoteAction> cardActions = new HashMap<>();
 
     @FunctionalInterface
@@ -35,8 +37,13 @@ public class GameController extends UnicastRemoteObject implements RemoteControl
      * @throws RemoteException if there is an error during the export of the remote object.
      */
     public GameController(Game game) throws RemoteException {
+        this(game, null);
+    }
+
+    public GameController(Game game, PersistenceManager persistenceManager) throws RemoteException {
         super();
         this.game = game;
+        this.persistenceManager = persistenceManager;
 
         initializeCardActions();
     }
@@ -81,6 +88,7 @@ public class GameController extends UnicastRemoteObject implements RemoteControl
     public void handleTileSelection(int tileIndex) throws RemoteException {
         try {
             game.placePlayerTotem(tileIndex);
+            persistAfterChange();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -96,6 +104,7 @@ public class GameController extends UnicastRemoteObject implements RemoteControl
     public void handleUpperCardSelection(int pos) throws RemoteException {
         try {
             game.resolveUpperCardPlayerPick(pos);
+            persistAfterChange();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -111,6 +120,7 @@ public class GameController extends UnicastRemoteObject implements RemoteControl
     public void handleLowerCardSelection(int pos) throws RemoteException {
         try {
             game.resolveLowerCardPlayerPick(pos);
+            persistAfterChange();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -126,6 +136,7 @@ public class GameController extends UnicastRemoteObject implements RemoteControl
     public void handleUpperBuildingSelection(int pos) throws RemoteException {
         try {
             game.resolveUpperBuildingPlayerPick(pos);
+            persistAfterChange();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -141,8 +152,21 @@ public class GameController extends UnicastRemoteObject implements RemoteControl
     public void handleLowerBuildingSelection(int pos) throws RemoteException {
         try {
             game.resolveLowerBuildingPlayerPick(pos);
+            persistAfterChange();
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void persistAfterChange() {
+        if (persistenceManager == null) {
+            return;
+        }
+
+        if ("EndGameState".equals(game.getCurrentStateName())) {
+            persistenceManager.deleteSave();
+        } else {
+            persistenceManager.saveGame(game);
         }
     }
 }

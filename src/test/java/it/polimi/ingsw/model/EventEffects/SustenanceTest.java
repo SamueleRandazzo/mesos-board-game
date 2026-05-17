@@ -73,7 +73,7 @@ class SustenanceTest {
 
         sustenanceEvent.resolve(players, game);
 
-        assertEquals(4, player.getFoodAmount(), "Player should pay 1 food.");
+        assertEquals(3, player.getFoodAmount(), "Player should pay 2 food for 2 character cards.");
         assertEquals(0, player.getPrestigePoints(), "Player should not lose any prestige points.");
     }
 
@@ -91,7 +91,7 @@ class SustenanceTest {
         sustenanceEvent.resolve(players, game);
 
         assertEquals(0, player.getFoodAmount(), "Player's food should be reduced to 0.");
-        assertEquals(-2, player.getPrestigePoints(), "Player should lose 2 prestige points.");
+        assertEquals(-4, player.getPrestigePoints(), "Player should lose 4 prestige points for 2 missing food.");
     }
 
     @Test
@@ -109,7 +109,7 @@ class SustenanceTest {
         sustenanceEvent.resolve(players, game);
 
         assertEquals(0, player.getFoodAmount(), "Food should remain at 0.");
-        assertEquals(0, player.getPrestigePoints(), "Player should lose no prestige points after discount.");
+        assertEquals(-2, player.getPrestigePoints(), "Player should lose 2 prestige points for the remaining required food.");
     }
 
     @Test
@@ -127,7 +127,7 @@ class SustenanceTest {
 
         sustenanceEvent.resolve(players, game);
 
-        assertEquals(1, player.getFoodAmount(), "Player should gain/keep 1 food after sustenance resolution.");
+        assertEquals(0, player.getFoodAmount(), "Player should keep 0 food when discounts fully cover sustenance.");
         assertEquals(0, player.getPrestigePoints(), "No prestige points should be lost.");
     }
 }

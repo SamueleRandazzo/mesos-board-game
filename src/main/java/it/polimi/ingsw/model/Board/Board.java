@@ -68,6 +68,20 @@ public class Board {
         this.lowerBuildingCards = new ArrayList<>();
     }
 
+    public Board(List<TribeDeck> tribeDeck,
+                 List<BuildingCard> buildingDeck,
+                 List<TribeDeck> upperTribeCards,
+                 List<TribeDeck> lowerTribeCards,
+                 List<BuildingCard> upperBuildingCards,
+                 List<BuildingCard> lowerBuildingCards) {
+        this.tribeDeck = new ArrayList<>(tribeDeck);
+        this.buildingDeck = new ArrayList<>(buildingDeck);
+        this.upperTribeCards = new ArrayList<>(upperTribeCards);
+        this.lowerTribeCards = new ArrayList<>(lowerTribeCards);
+        this.upperBuildingCards = new ArrayList<>(upperBuildingCards);
+        this.lowerBuildingCards = new ArrayList<>(lowerBuildingCards);
+    }
+
     // -------------------------------------------------------------------------
     // Tribe row accessors
     // -------------------------------------------------------------------------
@@ -144,6 +158,14 @@ public class Board {
      */
     public List<BuildingCard> getLowerBuildingCards() {
         return new ArrayList<>(lowerBuildingCards);
+    }
+
+    public List<TribeDeck> getTribeDeck() {
+        return new ArrayList<>(tribeDeck);
+    }
+
+    public List<BuildingCard> getBuildingDeck() {
+        return new ArrayList<>(buildingDeck);
     }
 
     /**

@@ -21,6 +21,7 @@ module it.polimi.ingsw {
     exports it.polimi.ingsw.network.DTO;
     exports it.polimi.ingsw.view;
     exports it.polimi.ingsw.model.Enum;
+    exports it.polimi.ingsw.persistence;
 
     // Opens
     opens it.polimi.ingsw.view.GUI to javafx.graphics, javafx.fxml;
@@ -28,4 +29,5 @@ module it.polimi.ingsw {
     opens it.polimi.ingsw.model.factories to com.fasterxml.jackson.databind;
     opens it.polimi.ingsw.network.DTO to com.fasterxml.jackson.databind;
     opens it.polimi.ingsw.model.Enum to com.fasterxml.jackson.databind;
+    opens it.polimi.ingsw.persistence to com.fasterxml.jackson.databind;
 }

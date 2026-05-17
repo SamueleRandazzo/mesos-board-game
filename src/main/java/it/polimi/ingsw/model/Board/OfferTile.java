@@ -62,6 +62,10 @@ public class OfferTile {
         }
     }
 
+    public void restorePlacedPlayer(Player player) {
+        this.placedPlayer = player;
+    }
+
     /** remove the totem from this tile at the end of the phase*/
     public void removeTotem(){
         this.placedPlayer = null;

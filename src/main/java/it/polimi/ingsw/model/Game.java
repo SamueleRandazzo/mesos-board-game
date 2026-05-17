@@ -10,6 +10,7 @@ import it.polimi.ingsw.model.states.EndGameState;
 import it.polimi.ingsw.model.states.GameState;
 import it.polimi.ingsw.model.states.SetupGameState;
 import it.polimi.ingsw.model.states.TotemPlacementState;
+import it.polimi.ingsw.model.states.ActionResolutionState;
 import it.polimi.ingsw.network.DTO.LeaderboardDTO;
 import it.polimi.ingsw.network.DTO.OfferTileDTO;
 import it.polimi.ingsw.network.DTO.PlayerRankDTO;
@@ -136,6 +137,46 @@ public class Game {
         this.board = new Board(tribeDeck, era1Buildings);
 
         this.currentState = new SetupGameState();
+    }
+
+    public Game(List<Player> players,
+                Board board,
+                OfferTrack offerTrack,
+                TurnOrderTile turnOrderTile,
+                List<List<BuildingCard>> eraBuildingDecks,
+                int currentEra,
+                int currentRound,
+                int currentPlayerIndex,
+                List<Player> roundTurnOrder,
+                GameState currentState) {
+        if (players == null) throw new NullPointerException("players cannot be null.");
+        if (board == null) throw new NullPointerException("board cannot be null.");
+        if (offerTrack == null) throw new NullPointerException("offerTrack cannot be null.");
+        if (turnOrderTile == null) throw new NullPointerException("turnOrderTile cannot be null.");
+        if (eraBuildingDecks == null) throw new NullPointerException("eraBuildingDecks cannot be null.");
+        if (roundTurnOrder == null) throw new NullPointerException("roundTurnOrder cannot be null.");
+        if (currentState == null) throw new NullPointerException("currentState cannot be null.");
+
+        this.numPlayers = players.size();
+        if (this.numPlayers < 2 || this.numPlayers > 5) {
+            throw new IllegalArgumentException(
+                    "Mesos supports 2 to 5 players. Got: " + this.numPlayers
+            );
+        }
+
+        this.players = new ArrayList<>(players);
+        this.board = board;
+        this.offerTrack = offerTrack;
+        this.turnOrderTile = turnOrderTile;
+        this.eraBuildingDecks = new ArrayList<>();
+        for (List<BuildingCard> deck : eraBuildingDecks) {
+            this.eraBuildingDecks.add(new ArrayList<>(deck));
+        }
+        this.currentEra = currentEra;
+        this.currentRound = currentRound;
+        this.currentPlayerIndex = currentPlayerIndex;
+        this.roundTurnOrder = new ArrayList<>(roundTurnOrder);
+        this.currentState = currentState;
     }
 
     public void startGame() {
@@ -525,6 +566,29 @@ public class Game {
             return null;
         }
         return roundTurnOrder.get(currentPlayerIndex);
+    }
+
+    public List<Player> getRoundTurnOrder() {
+        return Collections.unmodifiableList(roundTurnOrder);
+    }
+
+    public List<List<BuildingCard>> getEraBuildingDecks() {
+        List<List<BuildingCard>> copy = new ArrayList<>();
+        for (List<BuildingCard> deck : eraBuildingDecks) {
+            copy.add(new ArrayList<>(deck));
+        }
+        return copy;
+    }
+
+    public String getCurrentStateName() {
+        return currentState.getClass().getSimpleName();
+    }
+
+    public Optional<ActionResolutionState> getActionResolutionState() {
+        if (currentState instanceof ActionResolutionState actionResolutionState) {
+            return Optional.of(actionResolutionState);
+        }
+        return Optional.empty();
     }
     //endregion
 

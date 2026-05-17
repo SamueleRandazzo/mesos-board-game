@@ -126,7 +126,7 @@ class HuntTest {
         assertEquals(10, player.getPrestigePoints(),
                 "Player should gain total prestige points from Hunt + Building.");
 
-        // Food bonus from building: 2 Hunters * 1 Food = 2 Food
-        assertEquals(5, player.getFoodAmount(), "Player should gain food from Hunt event and Hunt Building.");
+        // Food reward: 2 Hunters + building bonus (2 Hunters * 1 Food) = 4 Food
+        assertEquals(4, player.getFoodAmount(), "Player should gain food from Hunters and Hunt Building.");
     }
 }

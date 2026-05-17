@@ -367,7 +367,7 @@ class GameTest {
     }
 
     @Test
-    void initializeGame_shouldSetTotemPlacementState() {
+    void startGame_shouldSetTotemPlacementState() {
         List<Player> players = List.of(
                 newPlayer(Color.RED, 0, 0),
                 newPlayer(Color.BLUE, 0, 0)
@@ -375,7 +375,7 @@ class GameTest {
 
         Game game = newGameWithPlayers(players);
 
-        game.initializeGame();
+        game.startGame();
 
         Object currentState = getPrivateField(game, "currentState");
 

@@ -12,6 +12,7 @@ import it.polimi.ingsw.model.factories.GameDataLoader;
 import it.polimi.ingsw.network.DTO.TribeStatusDTO;
 import it.polimi.ingsw.network.GameObserver;
 import it.polimi.ingsw.network.ModelToRemoteViewAdapter;
+import it.polimi.ingsw.persistence.PersistenceManager;
 import org.jetbrains.annotations.NotNull;
 import java.rmi.RemoteException;
 import java.util.*;
@@ -33,10 +34,32 @@ public class Lobby {
     private final Map<String, GameObserver> playerObservers = new HashMap<>();
     private final Map<String, Color> playersInfo = new LinkedHashMap<>();
     private Game currentGame;
+    private final PersistenceManager persistenceManager;
+    private boolean recoveryMode = false;
 
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private boolean healthCheckStarted = false;
     private final ExecutorService pingExecutor = Executors.newCachedThreadPool();
+
+    public Lobby() {
+        this(new PersistenceManager());
+    }
+
+    public Lobby(PersistenceManager persistenceManager) {
+        this.persistenceManager = persistenceManager;
+
+        if (persistenceManager.hasSave()) {
+            this.currentGame = persistenceManager.loadGame();
+            this.targetPlayers = currentGame.getNumPlayers();
+            this.recoveryMode = true;
+
+            for (Player player : currentGame.getPlayers()) {
+                playersInfo.put(player.getNickname(), player.getColor());
+            }
+
+            System.out.println("[PERSISTENCE] Saved game loaded. Waiting for players to reconnect.");
+        }
+    }
 
     /**
      * Handles player login requests. Adds players to the lobby and manages
@@ -47,6 +70,11 @@ public class Lobby {
      * @throws RemoteException if the game is full or the server is unreachable.
      */
     public synchronized void addPlayer(String nickname, Color color, GameObserver observer) throws Exception {
+        if (recoveryMode) {
+            addRecoveringPlayer(nickname, color, observer);
+            return;
+        }
+
         if (targetPlayers != -1 && nicknames.size() >= targetPlayers) {
             throw new CustomException.LobbyFullException();
         }
@@ -138,9 +166,10 @@ public class Lobby {
             Collections.shuffle(players);
 
             currentGame = getGame(players, targetPlayers);
-            GameController gameController = new GameController(currentGame);
+            GameController gameController = new GameController(currentGame, persistenceManager);
 
             currentGame.startGame();
+            persistenceManager.saveGame(currentGame);
 
             for (GameObserver o : remoteObservers) {
                 o.onGameStarted(gameController, targetPlayers);
@@ -186,6 +215,77 @@ public class Lobby {
         return new Game(players, decks, era1Buildings, era2Buildings, era3Buildings, offerTrack);
     }
 
+    private synchronized void addRecoveringPlayer(String nickname, Color color, GameObserver observer) throws Exception {
+        if (!isSavedNickname(nickname)) {
+            throw new CustomException.UnknownRecoveryNicknameException();
+        }
+
+        if (nicknames.contains(nickname)) {
+            throw new CustomException.NicknameAlreadyUsedException();
+        }
+
+        Color savedColor = playersInfo.get(nickname);
+        if (savedColor != color) {
+            throw new CustomException.RecoveryColorMismatchException(savedColor);
+        }
+
+        nicknames.add(nickname);
+        colors.add(savedColor);
+        remoteObservers.add(observer);
+        playerObservers.put(nickname, observer);
+
+        if (!healthCheckStarted) {
+            startNetworkHealthCheck();
+        }
+
+        if (nicknames.size() == targetPlayers) {
+            resumeRecoveredGame();
+        } else {
+            for (GameObserver o : remoteObservers) {
+                o.onPlayerJoined(nicknames.size(), targetPlayers);
+            }
+        }
+    }
+
+    private boolean isSavedNickname(String nickname) {
+        return currentGame != null && currentGame.getPlayers().stream()
+                .anyMatch(player -> player.getNickname().equals(nickname));
+    }
+
+    private void resumeRecoveredGame() throws RemoteException {
+        GameController gameController = new GameController(currentGame, persistenceManager);
+        ModelToRemoteViewAdapter adapter = new ModelToRemoteViewAdapter(this.playerObservers);
+        currentGame.addListener(adapter);
+
+        for (GameObserver observer : remoteObservers) {
+            observer.onGameStarted(gameController, targetPlayers);
+            observer.onShowPlayersInfo(playersInfo);
+        }
+
+        for (Player player : currentGame.getPlayers()) {
+            TribeStatusDTO tribeDTO = player.getTribe().toDTO();
+            for (GameObserver observer : remoteObservers) {
+                observer.onShowTribe(player.getNickname(), tribeDTO);
+            }
+        }
+
+        currentGame.notifyDisplayTurnOrderTile();
+        currentGame.notifyShowPlayerOrder();
+        currentGame.notifyOnShowBoard();
+        currentGame.notifyOnShowOfferTrack();
+
+        if ("TotemPlacementState".equals(currentGame.getCurrentStateName())) {
+            currentGame.notifyTotemPlacementTurnChanged();
+        } else if ("ActionResolutionState".equals(currentGame.getCurrentStateName())) {
+            currentGame.notifyActionResultTurnChanged();
+        } else if ("EndGameState".equals(currentGame.getCurrentStateName())) {
+            currentGame.notifyEndGame();
+        }
+
+        recoveryMode = false;
+        System.out.println("[PERSISTENCE] All players reconnected. Game resumed.");
+    }
+
     public void handleDisconnection(String nickname) {
         if (nickname == null || !nicknames.contains(nickname)) {
             return;
@@ -199,8 +299,14 @@ public class Lobby {
                 remoteObservers.remove(index);
                 playerObservers.remove(nickname);
                 nicknames.remove(nickname);
-                playersInfo.remove(nickname);
+                if (!recoveryMode) {
+                    playersInfo.remove(nickname);
+                }
             }
+        }
+
+        if (recoveryMode) {
+            return;
         }
 
         terminateGame(nickname);

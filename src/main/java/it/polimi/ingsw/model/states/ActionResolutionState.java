@@ -30,6 +30,39 @@ public class ActionResolutionState extends GameState {
         this.hasBoughtBuilding = false;
     }
 
+    public ActionResolutionState(Game context,
+                                 int upperPicksLeft,
+                                 int lowerPicksLeft,
+                                 boolean hasBoughtBuilding,
+                                 Player currentActivePlayer,
+                                 boolean extraCardChoose) {
+        this.upperPicksLeft = upperPicksLeft;
+        this.lowerPicksLeft = lowerPicksLeft;
+        this.hasBoughtBuilding = hasBoughtBuilding;
+        this.currentActivePlayer = currentActivePlayer;
+        this.extraCardChoose = extraCardChoose;
+    }
+
+    public int getUpperPicksLeft() {
+        return upperPicksLeft;
+    }
+
+    public int getLowerPicksLeft() {
+        return lowerPicksLeft;
+    }
+
+    public boolean hasBoughtBuilding() {
+        return hasBoughtBuilding;
+    }
+
+    public Player getCurrentActivePlayerForState() {
+        return currentActivePlayer;
+    }
+
+    public boolean isExtraCardChoose() {
+        return extraCardChoose;
+    }
+
     /**
      * Sets up the counters for the active player
      * if they haven't been initialized for the current turn yet.

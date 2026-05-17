@@ -1,0 +1,71 @@
+{
+  "numPlayers" : 2,
+  "currentEra" : 1,
+  "currentRound" : 1,
+  "currentPlayerIndex" : 0,
+  "currentStateName" : "TotemPlacementState",
+  "players" : [ {
+    "nickname" : "cla",
+    "color" : "RED",
+    "foodAmount" : 1,
+    "prestigePoints" : 0,
+    "ownedCardIds" : [ ]
+  }, {
+    "nickname" : "clacla",
+    "color" : "BLACK",
+    "foodAmount" : 2,
+    "prestigePoints" : 0,
+    "ownedCardIds" : [ ]
+  } ],
+  "board" : {
+    "upperTribeCards" : [ "event_3", "tribeCard_9", "tribeCard_22", "tribeCard_4", "tribeCard_20", "tribeCard_6" ],
+    "lowerTribeCards" : [ "tribeCard_11", "tribeCard_21", "tribeCard_10" ],
+    "upperBuildingCards" : [ "building_4" ],
+    "lowerBuildingCards" : [ ],
+    "tribeDeck" : [ "event_1", "tribeCard_27", "tribeCard_16", "tribeCard_1", "event_2", "event_4", "tribeCard_7", "tribeCard_14", "tribeCard_2", "tribeCard_3", "tribeCard_28", "tribeCard_19", "tribeCard_15", "tribeCard_55", "tribeCard_35", "tribeCard_47", "tribeCard_53", "event_5", "tribeCard_31", "event_6", "tribeCard_36", "tribeCard_54", "tribeCard_40", "event_8", "tribeCard_48", "tribeCard_46", "event_7", "tribeCard_33", "tribeCard_45", "tribeCard_52", "tribeCard_50", "tribeCard_51", "tribeCard_37", "tribeCard_39", "tribeCard_30", "event_9", "tribeCard_62", "tribeCard_82", "tribeCard_71", "tribeCard_68", "tribeCard_59", "tribeCard_79", "tribeCard_60", "tribeCard_83", "tribeCard_72", "event_10", "tribeCard_77", "tribeCard_81", "tribeCard_63", "tribeCard_65", "tribeCard_61", "tribeCard_70", "tribeCard_78", "tribeCard_76", "event_11", "event_12" ],
+    "buildingDeck" : [ "building_4" ]
+  },
+  "offerTrack" : {
+    "tiles" : [ {
+      "foodBonus" : 0,
+      "tileId" : "B",
+      "topRowDraws" : 0,
+      "bottomRowDraws" : 1,
+      "minPlayers" : 2,
+      "placedPlayerNickname" : null
+    }, {
+      "foodBonus" : 0,
+      "tileId" : "C",
+      "topRowDraws" : 1,
+      "bottomRowDraws" : 0,
+      "minPlayers" : 2,
+      "placedPlayerNickname" : null
+    }, {
+      "foodBonus" : 0,
+      "tileId" : "E",
+      "topRowDraws" : 1,
+      "bottomRowDraws" : 1,
+      "minPlayers" : 2,
+      "placedPlayerNickname" : null
+    }, {
+      "foodBonus" : 0,
+      "tileId" : "F",
+      "topRowDraws" : 2,
+      "bottomRowDraws" : 0,
+      "minPlayers" : 2,
+      "placedPlayerNickname" : null
+    } ]
+  },
+  "turnOrderTile" : {
+    "slots" : [ {
+      "foodModifier" : 1,
+      "occupyingPlayerNickname" : "cla"
+    }, {
+      "foodModifier" : -1,
+      "occupyingPlayerNickname" : "clacla"
+    } ]
+  },
+  "roundTurnOrder" : [ "cla", "clacla" ],
+  "eraBuildingDecks" : [ [ "building_8", "building_12" ], [ "building_17", "building_15", "building_13" ] ],
+  "actionResolutionState" : null
+}

@@ -165,6 +165,23 @@ public class Tribe {
     public boolean getExtraFoodFromBonus() {
         return this.extraFoodFromBonus;
     }
+
+    public List<Card> getOwnedCards() {
+        List<Card> cards = new ArrayList<>();
+        cards.addAll(artists);
+        cards.addAll(gatherers);
+        cards.addAll(builders);
+        cards.addAll(hunters);
+        cards.addAll(inventors);
+        cards.addAll(shamans);
+        cards.addAll(instantEffectBuildings);
+        cards.addAll(scoringBuildings);
+        cards.addAll(sustenanceBuildings);
+        cards.addAll(cavePaintingBuildings);
+        cards.addAll(huntBuildings);
+        cards.addAll(cardAddedBuildings);
+        return cards;
+    }
     //endregion
 
     //region Card Adder

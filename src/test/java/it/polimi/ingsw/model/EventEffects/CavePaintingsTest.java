@@ -72,7 +72,7 @@ class CavePaintingsTest {
         cavePaintingsEvent.resolve(players, game);
 
         assertEquals(-5, player.getPrestigePoints(), "Player should lose 5 PP for not meeting the Artist threshold.");
-        assertEquals(1, player.getFoodAmount(), "Player should gain 1 base food from Cave Paintings.");
+        assertEquals(0, player.getFoodAmount(), "Player should not gain food without Cave Painting buildings.");
     }
 
     @Test
@@ -103,7 +103,7 @@ class CavePaintingsTest {
 
         cavePaintingsEvent.resolve(players, game);
 
-        assertEquals(5, player.getFoodAmount(), "Player should gain 1 base food plus 4 food from the building.");
+        assertEquals(4, player.getFoodAmount(), "Player should gain 4 food from the Cave Painting building.");
         assertEquals(6, player.getPrestigePoints(), "Player should still gain the 6 PP from the event.");
     }
 }

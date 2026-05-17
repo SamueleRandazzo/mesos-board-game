@@ -68,6 +68,25 @@ public class GameDataLoader {
         return finalDeck;
     }
 
+    public Map<String, TribeDeck> loadAllTribeCardsById(int playersNum) {
+        List<RawTribeCardData> rawTribes = readJsonList("/cards/tribe_cards.json", new TypeReference<>() {});
+        List<RawEventCardData> rawEvents = readJsonList("/cards/event_cards.json", new TypeReference<>() {});
+
+        Map<String, TribeDeck> cardsById = new HashMap<>();
+
+        rawTribes.stream()
+                .filter(d -> d.minPlayers <= playersNum)
+                .map(cardFactory::createTribeCard)
+                .forEach(card -> cardsById.put(card.getId(), card));
+
+        rawEvents.stream()
+                .filter(d -> d.minPlayers <= playersNum)
+                .map(cardFactory::createEventCard)
+                .forEach(card -> cardsById.put(card.getId(), card));
+
+        return cardsById;
+    }
+
     public List<BuildingCard> loadBuildings(int era, int playersNum) {
         if (playersNum < 2 || playersNum > 5 || era < 1 || era > 3) {
             throw new IllegalArgumentException("Parameters out of range");
@@ -88,6 +107,29 @@ public class GameDataLoader {
                 .limit(countToTake)
                 .map(cardFactory::createBuildingCard)
                 .collect(Collectors.toList());
+    }
+
+    public Map<String, BuildingCard> loadAllBuildingCardsById(int playersNum) {
+        if (playersNum < 2 || playersNum > 5) {
+            throw new IllegalArgumentException("Parameters out of range");
+        }
+
+        Map<String, BuildingCard> cardsById = new HashMap<>();
+
+        for (int era = 1; era <= 3; era++) {
+            String path = String.format("/cards/buildings_era%d.json", era);
+            List<RawBuildingCardData> rawBuildings = readJsonList(
+                    path,
+                    new TypeReference<List<RawBuildingCardData>>() {}
+            );
+
+            rawBuildings.stream()
+                    .filter(d -> d.minPlayers <= playersNum)
+                    .map(cardFactory::createBuildingCard)
+                    .forEach(card -> cardsById.put(card.getId(), card));
+        }
+
+        return cardsById;
     }
 
     public OfferTrack loadOfferTrack(int numPlayers) {

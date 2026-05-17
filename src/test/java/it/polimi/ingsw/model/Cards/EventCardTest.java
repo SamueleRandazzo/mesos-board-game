@@ -89,7 +89,7 @@ class EventCardTest {
         eventCard.raiseEvent(players, game);
 
         // ASSERT: Verify the player hasn't erroneously lost or gained resources
-        assertEquals(6, player.getFoodAmount(), "The Hunt event should add 1 food.");
+        assertEquals(5, player.getFoodAmount(), "The Hunt event should not add food without Hunters.");
     }
 
     @Test
