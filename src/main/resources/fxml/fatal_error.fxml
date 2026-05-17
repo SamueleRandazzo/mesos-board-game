@@ -1,22 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
 <?import javafx.scene.text.Font?>
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="it.polimi.ingsw.view.GUI.FatalErrorController"
-      prefHeight="400.0" prefWidth="600.0"
-      style="-fx-background-color: #1a1a1a;">
-    <Label text="GAME OVER" textFill="#ff4444">
-        <font>
-            <Font name="System Bold" size="48.0"/>
-        </font>
-    </Label>
-    <Label fx:id="errorMessage" text="Fatal error.." textFill="WHITE" wrapText="true" textAlignment="CENTER">
-        <font>
-            <Font size="18.0"/>
-        </font>
-    </Label>
-</VBox>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.paint.Color?>
+
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="it.polimi.ingsw.view.GUI.FatalErrorController"
+           prefHeight="600.0" prefWidth="900.0"
+           style="-fx-background-color: linear-gradient(to bottom right, #111111, #1a1a1a, #241111);">
+
+    <VBox alignment="CENTER" spacing="30.0">
+        <padding>
+            <Insets bottom="40.0" left="40.0" right="40.0" top="40.0"/>
+        </padding>
+
+        <StackPane maxHeight="80.0" maxWidth="80.0" style="-fx-background-color: rgba(255, 68, 68, 0.1); -fx-background-radius: 50;">
+            <padding>
+                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0"/>
+            </padding>
+            <SVGPath content="M12 2L1 21h22L12 2zm1 14h-2v-2h2v2zm0-4h-2V8h2v4z"
+                     fill="#ff4444"
+                     scaleX="2.5" scaleY="2.5" />
+        </StackPane>
+
+        <Label text="GAME OVER" textFill="#ff4444">
+            <font>
+                <Font name="System Bold" size="54.0"/>
+            </font>
+            <effect>
+                <DropShadow radius="15.0" spread="0.2">
+                    <color>
+                        <Color red="1.0" green="0.26" blue="0.26" opacity="0.4"/>
+                    </color>
+                </DropShadow>
+            </effect>
+        </Label>
+
+        <VBox alignment="CENTER" maxWidth="550.0" spacing="15.0"
+              style="-fx-background-color: rgba(30, 30, 30, 0.75); -fx-background-radius: 12; -fx-border-color: rgba(255, 68, 68, 0.3); -fx-border-radius: 12; -fx-border-width: 1.5;">
+            <padding>
+                <Insets bottom="25.0" left="30.0" right="30.0" top="25.0"/>
+            </padding>
+            <effect>
+                <DropShadow radius="20.0" color="rgba(0,0,0,0.5)"/>
+            </effect>
+
+            <Label text="CRITICAL DISCONNECTION" textFill="#aaaaaa">
+                <font>
+                    <Font name="System Bold" size="12.0"/>
+                </font>
+            </Label>
+
+            <Label fx:id="errorMessage" text="Fatal error.. Connection with the server or a player was lost."
+                   textFill="WHITE" wrapText="true" textAlignment="CENTER" lineSpacing="4.0">
+                <font>
+                    <Font name="System" size="16.0"/>
+                </font>
+            </Label>
+        </VBox>
+
+    </VBox>
+</StackPane>

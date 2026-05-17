@@ -406,9 +406,9 @@ public class GameBoardController extends SceneController {
         });
     }
 
-    /*
-        method that saves a new board when it comes from server and put it in "lastBoard", in this moment the player can't click it
-         */
+    /**
+        method that saves a new board when it comes from server and put it in "lastBoard", at this moment the player can't click it
+     */
     public void displayBoardCards() {
         if (lastBoard == null) {
             renderStaticCardBacks();
@@ -711,12 +711,11 @@ public class GameBoardController extends SceneController {
 
         if (cardSelectionEnabled) {
             if (isEventCard) {
-                // Gli eventi sono passivi: non si illuminano e restituiscono un errore locale
                 cardPane.setStyle(nonSelectableCardStyle());
                 cardPane.setOnMouseClicked(event -> {
                     showErrorMessage("You cannot select event cards.");
                 });
-            }else{
+            } else {
                     cardPane.setStyle(selectableCardStyle());
 
                     cardPane.setOnMouseClicked(event -> {
@@ -732,46 +731,12 @@ public class GameBoardController extends SceneController {
                         }
                     });
             }
-
-        }else{ //if is not player turn, all card are not clickable
-
-                cardPane.setStyle(disabledCardStyle());
-                cardPane.setOnMouseClicked(null);
+        } else { //if is not player turn, all card are not clickable
+            cardPane.setStyle(disabledCardStyle());
+            cardPane.setOnMouseClicked(null);
         }
 
         return cardPane;
-    }
-
-    /**
-     * Creates a single empty tribe slot with a fixed counter starting from zero.
-     *
-     */
-    private StackPane createEmptyTribeSlot(String category) {
-        VBox box = new VBox(4);
-        box.setAlignment(Pos.CENTER);
-
-        ImageView icon = createImageView("/images/Tribe/" + category + "_ICON.png", 44, 44);
-        icon.setOpacity(0.25);
-
-        Label counter = new Label("0");
-        counter.setStyle("-fx-font-weight: bold; -fx-text-fill: #2b2f32;");
-
-        Label title = new Label(category);
-        title.setStyle("-fx-font-size: 10px; -fx-text-fill: #2b2f32;");
-
-        box.getChildren().addAll(icon, counter, title);
-
-        StackPane wrapper = new StackPane(box);
-        wrapper.setStyle("""
-                -fx-background-color: #f7f3ea;
-                -fx-border-color: #c4bba4;
-                -fx-border-width: 1;
-                -fx-border-radius: 6;
-                -fx-background-radius: 6;
-                -fx-padding: 6;
-                """);
-
-        return wrapper;
     }
 
     /**
@@ -808,7 +773,9 @@ public class GameBoardController extends SceneController {
      * Closes the in-scene tribe overlay.
      */
     private void closeTribeOverlay() {
-        if (tribeOverlay == null) return;
+        if (tribeOverlay == null)
+            return;
+
         tribeOverlay.setVisible(false);
         tribeOverlay.setManaged(false);
     }
@@ -978,7 +945,7 @@ public class GameBoardController extends SceneController {
         fadeOut.setOnFinished(e -> toastContainer.getChildren().remove(toast));
 
         Timeline timeline = new Timeline(
-                new KeyFrame(javafx.util.Duration.seconds(5), event -> fadeOut.play())
+                new KeyFrame(javafx.util.Duration.seconds(6), event -> fadeOut.play())
         );
         timeline.play();
     }
