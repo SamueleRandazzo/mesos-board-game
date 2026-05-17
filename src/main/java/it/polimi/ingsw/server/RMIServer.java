@@ -44,9 +44,9 @@ public class RMIServer extends UnicastRemoteObject implements Loggable {
     public void getGlobalLeaderboard(int targetPlayers, GameObserver observer) throws RemoteException {
         try {
             List<GlobalPlayerRankDTO> ranks = MatchDAO.getLeaderboard(targetPlayers);
-            GlobalLeaderboardDTO leaderbaord = new GlobalLeaderboardDTO(ranks);
+            GlobalLeaderboardDTO leaderboard = new GlobalLeaderboardDTO(ranks);
 
-            observer.onDisplayGlobalLeaderboard(leaderbaord);
+            observer.onDisplayGlobalLeaderboard(leaderboard);
         } catch (Exception e) {
             throw new RemoteException(e.getMessage());
         }

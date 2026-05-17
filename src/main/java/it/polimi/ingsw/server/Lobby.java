@@ -20,6 +20,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
 import it.polimi.ingsw.database.*;
 
 public class Lobby {
@@ -35,7 +37,6 @@ public class Lobby {
     private final Map<String, Color> playersInfo = new LinkedHashMap<>();
     private Game currentGame;
     private final PersistenceManager persistenceManager;
-    private boolean recoveryMode = false;
 
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private boolean healthCheckStarted = false;
@@ -51,13 +52,12 @@ public class Lobby {
         if (persistenceManager.hasSave()) {
             this.currentGame = persistenceManager.loadGame();
             this.targetPlayers = currentGame.getNumPlayers();
-            this.recoveryMode = true;
 
             for (Player player : currentGame.getPlayers()) {
                 playersInfo.put(player.getNickname(), player.getColor());
             }
 
-            System.out.println("[PERSISTENCE] Saved game loaded. Waiting for players to reconnect.");
+            System.out.println("[PERSISTENCE] Saved game loaded.");
         }
     }
 
@@ -70,11 +70,6 @@ public class Lobby {
      * @throws RemoteException if the game is full or the server is unreachable.
      */
     public synchronized void addPlayer(String nickname, Color color, GameObserver observer) throws Exception {
-        if (recoveryMode) {
-            addRecoveringPlayer(nickname, color, observer);
-            return;
-        }
-
         if (targetPlayers != -1 && nicknames.size() >= targetPlayers) {
             throw new CustomException.LobbyFullException();
         }
@@ -156,12 +151,32 @@ public class Lobby {
 
     private synchronized void checkStartCondition() throws Exception {
         if (targetPlayers != -1 && nicknames.size() == targetPlayers) {
-            System.out.println("Game starting!");
 
             List<Player> players = new ArrayList<>();
             for (int i = 0; i < nicknames.size(); i++) {
                 players.add(new Player(colors.get(i), nicknames.get(i)));
             }
+
+            if (currentGame != null) {
+                List<Player> currentPlayers = currentGame.getPlayers();
+
+                if (currentPlayers.size() == players.size()) {
+                    Set<String> currentIdentifiers = currentPlayers.stream()
+                            .map(p -> p.getNickname() + "-" + p.getColor())
+                            .collect(Collectors.toSet());
+
+                    boolean allMatch = players.stream()
+                            .map(p -> p.getNickname() + "-" + p.getColor())
+                            .allMatch(currentIdentifiers::contains);
+
+                    if (allMatch) {
+                        resumeRecoveredGame();
+                        return;
+                    }
+                }
+            }
+
+            System.out.println("Game starting!");
 
             Collections.shuffle(players);
 
@@ -215,44 +230,9 @@ public class Lobby {
         return new Game(players, decks, era1Buildings, era2Buildings, era3Buildings, offerTrack);
     }
 
-    private synchronized void addRecoveringPlayer(String nickname, Color color, GameObserver observer) throws Exception {
-        if (!isSavedNickname(nickname)) {
-            throw new CustomException.UnknownRecoveryNicknameException();
-        }
-
-        if (nicknames.contains(nickname)) {
-            throw new CustomException.NicknameAlreadyUsedException();
-        }
-
-        Color savedColor = playersInfo.get(nickname);
-        if (savedColor != color) {
-            throw new CustomException.RecoveryColorMismatchException(savedColor);
-        }
-
-        nicknames.add(nickname);
-        colors.add(savedColor);
-        remoteObservers.add(observer);
-        playerObservers.put(nickname, observer);
-
-        if (!healthCheckStarted) {
-            startNetworkHealthCheck();
-        }
-
-        if (nicknames.size() == targetPlayers) {
-            resumeRecoveredGame();
-        } else {
-            for (GameObserver o : remoteObservers) {
-                o.onPlayerJoined(nicknames.size(), targetPlayers);
-            }
-        }
-    }
-
-    private boolean isSavedNickname(String nickname) {
-        return currentGame != null && currentGame.getPlayers().stream()
-                .anyMatch(player -> player.getNickname().equals(nickname));
-    }
-
     private void resumeRecoveredGame() throws RemoteException {
+        System.out.println("Game resuming!");
+
         GameController gameController = new GameController(currentGame, persistenceManager);
         ModelToRemoteViewAdapter adapter = new ModelToRemoteViewAdapter(this.playerObservers);
         currentGame.addListener(adapter);
@@ -282,7 +262,6 @@ public class Lobby {
             currentGame.notifyEndGame();
         }
 
-        recoveryMode = false;
         System.out.println("[PERSISTENCE] All players reconnected. Game resumed.");
     }
 
@@ -299,14 +278,8 @@ public class Lobby {
                 remoteObservers.remove(index);
                 playerObservers.remove(nickname);
                 nicknames.remove(nickname);
-                if (!recoveryMode) {
-                    playersInfo.remove(nickname);
-                }
+                playersInfo.remove(nickname);
             }
-        }
-
-        if (recoveryMode) {
-            return;
         }
 
         terminateGame(nickname);

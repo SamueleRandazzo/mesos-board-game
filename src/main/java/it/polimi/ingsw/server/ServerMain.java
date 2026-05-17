@@ -49,7 +49,7 @@ public class ServerMain {
                     new SocketClientHandler(clientSocket, lobby).start();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println(e);
             }
         }).start();
     }

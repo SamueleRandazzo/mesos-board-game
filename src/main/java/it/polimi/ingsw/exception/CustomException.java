@@ -50,16 +50,4 @@ public class CustomException {
             super("Host is choosing players number, try later.");
         }
     }
-
-    public static class UnknownRecoveryNicknameException extends BaseGameException {
-        public UnknownRecoveryNicknameException() {
-            super("A saved game is waiting for recovery. Reconnect with one of the saved nicknames.");
-        }
-    }
-
-    public static class RecoveryColorMismatchException extends BaseGameException {
-        public RecoveryColorMismatchException(Color expectedColor) {
-            super("Wrong color for saved game recovery. Use the saved color: " + expectedColor + ".");
-        }
-    }
 }
