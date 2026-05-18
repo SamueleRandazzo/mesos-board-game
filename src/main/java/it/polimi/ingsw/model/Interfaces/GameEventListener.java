@@ -14,4 +14,5 @@ public interface GameEventListener {
     void onEventMessage(String playerNickname, String message);
     void onEndGame(LeaderboardDTO leaderboard);
     void onShowPlayersOrder(List<String> playersOrder);
+    void onManualEndTurnRequest(String playerNickname);
 }

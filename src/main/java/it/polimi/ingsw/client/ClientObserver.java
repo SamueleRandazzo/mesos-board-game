@@ -107,4 +107,9 @@ public class ClientObserver implements GameObserver {
     public void onShowEventMessage(String message) throws RemoteException {
         view.showEventMessage(message);
     }
+
+    @Override
+    public void askEndTurnOrBuyBuilding() throws RemoteException {
+        view.askEndTurnOrBuyBuilding();
+    }
 }

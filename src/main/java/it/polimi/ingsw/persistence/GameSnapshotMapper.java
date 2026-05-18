@@ -70,6 +70,8 @@ public class GameSnapshotMapper {
             player.setPrestigePoints(playerSnapshot.prestigePoints);
             players.add(player);
             playersByNickname.put(player.getNickname(), player);
+            player.setUpperPick(playerSnapshot.upperPick);
+            player.setLowerPick(playerSnapshot.lowerPick);
         }
 
         Board board = restoreBoard(snapshot.board, tribeCards, buildingCards);
@@ -104,6 +106,8 @@ public class GameSnapshotMapper {
         snapshot.ownedCardIds = player.getTribe().getOwnedCards().stream()
                 .map(Card::getId)
                 .toList();
+        snapshot.upperPick = player.getUpperPick();
+        snapshot.lowerPick = player.getLowerPick();
         return snapshot;
     }
 
@@ -150,9 +154,6 @@ public class GameSnapshotMapper {
 
     private ActionResolutionSnapshot toActionResolutionSnapshot(ActionResolutionState state) {
         ActionResolutionSnapshot snapshot = new ActionResolutionSnapshot();
-        snapshot.upperPicksLeft = state.getUpperPicksLeft();
-        snapshot.lowerPicksLeft = state.getLowerPicksLeft();
-        snapshot.hasBoughtBuilding = state.hasBoughtBuilding();
         snapshot.currentActivePlayerNickname = state.getCurrentActivePlayerForState() == null
                 ? null
                 : state.getCurrentActivePlayerForState().getNickname();
@@ -233,9 +234,6 @@ public class GameSnapshotMapper {
                         : resolvePlayer(state.currentActivePlayerNickname, playersByNickname);
                 yield new ActionResolutionState(
                         null,
-                        state == null ? 0 : state.upperPicksLeft,
-                        state == null ? 0 : state.lowerPicksLeft,
-                        state != null && state.hasBoughtBuilding,
                         currentActivePlayer,
                         state != null && state.extraCardChoose
                 );

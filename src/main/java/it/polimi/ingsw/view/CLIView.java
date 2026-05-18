@@ -622,4 +622,31 @@ public class CLIView implements View {
     public void showEventMessage(String message) {
         showMessage(message);
     }
+
+    @Override
+    public void askEndTurnOrBuyBuilding() {
+        clearInputBuffer();
+
+        System.out.println("You can only buy buildings. If you want to buy them, enter the building code; otherwise, type END_TURN.");
+        System.out.print("Enter your choice (e.g. A) or manual code (e.g. T0): ");
+        String input = readLine().trim().toUpperCase();
+
+        // Translates the chosen letter into the server format immediately
+        String serverCode = translateInputToServerCode(input);
+
+        try {
+            // Forwards the immediate selection straight to the server Model
+            if (input.equals("END_TURN")) {
+                network.endTurnRequest();
+            } else {
+                network.cardSelection(serverCode);
+            }
+        } catch (Exception e) {
+            showError(handleNetworkError(e));
+            if (lastBoard != null) {
+                displayBoard(lastBoard);
+                askEndTurnOrBuyBuilding();
+            }
+        }
+    }
 }

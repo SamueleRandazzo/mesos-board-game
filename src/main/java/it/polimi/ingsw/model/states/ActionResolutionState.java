@@ -13,9 +13,6 @@ import java.util.List;
 public class ActionResolutionState extends GameState {
 
     private static final int MISSING_FOOD_MALUS = -2;
-    private int upperPicksLeft;
-    private int lowerPicksLeft;
-    private boolean hasBoughtBuilding;
     private Player currentActivePlayer;
     private boolean extraCardChoose = false; // Used to permit an extra pick after resolution state
 
@@ -25,34 +22,13 @@ public class ActionResolutionState extends GameState {
      */
     public ActionResolutionState(Game context) {
         this.currentActivePlayer = null;
-        this.upperPicksLeft = 0;
-        this.lowerPicksLeft = 0;
-        this.hasBoughtBuilding = false;
     }
 
     public ActionResolutionState(Game context,
-                                 int upperPicksLeft,
-                                 int lowerPicksLeft,
-                                 boolean hasBoughtBuilding,
                                  Player currentActivePlayer,
                                  boolean extraCardChoose) {
-        this.upperPicksLeft = upperPicksLeft;
-        this.lowerPicksLeft = lowerPicksLeft;
-        this.hasBoughtBuilding = hasBoughtBuilding;
         this.currentActivePlayer = currentActivePlayer;
         this.extraCardChoose = extraCardChoose;
-    }
-
-    public int getUpperPicksLeft() {
-        return upperPicksLeft;
-    }
-
-    public int getLowerPicksLeft() {
-        return lowerPicksLeft;
-    }
-
-    public boolean hasBoughtBuilding() {
-        return hasBoughtBuilding;
     }
 
     public Player getCurrentActivePlayerForState() {
@@ -63,35 +39,6 @@ public class ActionResolutionState extends GameState {
         return extraCardChoose;
     }
 
-    /**
-     * Sets up the counters for the active player
-     * if they haven't been initialized for the current turn yet.
-     *
-     * @param context      the current game context
-     * @param activePlayer the player currently executing their turn
-     */
-    private void initializeTurnIfNeeded(Game context, Player activePlayer) {
-        // extra card init
-        if (extraCardChoose) {
-            this.currentActivePlayer = activePlayer;
-            this.upperPicksLeft = 1;
-            this.hasBoughtBuilding = false;
-            return;
-        }
-
-        // If the active player is not equal to the current one, it means a new turn has started
-        if (this.currentActivePlayer == null || !this.currentActivePlayer.equals(activePlayer)) {
-            this.currentActivePlayer = activePlayer;
-
-            // Find the OfferTile where the new player is located
-            OfferTile playerTile = findTileForPlayer(context, activePlayer);
-
-            // Set the remaining picks by reading the OfferTile parameters
-            this.upperPicksLeft = playerTile.getTopRowDraws();
-            this.lowerPicksLeft = playerTile.getBottomRowDraws();
-            this.hasBoughtBuilding = false;
-        }
-    }
 
     /**
      * Searches the OfferTrack to find the specific tile where the player placed their totem.
@@ -123,19 +70,16 @@ public class ActionResolutionState extends GameState {
      */
     @Override
     public void resolveUpperCardPick(Game context, Player player, int pos) {
-
-        initializeTurnIfNeeded(context, player);
-
-        if (upperPicksLeft <= 0) {
+        if (player.getUpperPick() <= 0) {
             throw new IllegalStateException("You have no upper row picks left!");
         }
 
         context.executeUpperCardPick(player, pos);
         context.notifyShowTribe(player.getNickname());
 
-        upperPicksLeft--;
+        player.changeUpperPick(-1);
 
-        if (lowerPicksLeft == 0 && upperPicksLeft == 0) {
+        if (player.getLowerPick() == 0 && player.getUpperPick() == 0) {
             context.resolveEndTurn();
         } else {
             context.notifyOnShowBoard();
@@ -153,19 +97,16 @@ public class ActionResolutionState extends GameState {
      */
     @Override
     public void resolveLowerCardPick(Game context, Player player, int pos) {
-
-        initializeTurnIfNeeded(context, player);
-
-        if (lowerPicksLeft <= 0) {
+        if (player.getLowerPick() <= 0) {
             throw new IllegalStateException("You have no lower row picks left!");
         }
 
         context.executeLowerCardPick(player, pos);
         context.notifyShowTribe(player.getNickname());
 
-        lowerPicksLeft--;
+        player.changeLowerPick(-1);
 
-        if (lowerPicksLeft == 0 && upperPicksLeft == 0) {
+        if (player.getLowerPick() == 0 && player.getUpperPick() == 0) {
             context.resolveEndTurn();
         } else {
             context.notifyOnShowBoard();
@@ -183,25 +124,23 @@ public class ActionResolutionState extends GameState {
      */
     @Override
     public void resolveUpperBuildingPick(Game context, Player player, int pos) {
-        initializeTurnIfNeeded(context, player);
-
-        if (hasBoughtBuilding) {
-            throw new IllegalStateException("You have already picked a building this turn!");
+        if (player.getUpperPick() <= 0) {
+            throw new IllegalStateException("You have no upper row picks left!");
         }
 
         int cost = context.getBoard().getUpperBuildingCards().get(pos).getFoodCost();
+        int realCost = Math.max(cost - player.getTribe().totalBuildersFoodDiscount(), 0);
 
-        if (player.getFoodAmount() < cost) {
+        if (player.getFoodAmount() < realCost) {
             throw new IllegalStateException("Not enough food to buy this building!");
         }
 
         context.executeUpperBuildingPick(player, pos);
         context.notifyShowTribe(player.getNickname());
 
-        hasBoughtBuilding = true;
-        upperPicksLeft--;
+        player.setUpperPick(-1);
 
-        if (lowerPicksLeft == 0 && upperPicksLeft == 0) {
+        if (player.getLowerPick() == 0 && player.getUpperPick() == 0) {
             context.resolveEndTurn();
         } else {
             context.notifyOnShowBoard();
@@ -219,25 +158,23 @@ public class ActionResolutionState extends GameState {
      */
     @Override
     public void resolveLowerBuildingPick(Game context, Player player, int pos) {
-        initializeTurnIfNeeded(context, player);
-
-        if (hasBoughtBuilding) {
-            throw new IllegalStateException("You have already picked a building this turn!");
+        if (player.getLowerPick() <= 0) {
+            throw new IllegalStateException("You have no upper row picks left!");
         }
 
         int cost = context.getBoard().getLowerBuildingCards().get(pos).getFoodCost();
+        int realCost = Math.max(cost - player.getTribe().totalBuildersFoodDiscount(), 0);
 
-        if (player.getFoodAmount() < cost) {
+        if (player.getFoodAmount() < realCost) {
             throw new IllegalStateException("Not enough food to buy this building!");
         }
 
         context.executeLowerBuildingPick(player, pos);
         context.notifyShowTribe(player.getNickname());
 
-        hasBoughtBuilding = true;
-        lowerPicksLeft--;
+        player.changeLowerPick(-1);
 
-        if (lowerPicksLeft == 0 && upperPicksLeft == 0) {
+        if (player.getLowerPick() == 0 && player.getUpperPick() == 0) {
             context.resolveEndTurn();
         } else {
             context.notifyOnShowBoard();
@@ -255,10 +192,6 @@ public class ActionResolutionState extends GameState {
      */
     @Override
     public void endTurn(Game context, Player player) {
-        if (upperPicksLeft > 0 || lowerPicksLeft > 0) {
-            throw new IllegalStateException("You must draw all your required tribe cards before ending your turn!");
-        }
-
         // if flag is true return immediately and show updated board
         if (extraCardChoose) {
             context.notifyOnShowBoard();
@@ -267,6 +200,7 @@ public class ActionResolutionState extends GameState {
 
         // Remove the totem from the Offer Track
         OfferTile tile = findTileForPlayer(context, player);
+        player.changeFoodAmount(tile.getFoodBonus());
         tile.removeTotem();
 
         // Place totem on the Turn Order Tile (Automatically finds the first empty slot)
@@ -285,7 +219,10 @@ public class ActionResolutionState extends GameState {
             }
         }
 
+        // Notify new offer track and updated tribe
+        context.notifyOnShowOfferTrack();
         context.notifyShowTribe(player.getNickname());
+
         context.advanceTurn();
 
         // BOARD HAS CHANGED: Send the updated board before asking the next player to pick

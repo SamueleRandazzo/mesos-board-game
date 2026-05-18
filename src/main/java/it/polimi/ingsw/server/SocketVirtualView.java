@@ -215,4 +215,13 @@ public class SocketVirtualView implements GameObserver {
             System.err.println("Serialization error: " + e.getMessage());
         }
     }
+
+    @Override
+    public void askEndTurnOrBuyBuilding() throws RemoteException {
+        try {
+            out.println("END_TURN_OR_BUY_BUILDING");
+        } catch (Exception e) {
+            System.err.println("Serialization error: " + e.getMessage());
+        }
+    }
 }

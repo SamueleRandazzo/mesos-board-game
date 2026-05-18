@@ -231,8 +231,26 @@ public class Game {
      * </p>
      */
     public void notifyActionResultTurnChanged () {
-        for (GameEventListener l : listeners) {
-            l.onActionResultTurnChanged(this.getCurrentActivePlayer().getNickname());
+        if (this.getCurrentActivePlayer().getUpperPick() == 0 && this.getCurrentActivePlayer().getLowerPick() == 0) {
+            resolveEndTurn();
+        } else {
+            boolean canChoose = checkIfCurrentPlayerCanChoose();
+
+            if (canChoose) {
+                for (GameEventListener l : listeners) {
+                    l.onActionResultTurnChanged(this.getCurrentActivePlayer().getNickname());
+                }
+            } else {
+                boolean canBuyBuilding = checkIfCurrentPlayerCanBuyBuilding();
+
+                if (canBuyBuilding) {
+                    for (GameEventListener l : listeners) {
+                        l.onManualEndTurnRequest(this.getCurrentActivePlayer().getNickname());
+                    }
+                } else {
+                    resolveEndTurn();
+                }
+            }
         }
     }
 
@@ -646,6 +664,7 @@ public class Game {
         for (int i = 0; i < roundTurnOrder.size(); i++) {
             if (roundTurnOrder.get(i).getTribe().getExtraCardFromUpper()) {
                 this.currentPlayerIndex = i;
+                this.getCurrentActivePlayer().setUpperPick(1);
                 notifyActionResultTurnChanged();
             }
         }
@@ -780,5 +799,37 @@ public class Game {
 
     public void setEndGameStatus() {
         this.currentState = new EndGameState();
+    }
+
+    public int getCurrenObtainableUpperCard() {
+        return Math.toIntExact(this.board.getTopRow().stream().filter(TribeDeck::getIsObtainable).count());
+    }
+
+    public int getCurrenObtainableLowerCard() {
+        return Math.toIntExact(this.board.getBottomRow().stream().filter(TribeDeck::getIsObtainable).count());
+    }
+
+    public boolean checkIfCurrentPlayerCanChoose() {
+        return (this.getCurrentActivePlayer().getLowerPick() > 0 && getCurrenObtainableLowerCard() != 0)
+                || (this.getCurrentActivePlayer().getUpperPick() > 0 && getCurrenObtainableUpperCard() != 0);
+    }
+
+    public boolean checkIfCurrentPlayerCanBuyBuilding() {
+        Player player = this.getCurrentActivePlayer();
+        int foodDiscount = player.getTribe().totalBuildersFoodDiscount();
+
+        if (player.getUpperPick() > 0) {
+            if (this.getBoard().getUpperBuildingCards().stream().anyMatch(b -> b.getFoodCost() < player.getFoodAmount() + foodDiscount)) {
+                return true;
+            }
+        }
+
+        if (player.getLowerPick() > 0) {
+            if (this.getBoard().getLowerBuildingCards().stream().anyMatch(b -> b.getFoodCost()  < player.getFoodAmount() + foodDiscount)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

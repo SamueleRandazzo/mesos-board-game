@@ -209,6 +209,12 @@ public class GUIView implements View {
         });
     }
 
+    @Override
+    public void askEndTurnOrBuyBuilding() {
+        Platform.runLater(() -> {
+            currentController.showEndTurn();
+        });
+    }
 
     public String getMyNickname() { return myNickname; }
 

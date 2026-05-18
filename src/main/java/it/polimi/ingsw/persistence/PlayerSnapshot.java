@@ -9,4 +9,6 @@ public class PlayerSnapshot {
     public int foodAmount;
     public int prestigePoints;
     public List<String> ownedCardIds = new ArrayList<>();
+    public int upperPick;
+    public int lowerPick;
 }

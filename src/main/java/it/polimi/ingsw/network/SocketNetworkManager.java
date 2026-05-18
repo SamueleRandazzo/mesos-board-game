@@ -43,4 +43,9 @@ public class SocketNetworkManager extends NetworkManager {
     public void seeGlobalLeaderboard(int targetPlayers) {
         out.println("GLOBAL_LEADERBOARD " + targetPlayers);
     }
+
+    @Override
+    public void endTurnRequest() {
+        out.println("END_TURN");
+    }
 }

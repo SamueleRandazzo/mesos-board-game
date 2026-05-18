@@ -10,6 +10,8 @@ public class Player
     private int foodAmount;
     public final Color color;
     private Tribe tribe;
+    private int upperPick;
+    private int lowerPick;
 
     public Player(Color color, String nickname){
         this.nickname = nickname;
@@ -17,6 +19,8 @@ public class Player
         this.foodAmount = 0;
         this.color = color;
         tribe = new Tribe(this);
+        upperPick = 0;
+        lowerPick = 0;
     }
 
     public Tribe getTribe(){
@@ -50,4 +54,28 @@ public class Player
     public Color getColor() { return this.color; }
 
     public String getNickname() { return this.nickname; }
+
+    public int getUpperPick() {
+        return upperPick;
+    }
+
+    public int getLowerPick() {
+        return lowerPick;
+    }
+
+    public void setUpperPick(int upperPick) {
+        this.upperPick = upperPick;
+    }
+
+    public void setLowerPick(int lowerPick) {
+        this.lowerPick = lowerPick;
+    }
+
+    public void changeUpperPick(int var) {
+        this.upperPick += var;
+    }
+
+    public void changeLowerPick(int var) {
+        this.lowerPick += var;
+    }
 }

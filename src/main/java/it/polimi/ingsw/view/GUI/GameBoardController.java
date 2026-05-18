@@ -6,6 +6,7 @@ import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -129,6 +130,9 @@ public class GameBoardController extends SceneController {
     @FXML private VBox toastContainer;
 
     @FXML private Label tribeOverlayTitle;
+
+    @FXML private Button endTurnButton;
+
     /**
      * Initializes the board scene with disabled offer tiles and  cards.
      *
@@ -139,8 +143,6 @@ public class GameBoardController extends SceneController {
     public void initialize() {
         offerTrackContainer.setDisable(true);
 
-        // TODO: quando avremo i DTO delle carte, queste righe verranno riempite
-        // con le carte reali presenti sopra e sotto le mappe.
         renderStaticCardBacks();
 
         initializeTribeOverlay();
@@ -948,5 +950,29 @@ public class GameBoardController extends SceneController {
                 new KeyFrame(javafx.util.Duration.seconds(6), event -> fadeOut.play())
         );
         timeline.play();
+    }
+
+    @Override
+    public void showEndTurn() {
+        endTurnButton.setVisible(true);
+        endTurnButton.setManaged(true);
+
+        showToast("You can only buy buildings. If you want to buy them, click on them; otherwise, click END TURN button.");
+    }
+
+    @FXML
+    private void handleEndTurn(ActionEvent event) {
+        System.out.println("Ending turn!");
+
+        endTurnButton.setVisible(false);
+        endTurnButton.setManaged(false);
+
+        try {
+            network.endTurnRequest();
+        } catch (Exception ex) {
+            endTurnButton.setVisible(true);
+            endTurnButton.setManaged(true);
+            showErrorMessage(handleNetworkError(ex));
+        }
     }
 }

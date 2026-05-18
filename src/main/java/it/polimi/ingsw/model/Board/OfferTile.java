@@ -57,9 +57,8 @@ public class OfferTile {
     public void placeTotem(Player player){
         this.placedPlayer = player;
 
-        if (this.foodBonus != 0) {
-            player.changeFoodAmount(this.foodBonus);
-        }
+        player.setUpperPick(this.topRowDraws);
+        player.setLowerPick(this.bottomRowDraws);
     }
 
     public void restorePlacedPlayer(Player player) {

@@ -72,4 +72,9 @@ public class RMINetworkManager extends NetworkManager {
     public void seeGlobalLeaderboard(int targetPlayers) throws RemoteException {
         serverStub.getGlobalLeaderboard(targetPlayers, myObserver);
     }
+
+    @Override
+    public void endTurnRequest() throws Exception {
+        controller.handleEndTurnRequest();
+    }
 }

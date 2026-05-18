@@ -1,29 +1,29 @@
 {
   "numPlayers" : 2,
-  "currentEra" : 1,
-  "currentRound" : 1,
-  "currentPlayerIndex" : 0,
+  "currentEra" : 2,
+  "currentRound" : 4,
+  "currentPlayerIndex" : 1,
   "currentStateName" : "ActionResolutionState",
   "players" : [ {
-    "nickname" : "gg",
-    "color" : "BLACK",
+    "nickname" : "Samn",
+    "color" : "WHITE",
     "foodAmount" : 1,
-    "prestigePoints" : 0,
-    "ownedCardIds" : [ ]
+    "prestigePoints" : -2,
+    "ownedCardIds" : [ "tribeCard_15", "tribeCard_10", "tribeCard_7", "tribeCard_2", "tribeCard_20", "tribeCard_21", "tribeCard_28" ]
   }, {
-    "nickname" : "test",
+    "nickname" : "Test",
     "color" : "RED",
-    "foodAmount" : 2,
-    "prestigePoints" : 0,
-    "ownedCardIds" : [ ]
+    "foodAmount" : 4,
+    "prestigePoints" : -1,
+    "ownedCardIds" : [ "tribeCard_11", "tribeCard_9", "tribeCard_6", "tribeCard_3", "tribeCard_1", "tribeCard_4", "tribeCard_27" ]
   } ],
   "board" : {
-    "upperTribeCards" : [ "tribeCard_1", "tribeCard_4", "tribeCard_2", "event_2", "event_3", "tribeCard_14" ],
-    "lowerTribeCards" : [ "tribeCard_6", "tribeCard_3", "tribeCard_28" ],
-    "upperBuildingCards" : [ "building_4" ],
-    "lowerBuildingCards" : [ ],
-    "tribeDeck" : [ "tribeCard_11", "tribeCard_20", "tribeCard_15", "tribeCard_22", "tribeCard_7", "tribeCard_10", "event_4", "tribeCard_19", "event_1", "tribeCard_21", "tribeCard_27", "tribeCard_16", "tribeCard_9", "tribeCard_31", "event_8", "tribeCard_45", "tribeCard_30", "tribeCard_48", "tribeCard_39", "tribeCard_36", "tribeCard_40", "tribeCard_51", "tribeCard_54", "event_6", "tribeCard_52", "tribeCard_37", "tribeCard_47", "event_5", "tribeCard_35", "tribeCard_46", "event_7", "tribeCard_33", "tribeCard_55", "tribeCard_50", "tribeCard_53", "tribeCard_81", "tribeCard_83", "tribeCard_76", "tribeCard_63", "tribeCard_61", "tribeCard_72", "tribeCard_68", "tribeCard_78", "tribeCard_70", "tribeCard_79", "tribeCard_82", "tribeCard_60", "tribeCard_59", "tribeCard_62", "tribeCard_77", "event_10", "tribeCard_65", "event_9", "tribeCard_71", "event_12", "event_11" ],
-    "buildingDeck" : [ "building_4" ]
+    "upperTribeCards" : [ "tribeCard_52", "event_7", "tribeCard_30", "tribeCard_45", "tribeCard_35" ],
+    "lowerTribeCards" : [ "event_1", "event_3" ],
+    "upperBuildingCards" : [ "building_7", "building_12" ],
+    "lowerBuildingCards" : [ "building_3" ],
+    "tribeDeck" : [ "tribeCard_54", "event_6", "tribeCard_47", "tribeCard_46", "tribeCard_48", "tribeCard_55", "tribeCard_33", "tribeCard_51", "event_5", "tribeCard_39", "tribeCard_36", "tribeCard_40", "tribeCard_31", "event_8", "tribeCard_50", "tribeCard_37", "tribeCard_53", "tribeCard_68", "tribeCard_81", "tribeCard_78", "tribeCard_59", "tribeCard_79", "event_9", "tribeCard_62", "tribeCard_61", "tribeCard_71", "tribeCard_70", "tribeCard_65", "tribeCard_77", "event_10", "tribeCard_63", "tribeCard_76", "tribeCard_72", "tribeCard_82", "tribeCard_83", "tribeCard_60", "event_12", "event_11" ],
+    "buildingDeck" : [ ]
   },
   "offerTrack" : {
     "tiles" : [ {
@@ -32,21 +32,21 @@
       "topRowDraws" : 0,
       "bottomRowDraws" : 1,
       "minPlayers" : 2,
-      "placedPlayerNickname" : "gg"
+      "placedPlayerNickname" : null
     }, {
       "foodBonus" : 0,
       "tileId" : "C",
       "topRowDraws" : 1,
       "bottomRowDraws" : 0,
       "minPlayers" : 2,
-      "placedPlayerNickname" : "test"
+      "placedPlayerNickname" : null
     }, {
       "foodBonus" : 0,
       "tileId" : "E",
       "topRowDraws" : 1,
       "bottomRowDraws" : 1,
       "minPlayers" : 2,
-      "placedPlayerNickname" : null
+      "placedPlayerNickname" : "Test"
     }, {
       "foodBonus" : 0,
       "tileId" : "F",
@@ -59,14 +59,14 @@
   "turnOrderTile" : {
     "slots" : [ {
       "foodModifier" : 1,
-      "occupyingPlayerNickname" : null
+      "occupyingPlayerNickname" : "Samn"
     }, {
       "foodModifier" : -1,
       "occupyingPlayerNickname" : null
     } ]
   },
-  "roundTurnOrder" : [ "gg", "test" ],
-  "eraBuildingDecks" : [ [ "building_9", "building_11" ], [ "building_12", "building_15", "building_14" ] ],
+  "roundTurnOrder" : [ "Samn", "Test" ],
+  "eraBuildingDecks" : [ [ "building_7", "building_12" ], [ "building_15", "building_18", "building_12" ] ],
   "actionResolutionState" : {
     "upperPicksLeft" : 0,
     "lowerPicksLeft" : 0,

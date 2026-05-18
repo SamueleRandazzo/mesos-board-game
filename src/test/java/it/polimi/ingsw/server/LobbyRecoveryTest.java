@@ -131,6 +131,7 @@ class LobbyRecoveryTest {
         @Override public void onDisplayGlobalLeaderboard(GlobalLeaderboardDTO globalLeaderboard) {}
         @Override public void onDisplayTurnOrderTile(List<TurnOrderTileDTO> turnOrderTile) {}
         @Override public void onShowEventMessage(String message) {}
+        @Override public void askEndTurnOrBuyBuilding() throws RemoteException {}
         @Override public void onShowTribe(String nickname, TribeStatusDTO tribe) {}
     }
 
