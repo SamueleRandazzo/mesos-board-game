@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  * across the server application.
  */
 public class DatabaseManager {
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/mesos";
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/GC35_Mesos_DB";
     private static String user;
     private static String pass;
     private static boolean available = false;
@@ -39,8 +39,8 @@ public class DatabaseManager {
             try (Connection conn = DriverManager.getConnection(baseUrl, user, pass);
                  Statement stmt = conn.createStatement()) {
 
-                stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS mesos");
-                System.out.println("[DB] Database 'mesos' checked/created.");
+                stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS GC35_Mesos_DB");
+                System.out.println("[DB] Database 'GC35_Mesos_DB' checked/created.");
             }
 
             try (Connection conn = getConnection()) {
