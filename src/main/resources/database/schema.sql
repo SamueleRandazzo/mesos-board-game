@@ -1,6 +1,6 @@
 -- 1. Create the database if it doesn't exist
-CREATE DATABASE IF NOT EXISTS mesos;
-USE mesos;
+CREATE DATABASE IF NOT EXISTS GC35_Mesos_DB;
+USE GC35_Mesos_DB;
 
 -- 2. Players table
 CREATE TABLE IF NOT EXISTS players (
