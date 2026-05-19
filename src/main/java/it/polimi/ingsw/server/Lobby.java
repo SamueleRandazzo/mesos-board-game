@@ -380,7 +380,6 @@ public class Lobby {
             }
         }
 
-        this.currentGame = null;
         this.nicknames.clear();
         this.colors.clear();
         this.remoteObservers.clear();

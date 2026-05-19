@@ -27,8 +27,8 @@ public class GUIView implements View {
     }
 
     /**
-     * Generic method to upload a file FXML and change scene
-     * @param fxmlFileName file nome (ex. "login.fxml")
+     * Generic method to upload a file FXML and change scene while preserving window dimensions
+     * @param fxmlFileName file name (ex. "login.fxml")
      * @return the controller associated to the new scene
      */
     private SceneController loadScene(String fxmlFileName) {
@@ -40,19 +40,37 @@ public class GUIView implements View {
             controller.setNetwork(network);
             controller.setView(this);
             this.currentController = controller;
-            //runLater ensures that only the main thread of JavaFX will update dates
+
+            Scene scene = new Scene(root);
+
             Platform.runLater(() -> {
-                Scene scene = new Scene(root, 1200, 675);
+                boolean isFullScreen = stage.isFullScreen();
+                boolean isMaximized = stage.isMaximized();
+                double currentWidth = stage.getWidth();
+                double currentHeight = stage.getHeight();
+
                 stage.setScene(scene);
                 stage.setResizable(true);
+
+                if (isFullScreen) {
+                    stage.setFullScreen(true);
+                } else if (isMaximized) {
+                    stage.setMaximized(true);
+                } else {
+                    stage.setWidth(currentWidth);
+                    stage.setHeight(currentHeight);
+                }
+
                 stage.show();
-                stage.centerOnScreen();
+
+                if (!isFullScreen && !isMaximized) {
+                    stage.centerOnScreen();
+                }
             });
 
             return controller;
         } catch (IOException e) {
             System.err.println("Errore nel caricamento del file FXML: " + fxmlFileName);
-            e.printStackTrace();
             return null;
         }
     }
@@ -66,20 +84,18 @@ public class GUIView implements View {
     public void showLobby(int current, int total) {
         this.totalPlayers = total;
 
-        loadScene("lobby.fxml");
+        SceneController controller = loadScene("lobby.fxml");
 
         Platform.runLater(() -> {
-            if (currentController != null) {
-                currentController.updateLobby(current, total);
+            if (controller != null) {
+                controller.updateLobby(current, total);
             }
         });
     }
 
     @Override
     public void startGame(RemoteController controller, int totalPlayers) {
-
         this.totalPlayers = totalPlayers;
-
         network.setController(controller);
 
         SceneController controllerScene = loadScene("game_board.fxml");
@@ -94,7 +110,9 @@ public class GUIView implements View {
     @Override
     public void showPlayersInfo(Map<String, Color> playersInfo) {
         Platform.runLater(() -> {
-            currentController.setPlayersInfo(playersInfo);
+            if (currentController != null) {
+                currentController.setPlayersInfo(playersInfo);
+            }
         });
     }
 
@@ -106,53 +124,57 @@ public class GUIView implements View {
     @Override
     public void askTotemPlacement() {
         Platform.runLater(() -> {
-            currentController.askTotemPlacement();
+            if (currentController != null) {
+                currentController.askTotemPlacement();
+            }
         });
     }
 
     @Override
     public void displayOfferTrack(List<OfferTileDTO> tiles) {
         Platform.runLater(() -> {
-            currentController.displayOfferTrack(tiles, totalPlayers);
+            if (currentController != null) {
+                currentController.displayOfferTrack(tiles, totalPlayers);
+            }
         });
     }
 
     @Override
     public void askCardChoose() {
         Platform.runLater(() -> {
-            currentController.displayChoosableCards();
+            if (currentController != null) {
+                currentController.displayChoosableCards();
+            }
         });
     }
 
     @Override
     public void showError(String error) {
         Platform.runLater(() -> {
-            currentController.showErrorMessage(error);
+            if (currentController != null) {
+                currentController.showErrorMessage(error);
+            }
         });
     }
 
     @Override
     public void showMessage(String message) {
         Platform.runLater(() -> {
-            currentController.showNotification(message);
+            if (currentController != null) {
+                currentController.showNotification(message);
+            }
         });
     }
 
     @Override
     public void showPlayersOrder(List<String> playersOrder) {
         Platform.runLater(() -> {
-            currentController.updatePlayersOrder(playersOrder);
+            if (currentController != null) {
+                currentController.updatePlayersOrder(playersOrder);
+            }
         });
     }
 
-    /**
-     * Updates the tribe display for the GUI.
-     * This method adapts to the new interface signature by accepting the player's nickname,
-     * ensuring compatibility without altering the underlying JavaFX scene controller logic.
-     *
-     * @param nickname the nickname of the player owning the tribe
-     * @param tribe    the updated TribeStatusDTO object
-     */
     @Override
     public void showTribe(String nickname, TribeStatusDTO tribe) {
         Platform.runLater(() -> {
@@ -164,55 +186,69 @@ public class GUIView implements View {
 
     public void displayBoard(BoardDTO board) {
         Platform.runLater(() -> {
-            currentController.displayBoard(board);
+            if (currentController != null) {
+                currentController.displayBoard(board);
+            }
         });
     }
 
     @Override
     public void displayLeaderboard(LeaderboardDTO leaderboard, String globalRank) {
-        loadScene("leaderboard.fxml");
+        SceneController controller = loadScene("leaderboard.fxml");
 
         Platform.runLater(() -> {
-           currentController.displayLeaderboard(leaderboard, globalRank);
+            if (controller != null) {
+                controller.displayLeaderboard(leaderboard, globalRank);
+            }
         });
     }
 
     @Override
     public void showFatalError(String error) {
-        loadScene("fatal_error.fxml");
+        SceneController controller = loadScene("fatal_error.fxml");
 
         Platform.runLater(() -> {
-            currentController.showErrorMessage(error);
+            if (controller != null) {
+                controller.showErrorMessage(error);
+            }
         });
     }
 
     @Override
     public void displayGlobalLeaderboard(GlobalLeaderboardDTO leaderboard) {
-        loadScene("global_leaderboard.fxml");
+        SceneController controller = loadScene("global_leaderboard.fxml");
 
         Platform.runLater(() -> {
-            currentController.displayGlobalLeaderboard(leaderboard);
+            if (controller != null) {
+                controller.displayGlobalLeaderboard(leaderboard);
+            }
         });
     }
 
     @Override
     public void displayTurnOrderTile(List<TurnOrderTileDTO> turnOrderTile) {
         Platform.runLater(() -> {
-            currentController.displayTurnOrderTile(turnOrderTile);
+            if (currentController != null) {
+                currentController.displayTurnOrderTile(turnOrderTile);
+            }
         });
     }
 
     @Override
     public void showEventMessage(String message) {
         Platform.runLater(() -> {
-            currentController.showToast(message);
+            if (currentController != null) {
+                currentController.showToast(message);
+            }
         });
     }
 
     @Override
     public void askEndTurnOrBuyBuilding() {
         Platform.runLater(() -> {
-            currentController.showEndTurn();
+            if (currentController != null) {
+                currentController.showEndTurn();
+            }
         });
     }
 
