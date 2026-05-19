@@ -16,7 +16,6 @@ import it.polimi.ingsw.network.DTO.OfferTileDTO;
 import it.polimi.ingsw.network.DTO.PlayerRankDTO;
 import it.polimi.ingsw.network.DTO.TribeStatusDTO;
 import it.polimi.ingsw.network.DTO.TurnOrderTileDTO;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -179,10 +178,25 @@ public class Game {
         this.currentState = currentState;
     }
 
+    /**
+     * Triggers the start of the game execution.
+     * <p>
+     * This method delegates the specific game initialization logic, validation,
+     * and initial state transitions to the active {@link GameState}.
+     * </p>
+     */
     public void startGame() {
         currentState.startGame(this);
     }
 
+    /**
+     * Initializes the fundamental components and resources required at the beginning of the game.
+     * <p>
+     * This method distributes starting food resources to players based on their turn order positioning
+     * using a specific modifier formula, populates the initial board rows, and generates the turn order track.
+     * Finally, it sets the current round counter to one and resets the active player index to zero.
+     * </p>
+     */
     public void initializeGame() {
         for (int i = 1; i <= players.size(); i++) {
             int initFoodModifier = i / 2 + 1;
@@ -354,6 +368,14 @@ public class Game {
 
     }
 
+    /**
+     * Notifies all registered game event listeners of the current turn order for the round.
+     * <p>
+     * This method extracts the nicknames of the players from the {@code roundTurnOrder} list,
+     * maps them into a list of strings, and then broadcasts this ordered list to each
+     * {@link GameEventListener} via the {@code onShowPlayersOrder} callback.
+     * </p>
+     */
     public void notifyShowPlayerOrder() {
         List<String> playersOrder = roundTurnOrder.stream()
                 .map(Player::getNickname)
@@ -385,7 +407,7 @@ public class Game {
      * Event cards drawn for the lower row are redirected to the upper row
      * as required by the rules.
      */
-    public void setupInitialRows() {
+    private void setupInitialRows() {
         board.initializeLowerRow(numPlayers);
         board.fillUpperRow(numPlayers);
     }
@@ -429,6 +451,17 @@ public class Game {
         resolveSortedEvents(events);
     }
 
+    /**
+     * Processes a list of event cards by sorting them according to priority and executing their effects.
+     * <p>
+     * The sorting logic prioritizes event effects that are not instances of {@code Sustenance}
+     * (moving them to the front of the execution queue), and then breaks ties by sorting chronologically
+     * based on the card's era. After sorting, each event is triggered sequentially for all players,
+     * and an update notification is sent out for each player's tribe.
+     * </p>
+     *
+     * @param events the list of {@link EventCard} instances to be sorted and resolved
+     */
     private void resolveSortedEvents(List<EventCard> events) {
         List<EventCard> sortedEvents = events.stream().sorted(Comparator.comparingInt((EventCard card) ->
                                                                 card.getEventEffect() instanceof Sustenance ? 1 : 0)
@@ -443,7 +476,6 @@ public class Game {
      * Checks whether the cards just revealed in the upper row belong to a new era.
      * If so, triggers the era transition on Board (rulebook p. 7).
      */
-
     private void checkEraTransition() {
         List<TribeDeck> topRow = board.getTopRow();
 
@@ -610,14 +642,31 @@ public class Game {
     }
     //endregion
 
-    //create the TurnOrderTile using the TurnOrderFactory
-    public void createTurnOrderTile(int numPlayers){
+    /**
+     * Initializes and populates the turn order tile structure based on the number of players.
+     * <p>
+     * This method uses a factory to create the appropriate turn order track for the given
+     * player count, and then registers each player in the game by placing their corresponding
+     * totem onto the newly created track.
+     * </p>
+     *
+     * @param numPlayers the total number of players participating in the game
+     */
+    private void createTurnOrderTile(int numPlayers){
 
         this.turnOrderTile = TurnOrderFactory.createTrack(numPlayers);
         for (Player p: players)
             this.turnOrderTile.placeTotem(p);
     }
 
+    /**
+     * Advances the active turn to the next player in alphabetical or turn sequence order.
+     * <p>
+     * This method increments the active player index, using a modulo operation based on the
+     * total player count to safely loop back to the first player (index 0) once a full cycle
+     * of turns is completed.
+     * </p>
+     */
     public void advanceTurn() {
         this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.size();
     }
@@ -629,6 +678,19 @@ public class Game {
         currentState.placeTotem(this, getCurrentActivePlayer(), tileIndex);
     }
 
+    /**
+     * Advances the game to the next round, handling both mid-game transitions and end-game triggers.
+     * <p>
+     * This method starts by checking for any extra card choices and incrementing the round counter.
+     * It resets the active player index to zero and triggers the end-of-round cleanup.
+     * </p>
+     * <p>
+     * If the maximum number of rounds ({@code TOTAL_ROUNDS}) has been exceeded, it processes any
+     * remaining events, calculates final scores, switches the game to {@link EndGameState}, and
+     * triggers the end-game notifications. Otherwise, it transitions the game to the
+     * {@link TotemPlacementState} and notifies listeners about the updated board track and placement turn.
+     * </p>
+     */
     public void nextRound() {
         checkExtraCardChoose();
 
@@ -650,7 +712,6 @@ public class Game {
         }
     }
 
-
     /**
      * Scans the turn order of the current round to identify players entitled to an extra card
      * choice (e.g., due to a specific tribe ability or power).
@@ -660,7 +721,7 @@ public class Game {
      * signal the turn change and update the UI/Client state.
      * </p>
      */
-    public void checkExtraCardChoose() {
+    private void checkExtraCardChoose() {
         for (int i = 0; i < roundTurnOrder.size(); i++) {
             if (roundTurnOrder.get(i).getTribe().getExtraCardFromUpper()) {
                 this.currentPlayerIndex = i;
@@ -670,22 +731,67 @@ public class Game {
         }
     }
 
+    /**
+     * Resolves the action of the current player picking a card from the upper row.
+     * <p>
+     * This method delegates the specific pick logic and subsequent state transitions
+     * to the active {@link GameState}.
+     * </p>
+     *
+     * @param pos the zero-based index or position of the selected card on the upper board row
+     */
     public void resolveUpperCardPlayerPick(int pos) {
         currentState.resolveUpperCardPick(this, getCurrentActivePlayer(), pos);
     }
 
+    /**
+     * Resolves the action of the current player picking a card from the lower row.
+     * <p>
+     * This method delegates the specific pick logic and subsequent state transitions
+     * to the active {@link GameState}.
+     * </p>
+     *
+     * @param pos the zero-based index or position of the selected card on the lower board row
+     */
     public void resolveLowerCardPlayerPick(int pos) {
         currentState.resolveLowerCardPick(this, getCurrentActivePlayer(), pos);
     }
 
+    /**
+     * Resolves the action of the current player purchasing or picking a building card from the upper row.
+     * <p>
+     * This method delegates the resource deduction, card acquisition, and state transitions
+     * to the active {@link GameState}.
+     * </p>
+     *
+     * @param pos the zero-based index or position of the selected building card on the upper board row
+     */
     public void resolveUpperBuildingPlayerPick(int pos) {
         currentState.resolveUpperBuildingPick(this, getCurrentActivePlayer(), pos);
     }
 
+    /**
+     * Resolves the action of the current player purchasing or picking a building card from the lower row.
+     * <p>
+     * This method delegates the resource deduction, card acquisition, and state transitions
+     * to the active {@link GameState}.
+     * </p>
+     *
+     * @param pos the zero-based index or position of the selected building card on the lower board row
+     */
     public void resolveLowerBuildingPlayerPick(int pos) {
         currentState.resolveLowerBuildingPick(this, getCurrentActivePlayer(), pos);
     }
 
+    /**
+     * Updates the current state of the game engine.
+     * <p>
+     * This method is used to dynamically transition the game between different phases
+     * or turns by replacing the active {@link GameState} instance.
+     * </p>
+     *
+     * @param newState the new {@link GameState} instance to be applied
+     */
     public void setState(GameState newState){
         this.currentState = newState;
     }
@@ -742,10 +848,24 @@ public class Game {
         this.currentPlayerIndex = 0;
     }
 
+    /**
+     * Retrieves the turn order tile currently assigned to this entity.
+     *
+     * @return the {@link TurnOrderTile} representing the player's position or advantages
+     *         in the turn sequence
+     */
     public TurnOrderTile getTurnOrderTile() {
         return this.turnOrderTile;
     }
 
+    /**
+     * Resolves the end-of-turn logic for the current active player based on the current game state.
+     * <p>
+     * This method delegates the turn-ending logic to the active {@link GameState} implementation,
+     * passing the current game instance and the active player to process state transitions,
+     * resource cleanups, or next-player determinations.
+     * </p>
+     */
     public void resolveEndTurn() {
         this.currentState.endTurn(this, this.getCurrentActivePlayer());
     }
@@ -767,7 +887,18 @@ public class Game {
                 .collect(Collectors.toList());
     }
 
-
+    /**
+     * Creates and populates a {@link LeaderboardDTO} based on the current player rankings.
+     * <p>
+     * This method retrieves the sorted list of players and assigns their positions.
+     * If multiple players share the exact same amount of prestige points and food,
+     * they are assigned the same rank (tie-handling). It also determines if there is
+     * a tie for the first place (multiple winners).
+     * </p>
+     *
+     * @return a {@code LeaderboardDTO} containing the list of ranked players and a flag
+     *         indicating if there are multiple winners
+     */
     public LeaderboardDTO createLeaderboardDTO() {
         List<Player> sortedPlayers = getLeaderboard();
         List<PlayerRankDTO> elements = new ArrayList<>();
@@ -797,37 +928,72 @@ public class Game {
         return new LeaderboardDTO(elements, winnerCount > 1);
     }
 
+    /**
+     * Updates the game status by transitioning the current state to the end-game state.
+     * <p>
+     * This method instantiates and assigns a new {@link EndGameState} to the game's state machine.
+     * </p>
+     */
     public void setEndGameStatus() {
         this.currentState = new EndGameState();
     }
 
-    public int getCurrenObtainableUpperCard() {
+    /**
+     * Retrieves the total number of upper deck cards that are currently available for purchase or selection.
+     *
+     * @return the count of obtainable cards in the board's top row as an {@code int}
+     */
+    private int getCurrenObtainableUpperCard() {
         return Math.toIntExact(this.board.getTopRow().stream().filter(TribeDeck::getIsObtainable).count());
     }
 
-    public int getCurrenObtainableLowerCard() {
+    /**
+     * Retrieves the total number of lower deck cards that are currently available for purchase or selection.
+     *
+     * @return the count of obtainable cards in the board's bottom row as an {@code int}
+     */
+    private int getCurrenObtainableLowerCard() {
         return Math.toIntExact(this.board.getBottomRow().stream().filter(TribeDeck::getIsObtainable).count());
     }
 
-    public boolean checkIfCurrentPlayerCanChoose() {
+    /**
+     * Checks whether the current active player has valid remaining choices to make on the board.
+     * <p>
+     * The player can make a choice if they have at least one lower pick available while lower cards
+     * are obtainable, or if they have at least one upper pick available while upper cards are obtainable.
+     * </p>
+     *
+     * @return {@code true} if the current player has available picks and there are corresponding
+     *         obtainable cards on the board; {@code false} otherwise
+     */
+    private boolean checkIfCurrentPlayerCanChoose() {
         return (this.getCurrentActivePlayer().getLowerPick() > 0 && getCurrenObtainableLowerCard() != 0)
                 || (this.getCurrentActivePlayer().getUpperPick() > 0 && getCurrenObtainableUpperCard() != 0);
     }
 
-    public boolean checkIfCurrentPlayerCanBuyBuilding() {
+    /**
+     * Checks whether the current active player has enough resources to purchase at least one
+     * available building card from the board.
+     * <p>
+     * The method factors in the player's available picks (upper or lower), their current food stock,
+     * and any food discounts provided by their tribe's builders.
+     * </p>
+     *
+     * @return {@code true} if the player has an upper or lower pick available and can afford at
+     *         least one building card in that row; {@code false} otherwise
+     */
+    private boolean checkIfCurrentPlayerCanBuyBuilding() {
         Player player = this.getCurrentActivePlayer();
         int foodDiscount = player.getTribe().totalBuildersFoodDiscount();
 
         if (player.getUpperPick() > 0) {
-            if (this.getBoard().getUpperBuildingCards().stream().anyMatch(b -> b.getFoodCost() < player.getFoodAmount() + foodDiscount)) {
+            if (this.getBoard().getUpperBuildingCards().stream().anyMatch(b -> b.getFoodCost() <= player.getFoodAmount() + foodDiscount)) {
                 return true;
             }
         }
 
         if (player.getLowerPick() > 0) {
-            if (this.getBoard().getLowerBuildingCards().stream().anyMatch(b -> b.getFoodCost()  < player.getFoodAmount() + foodDiscount)) {
-                return true;
-            }
+            return this.getBoard().getLowerBuildingCards().stream().anyMatch(b -> b.getFoodCost() <= player.getFoodAmount() + foodDiscount);
         }
 
         return false;
