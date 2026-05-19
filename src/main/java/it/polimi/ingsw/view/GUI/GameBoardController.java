@@ -954,6 +954,8 @@ public class GameBoardController extends SceneController {
 
     @Override
     public void showEndTurn() {
+        setCardSelectionEnabled(true);
+
         endTurnButton.setVisible(true);
         endTurnButton.setManaged(true);
 
