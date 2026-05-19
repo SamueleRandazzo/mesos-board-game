@@ -54,7 +54,6 @@ public class LoginController extends SceneController {
             errorLabel.setVisible(false);
         }
 
-        // Crea un effetto alone (DropShadow) chiaro e morbido per dare contrasto ai colori scuri come il BLACK
         DropShadow textGlow = new DropShadow();
         textGlow.setColor(javafx.scene.paint.Color.web("#FFF5E1", 0.85)); // Colore crema/oro chiaro coerente con la UI
         textGlow.setRadius(5.0);
@@ -90,13 +89,11 @@ public class LoginController extends SceneController {
                 } else {
                     setText(item.name());
                     setStyle("-fx-text-fill: " + item.name().toLowerCase() + "; -fx-font-weight: bold;");
-                    // Applica l'alone anche qui, così se scelgono BLACK si legge perfettamente sullo sfondo del pannello
                     setEffect(textGlow);
                 }
             }
         });
 
-        // --- GESTIONE DEI FOCUS SUI CAMPI DI TESTO (Bordi arancione fuoco al clic) ---
         nicknameField.focusedProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal) {
                 nicknameField.setStyle(nicknameField.getStyle() + "-fx-border-color: #e67e22; -fx-border-width: 1.5;");
