@@ -6,44 +6,90 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.text.Font?>
 
 <StackPane prefHeight="720.0" prefWidth="1280.0"
-           style="-fx-background-color: radial-gradient(center 50% 50%, radius 80%, #1b5e20 0%, #124116 60%, #0b290e 100%), linear-gradient(from 0% 0% to 100% 100%, rgba(255,255,255,0.03), rgba(0,0,0,0.1));"
+           style="-fx-background-color: radial-gradient(center 50% 50%, radius 70%, #3a1d18 0%, #1a0f0d 100%);"
            xmlns="http://javafx.com/javafx/17"
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="it.polimi.ingsw.view.GUI.SetPlayersController">
 
+    <Region maxWidth="600" maxHeight="600" mouseTransparent="true"
+            style="-fx-background-color: radial-gradient(center 50% 50%, radius 50%, rgba(230, 126, 34, 0.12) 0%, transparent 100%);"/>
+
     <VBox alignment="CENTER" spacing="30.0"
-          maxWidth="500.0" maxHeight="400.0"
-          style="-fx-background-color: rgba(20, 20, 20, 0.75); -fx-background-radius: 18; -fx-border-color: rgba(244, 213, 141, 0.3); -fx-border-radius: 18; -fx-border-width: 1.5;">
+          maxWidth="420.0" maxHeight="420.0"
+          style="-fx-background-color: rgba(15, 10, 10, 0.75);
+                 -fx-background-radius: 16;
+                 -fx-border-radius: 16;
+                 -fx-border-color: linear-gradient(to bottom right, rgba(244, 213, 141, 0.4), rgba(0,0,0,0.6));
+                 -fx-border-width: 1.5;">
+
+        <effect>
+            <DropShadow color="#000000EE" radius="35" spread="0.2" offsetX="0" offsetY="10"/>
+        </effect>
 
         <padding>
-            <Insets top="40.0" bottom="40.0" left="35.0" right="35.0"/>
+            <Insets top="45.0" bottom="45.0" left="35.0" right="35.0"/>
         </padding>
 
-        <VBox alignment="CENTER" spacing="5.0">
-            <Label text="GAME CONFIGURATION" textFill="#f4d58d">
+        <VBox alignment="CENTER" spacing="8.0">
+            <Label text="LOBBY SETUP" textFill="#f4d58d"
+                   style="-fx-font-family: 'Impact', 'System Bold'; -fx-letter-spacing: 2px;">
                 <font>
-                    <Font name="System Bold" size="26.0"/>
+                    <Font size="28.0"/>
                 </font>
+                <effect>
+                    <DropShadow color="#000000"/>
+                </effect>
             </Label>
-            <VBox maxWidth="140.0" minHeight="2.0" style="-fx-background-color: #f4d58d; -fx-opacity: 0.5;"/>
+            <VBox maxWidth="100.0" minHeight="1.5" style="-fx-background-color: linear-gradient(to right, transparent, #f4d58d, transparent); -fx-opacity: 0.6;"/>
         </VBox>
 
-        <Label text="You are the first player. Choose how many opponents to wait for:"
-               textFill="#e0e0e0" wrapText="true" alignment="CENTER" textAlignment="CENTER">
+        <Label text="You are the first tribal leader. Choose the size of the world to discover:"
+               textFill="#e0e0e0" wrapText="true" alignment="CENTER" textAlignment="CENTER"
+               style="-fx-font-size: 13px; -fx-line-spacing: 4px; -fx-opacity: 0.85;">
             <font>
-                <Font name="System Italic" size="14.0"/>
+                <Font name="System Bold"/>
             </font>
         </Label>
 
-        <ComboBox fx:id="numPlayersCombo" prefWidth="180.0" promptText="Select..."
-                  style="-fx-background-color: #2b2b2b; -fx-text-fill: white; -fx-border-color: rgba(244, 213, 141, 0.4); -fx-border-radius: 5; -fx-background-radius: 5; -fx-font-size: 14px; -fx-cursor: hand;"/>
+        <VBox spacing="6.0" alignment="CENTER">
+            <Label text="NUMBER OF PLAYERS"
+                   style="-fx-text-fill: #f4d58d; -fx-font-size: 10px; -fx-font-weight: bold; -fx-letter-spacing: 1px; -fx-opacity: 0.8;"/>
+            <ComboBox fx:id="numPlayersCombo" prefWidth="220.0" promptText="Select..."
+                      style="-fx-background-color: rgba(0, 0, 0, 0.4);
+                             -fx-border-color: rgba(244, 213, 141, 0.25);
+                             -fx-border-radius: 8;
+                             -fx-background-radius: 8;
+                             -fx-padding: 8;
+                             -fx-text-fill: #FFF5E1;
+                             -fx-font-weight: bold;
+                             -fx-cursor: hand;"/>
+        </VBox>
 
-        <Button mnemonicParsing="false" onAction="#handleConfirm" prefWidth="180.0" prefHeight="40.0"
-                style="-fx-background-color: #f4d58d; -fx-text-fill: #1a1a1a; -fx-font-weight: bold; -fx-font-size: 14px; -fx-background-radius: 8; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 4);"
-                text="CREATE LOBBY"/>
+        <Button mnemonicParsing="false" onAction="#handleConfirm" prefWidth="220.0" prefHeight="50.0"
+                text="CREATE LOBBY"
+                style="-fx-background-color: linear-gradient(to bottom, #e67e22, #d35400);
+                       -fx-text-fill: #ffffff;
+                       -fx-font-weight: bold;
+                       -fx-font-size: 15px;
+                       -fx-font-family: 'Papyrus', 'Impact', 'System Bold';
+                       -fx-background-radius: 10;
+                       -fx-cursor: hand;
+                       -fx-border-color: #f39c12;
+                       -fx-border-radius: 10;
+                       -fx-border-width: 1.2;
+                       -fx-letter-spacing: 1px;">
+            <VBox.margin>
+                <Insets top="15"/>
+            </VBox.margin>
+            <effect>
+                <DropShadow color="#d3540088" radius="20" spread="0.3" offsetX="0" offsetY="4"/>
+            </effect>
+        </Button>
     </VBox>
 
 </StackPane>

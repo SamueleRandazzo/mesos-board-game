@@ -10,98 +10,105 @@
             xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="it.polimi.ingsw.view.GUI.LoginController"
-            style="-fx-background-color: linear-gradient(to bottom, #8B0000, #FF4500, #FF8C00);">
+            style="-fx-background-color: radial-gradient(center 50% 50%, radius 70%, #3a1d18 0%, #1a0f0d 100%);">
 
-    <children>
-        <StackPane AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"
-                   AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+    <StackPane AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"
+               AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
 
-            <VBox alignment="CENTER" spacing="30.0">
+        <Region maxWidth="600" maxHeight="600" mouseTransparent="true"
+                style="-fx-background-color: radial-gradient(center 50% 50%, radius 50%, rgba(230, 126, 34, 0.15) 0%, transparent 100%);"/>
 
-                <Label text="MESOS"
-                       style="-fx-text-fill: linear-gradient(from 0% 0% to 0% 100%, #FFF5E1 0%, #FFD700 50%, #FF8C00 100%);
-                  -fx-letter-spacing: 10px;
-                  -fx-font-family: 'Papyrus', 'Impact', 'System Bold';
-                  -fx-font-weight: bold;">
-                    <font>
-                        <Font size="72.0" />
-                    </font>
-                    <effect>
-                        <DropShadow radius="20.0" spread="0.3" color="#FF4500">
-                            <input>
-                                <DropShadow radius="5.0" offsetX="3.0" offsetY="3.0" color="#000000BB" />
-                            </input>
-                        </DropShadow>
-                    </effect>
-                </Label>
+        <VBox alignment="CENTER" spacing="45.0">
 
-                <VBox alignment="CENTER" spacing="20.0" maxWidth="320.0" maxHeight="340.0"
-                      style="-fx-background-color: rgba(0, 0, 0, 0.45);
-                             -fx-background-radius: 20;
-                             -fx-border-radius: 20;
-                             -fx-border-color: rgba(255, 255, 255, 0.2);
-                             -fx-border-width: 1.5;">
+            <Label text="MESOS"
+                   style="-fx-text-fill: linear-gradient(from 0% 0% to 0% 100%, #FFF5E1 0%, #F4D58D 60%, #B87333 100%);
+                          -fx-letter-spacing: 10px;
+                          -fx-font-family: 'Papyrus', 'Impact', 'System Bold';
+                          -fx-font-weight: bold;">
+                <font>
+                    <Font size="84.0"/>
+                </font>
+                <effect>
+                    <DropShadow radius="25.0" spread="0.4" color="#d35400">
+                        <input>
+                            <DropShadow radius="6.0" offsetX="4.0" offsetY="4.0" color="#000000FA"/>
+                        </input>
+                    </DropShadow>
+                </effect>
+            </Label>
 
-                    <effect>
-                        <DropShadow color="#000000CC" radius="30" spread="0.1" />
-                    </effect>
+            <VBox alignment="CENTER" spacing="22.0" maxWidth="350.0" prefWidth="350.0"
+                  style="-fx-background-color: rgba(15, 10, 10, 0.75);
+                         -fx-background-radius: 16;
+                         -fx-border-radius: 16;
+                         -fx-border-color: linear-gradient(to bottom right, rgba(244, 213, 141, 0.4), rgba(0,0,0,0.6));
+                         -fx-border-width: 1.5;">
 
-                    <padding>
-                        <Insets top="40" right="30" bottom="40" left="30"/>
-                    </padding>
+                <effect>
+                    <DropShadow color="#000000EE" radius="35" spread="0.2" offsetX="0" offsetY="10"/>
+                </effect>
 
-                    <VBox spacing="6.0" alignment="CENTER_LEFT">
-                        <Label text="NICKNAME" style="-fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-opacity: 0.9;" />
-                        <TextField fx:id="nicknameField"
-                                   promptText="Your nickname..."
-                                   style="-fx-background-color: rgba(255, 255, 255, 0.15);
-                                          -fx-text-fill: white;
-                                          -fx-prompt-text-fill: rgba(255, 255, 255, 0.8);
-                                          -fx-background-radius: 5;
-                                          -fx-border-color: rgba(255, 255, 255, 0.3);
-                                          -fx-padding: 10;" />
-                    </VBox>
+                <padding>
+                    <Insets top="35" right="35" bottom="35" left="35"/>
+                </padding>
 
-                    <VBox spacing="6.0" alignment="CENTER_LEFT">
-                        <Label text="CHOOSE YOUR COLOR" style="-fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-opacity: 0.9;" />
-                        <ComboBox fx:id="colorComboBox"
-                                  promptText="Select color..."
-                                  maxWidth="Infinity"
-                                  style="-fx-background-color: rgba(255, 255, 255, 0.15);
-                                         -fx-border-color: rgba(255, 255, 255, 0.3);
-                                         -fx-border-radius: 5;
-                                         -fx-padding: 4;
-                                         -fx-prompt-text-fill: white;" />
-                    </VBox>
-
-                    <Label fx:id="errorLabel" text="" textFill="#ff5555" visible="false" wrapText="true"
-                           style="-fx-font-size: 11px; -fx-font-weight: bold;" />
-
-                    <Button fx:id="loginButton"
-                            text="JOIN GAME"
-                            onAction="#handleLogin"
-                            maxWidth="Infinity"
-                            prefHeight="50.0"
-                            style="-fx-background-color: linear-gradient(to bottom, #d35400, #e67e22);
-                           -fx-text-fill: white;
-                           -fx-font-weight: bold;
-                           -fx-font-size: 16px;
-                           -fx-font-family: 'Papyrus', 'Impact', 'System Bold';
-                           -fx-background-radius: 12;
-                           -fx-cursor: hand;
-                           -fx-border-color: rgba(255, 255, 255, 0.3);
-                           -fx-border-radius: 12;
-                           -fx-border-width: 1.5;
-                           -fx-letter-spacing: 2px;">
-                        <VBox.margin>
-                            <Insets top="10" />
-                        </VBox.margin>
-                        <effect>
-                            <DropShadow color="#e67e22aa" radius="15" spread="0.2" />
-                        </effect>
-                    </Button>
+                <VBox spacing="8.0" alignment="CENTER_LEFT">
+                    <Label text="PLAYER NICKNAME"
+                           style="-fx-text-fill: #F4D58D; -fx-font-size: 11px; -fx-font-weight: bold; -fx-letter-spacing: 1px;"/>
+                    <TextField fx:id="nicknameField"
+                               promptText="Enter your name..."
+                               style="-fx-background-color: rgba(0, 0, 0, 0.4);
+                                      -fx-text-fill: #FFF5E1;
+                                      -fx-prompt-text-fill: rgba(255, 255, 255, 0.35);
+                                      -fx-background-radius: 8;
+                                      -fx-border-color: rgba(244, 213, 141, 0.25);
+                                      -fx-border-radius: 8;
+                                      -fx-border-width: 1;
+                                      -fx-padding: 12;
+                                      -fx-font-weight: bold;"/>
                 </VBox>
+
+                <VBox spacing="8.0" alignment="CENTER_LEFT">
+                    <Label text="TRIBE EMBLEM COLOR"
+                           style="-fx-text-fill: #F4D58D; -fx-font-size: 11px; -fx-font-weight: bold; -fx-letter-spacing: 1px;"/>
+                    <ComboBox fx:id="colorComboBox"
+                              promptText="Select your color..."
+                              maxWidth="Infinity"
+                              style="-fx-background-color: rgba(0, 0, 0, 0.4);
+                                     -fx-border-color: rgba(244, 213, 141, 0.25);
+                                     -fx-border-radius: 8;
+                                     -fx-background-radius: 8;
+                                     -fx-padding: 6;
+                                     -fx-text-fill: #FFF5E1;"/>
+                </VBox>
+
+                <Label fx:id="errorLabel" text="" textFill="#ff6b6b" visible="false" wrapText="true"
+                       style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 4 0 4 0;"/>
+
+                <Button fx:id="loginButton"
+                        text="JOIN GAME"
+                        onAction="#handleLogin"
+                        maxWidth="Infinity"
+                        prefHeight="54.0"
+                        style="-fx-background-color: linear-gradient(to bottom, #e67e22, #d35400);
+                               -fx-text-fill: #ffffff;
+                               -fx-font-weight: bold;
+                               -fx-font-size: 16px;
+                               -fx-font-family: 'Papyrus', 'Impact', 'System Bold';
+                               -fx-background-radius: 10;
+                               -fx-cursor: hand;
+                               -fx-border-color: #f39c12;
+                               -fx-border-radius: 10;
+                               -fx-border-width: 1.2;
+                               -fx-letter-spacing: 2px;">
+                    <VBox.margin>
+                        <Insets top="10"/>
+                    </VBox.margin>
+                    <effect>
+                        <DropShadow color="#d3540088" radius="20" spread="0.3" offsetX="0" offsetY="4"/>
+                    </effect>
+                </Button>
             </VBox>
-        </StackPane>
-    </children>
+        </VBox>
+    </StackPane>
 </AnchorPane>

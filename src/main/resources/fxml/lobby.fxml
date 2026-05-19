@@ -4,40 +4,59 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.text.Font?>
 
 <StackPane prefHeight="720.0" prefWidth="1280.0"
-           style="-fx-background-color: radial-gradient(center 50% 50%, radius 80%, #1b5e20 0%, #124116 60%, #0b290e 100%), linear-gradient(from 0% 0% to 100% 100%, rgba(255,255,255,0.03), rgba(0,0,0,0.1));"
+           style="-fx-background-color: radial-gradient(center 50% 50%, radius 70%, #3a1d18 0%, #1a0f0d 100%);"
            xmlns="http://javafx.com/javafx/17"
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="it.polimi.ingsw.view.GUI.LobbyController">
 
+    <Region maxWidth="600" maxHeight="600" mouseTransparent="true"
+            style="-fx-background-color: radial-gradient(center 50% 50%, radius 50%, rgba(230, 126, 34, 0.12) 0%, transparent 100%);"/>
+
     <VBox alignment="CENTER" spacing="35.0"
-          maxWidth="450.0" maxHeight="350.0"
-          style="-fx-background-color: rgba(20, 20, 20, 0.75); -fx-background-radius: 18; -fx-border-color: rgba(244, 213, 141, 0.3); -fx-border-radius: 18; -fx-border-width: 1.5;">
+          maxWidth="420.0" maxHeight="380.0"
+          style="-fx-background-color: rgba(15, 10, 10, 0.75);
+                 -fx-background-radius: 16;
+                 -fx-border-radius: 16;
+                 -fx-border-color: linear-gradient(to bottom right, rgba(244, 213, 141, 0.4), rgba(0,0,0,0.6));
+                 -fx-border-width: 1.5;">
+
+        <effect>
+            <DropShadow color="#000000EE" radius="35" spread="0.2" offsetX="0" offsetY="10"/>
+        </effect>
 
         <padding>
-            <Insets top="40.0" bottom="40.0" left="30.0" right="30.0"/>
+            <Insets top="45.0" bottom="45.0" left="35.0" right="35.0"/>
         </padding>
 
-        <VBox alignment="CENTER" spacing="5.0">
-            <Label text="WAITING LOBBY" textFill="#f4d58d">
+        <VBox alignment="CENTER" spacing="8.0">
+            <Label text="GAME LOBBY" textFill="#f4d58d"
+                   style="-fx-font-family: 'Impact', 'System Bold'; -fx-letter-spacing: 2px;">
                 <font>
-                    <Font name="System Bold" size="28.0"/>
+                    <Font size="28.0"/>
                 </font>
+                <effect>
+                    <DropShadow color="#000000"/>
+                </effect>
             </Label>
-            <VBox maxWidth="120.0" minHeight="2.0" style="-fx-background-color: #f4d58d; -fx-opacity: 0.5;"/>
+            <VBox maxWidth="100.0" minHeight="1.5" style="-fx-background-color: linear-gradient(to right, transparent, #f4d58d, transparent); -fx-opacity: 0.6;"/>
         </VBox>
 
-        <ProgressIndicator prefHeight="90.0" prefWidth="90.0"
-                           style="-fx-progress-color: #f4d58d; -fx-text-fill: white;"/>
+        <ProgressIndicator prefHeight="80.0" prefWidth="80.0"
+                           style="-fx-progress-color: #e67e22; -fx-text-fill: #FFF5E1; -fx-font-weight: bold;">
+            <effect>
+                <DropShadow color="#d3540066" radius="15" spread="0.2"/>
+            </effect>
+        </ProgressIndicator>
 
-        <Label fx:id="lobbyStatusLabel" text="Waiting for other players..." textFill="#e0e0e0">
-            <font>
-                <Font name="System Italic" size="16.0"/>
-            </font>
-        </Label>
+        <Label fx:id="lobbyStatusLabel" text="Gathering tribe leaders..." textFill="#e0e0e0"
+               wrapText="true" alignment="CENTER" textAlignment="CENTER"
+               style="-fx-font-size: 15px; -fx-font-style: italic; -fx-opacity: 0.85;"/>
     </VBox>
 
 </StackPane>

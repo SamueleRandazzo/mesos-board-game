@@ -6,6 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.event.ActionEvent;
+import javafx.scene.effect.DropShadow;
 
 /**
  * Controller class for the Login scene in the GUI.
@@ -53,6 +54,12 @@ public class LoginController extends SceneController {
             errorLabel.setVisible(false);
         }
 
+        // Crea un effetto alone (DropShadow) chiaro e morbido per dare contrasto ai colori scuri come il BLACK
+        DropShadow textGlow = new DropShadow();
+        textGlow.setColor(javafx.scene.paint.Color.web("#FFF5E1", 0.85)); // Colore crema/oro chiaro coerente con la UI
+        textGlow.setRadius(5.0);
+        textGlow.setSpread(0.6);
+
         // Customizes the rendering of each color selection cell inside the dropdown view
         colorComboBox.setCellFactory(lv -> new ListCell<Color>() {
             @Override
@@ -61,10 +68,12 @@ public class LoginController extends SceneController {
                 if (empty || item == null) {
                     setText(null);
                     setGraphic(null);
+                    setEffect(null);
                 } else {
                     setText(item.name());
-                    // Dynamically set text color matching the item's name string
-                    setStyle("-fx-text-fill: " + item.name().toLowerCase() + "; -fx-font-weight: bold; -fx-background-color: #222;");
+                    // Cambiato lo sfondo in un grigio roccia leggermente più morbido per armonizzarsi con l'alone
+                    setStyle("-fx-text-fill: " + item.name().toLowerCase() + "; -fx-font-weight: bold; -fx-background-color: #2b2524; -fx-padding: 8px;");
+                    setEffect(textGlow);
                 }
             }
         });
@@ -76,11 +85,31 @@ public class LoginController extends SceneController {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
                     setText("Select color...");
-                    setStyle("-fx-text-fill: white !important; -fx-opacity: 0.8;");
+                    setStyle("-fx-text-fill: rgba(255, 255, 255, 0.35); -fx-font-weight: bold;");
+                    setEffect(null);
                 } else {
                     setText(item.name());
                     setStyle("-fx-text-fill: " + item.name().toLowerCase() + "; -fx-font-weight: bold;");
+                    // Applica l'alone anche qui, così se scelgono BLACK si legge perfettamente sullo sfondo del pannello
+                    setEffect(textGlow);
                 }
+            }
+        });
+
+        // --- GESTIONE DEI FOCUS SUI CAMPI DI TESTO (Bordi arancione fuoco al clic) ---
+        nicknameField.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal) {
+                nicknameField.setStyle(nicknameField.getStyle() + "-fx-border-color: #e67e22; -fx-border-width: 1.5;");
+            } else {
+                nicknameField.setStyle(nicknameField.getStyle() + "-fx-border-color: rgba(244, 213, 141, 0.25); -fx-border-width: 1;");
+            }
+        });
+
+        colorComboBox.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal) {
+                colorComboBox.setStyle(colorComboBox.getStyle() + "-fx-border-color: #e67e22; -fx-border-width: 1.5;");
+            } else {
+                colorComboBox.setStyle(colorComboBox.getStyle() + "-fx-border-color: rgba(244, 213, 141, 0.25); -fx-border-width: 1;");
             }
         });
 
