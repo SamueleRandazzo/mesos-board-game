@@ -200,19 +200,77 @@
                         style="-fx-background-color: rgba(33, 25, 22, 0.95); -fx-border-color: #f4d58d; -fx-border-width: 1.5; -fx-border-radius: 16; -fx-background-radius: 16; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.6), 20, 0, 0, 0);">
 
                 <top>
-                    <BorderPane style="-fx-padding: 16 20 10 20; -fx-border-color: rgba(244, 213, 141, 0.2); -fx-border-width: 0 0 1 0;">
-                        <left>
-                            <Label fx:id="tribeOverlayTitle" text="🎪 TRIBE" textFill="#f4d58d" BorderPane.alignment="CENTER">
-                                <font>
-                                    <Font name="System Bold" size="18.0" />
-                                </font>
-                            </Label>
-                        </left>
-                        <right>
-                            <Button fx:id="closeTribeButton" text="✕ Close" BorderPane.alignment="CENTER"
-                                    style="-fx-background-color: #d32f2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 6 14 6 14; -fx-cursor: hand;"/>
-                        </right>
-                    </BorderPane>
+                    <VBox style="-fx-border-color: rgba(244, 213, 141, 0.2); -fx-border-width: 0 0 1 0;" spacing="10.0">
+                        <padding>
+                            <Insets bottom="16.0" left="20.0" right="20.0" top="16.0" />
+                        </padding>
+
+                        <!-- Riga Titolo e Bottone Chiudi -->
+                        <BorderPane>
+                            <left>
+                                <Label fx:id="tribeOverlayTitle" text="🎪 TRIBE" textFill="#f4d58d" BorderPane.alignment="CENTER">
+                                    <font>
+                                        <Font name="System Bold" size="18.0" />
+                                    </font>
+                                </Label>
+                            </left>
+                            <right>
+                                <Button fx:id="closeTribeButton" text="✕ Close" BorderPane.alignment="CENTER"
+                                        style="-fx-background-color: #d32f2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 6 14 6 14; -fx-cursor: hand;"/>
+                            </right>
+                        </BorderPane>
+
+                        <HBox alignment="CENTER" spacing="12.0"
+                              style="-fx-background-color: rgba(25, 25, 25, 0.65); -fx-background-radius: 12; -fx-padding: 8 16 8 16; -fx-border-color: rgba(244, 213, 141, 0.3); -fx-border-width: 1; -fx-border-radius: 12;">
+
+                            <VBox alignment="CENTER" spacing="2.0">
+                                <Label text="🏆 Prestige" textFill="#f4d58d" style="-fx-font-size: 11px; -fx-font-weight: bold;" />
+                                <Label fx:id="totalPrestigePointsOverlayLabel" text="0" textFill="WHITE" style="-fx-font-size: 15px; -fx-font-weight: bold;" />
+                            </VBox>
+
+                            <Label text="|" textFill="rgba(255,255,255,0.2)" style="-fx-font-size: 16px;"/>
+
+                            <VBox alignment="CENTER" spacing="2.0">
+                                <Label text="🍖 Food" textFill="#ffb3a7" style="-fx-font-size: 11px; -fx-font-weight: bold;" />
+                                <Label fx:id="currentFoodOverlayLabel" text="0" textFill="WHITE" style="-fx-font-size: 15px; -fx-font-weight: bold;" />
+                            </VBox>
+
+                            <Label text="|" textFill="rgba(255,255,255,0.2)" style="-fx-font-size: 16px;"/>
+
+                            <VBox alignment="CENTER" spacing="2.0">
+                                <Label text="🌾 Sust. Disc." textFill="#a2e8dd" style="-fx-font-size: 11px; -fx-font-weight: bold;" />
+                                <Label fx:id="totalSustenanceDiscountOverlayLabel" text="0" textFill="WHITE" style="-fx-font-size: 15px; -fx-font-weight: bold;" />
+                            </VBox>
+
+                            <Label text="|" textFill="rgba(255,255,255,0.2)" style="-fx-font-size: 16px;"/>
+
+                            <VBox alignment="CENTER" spacing="2.0">
+                                <Label text="🏡 Build. Disc." textFill="#8daef4" style="-fx-font-size: 11px; -fx-font-weight: bold;" />
+                                <Label fx:id="totalBuildingsFoodDiscountOverlayLabel" text="0" textFill="WHITE" style="-fx-font-size: 15px; -fx-font-weight: bold;" />
+                            </VBox>
+
+                            <Label text="|" textFill="rgba(255,255,255,0.2)" style="-fx-font-size: 16px;"/>
+
+                            <VBox alignment="CENTER" spacing="2.0">
+                                <Label text="✨ Shaman Stars" textFill="#e2b3ff" style="-fx-font-size: 11px; -fx-font-weight: bold;" />
+                                <Label fx:id="shamanStarsOverlayLabel" text="0" textFill="WHITE" style="-fx-font-size: 15px; -fx-font-weight: bold;" />
+                            </VBox>
+
+                            <Label text="|" textFill="rgba(255,255,255,0.2)" style="-fx-font-size: 16px;"/>
+
+                            <VBox alignment="CENTER" spacing="2.0">
+                                <Label text="📜 Upper Card" textFill="#fcefb4" style="-fx-font-size: 11px; -fx-font-weight: bold;" />
+                                <Label fx:id="extraCardFromUpperOverlayLabel" text="✕" textFill="#ff4d4d" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+                            </VBox>
+
+                            <Label text="|" textFill="rgba(255,255,255,0.2)" style="-fx-font-size: 16px;"/>
+
+                            <VBox alignment="CENTER" spacing="2.0">
+                                <Label text="➕ Bonus Food" textFill="#ffcbb3" style="-fx-font-size: 11px; -fx-font-weight: bold;" />
+                                <Label fx:id="extraFoodFromBonusOverlayLabel" text="✕" textFill="#ff4d4d" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+                            </VBox>
+                        </HBox>
+                    </VBox>
                 </top>
 
                 <center>

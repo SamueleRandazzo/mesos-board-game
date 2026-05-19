@@ -1,21 +1,19 @@
--- 1. Create the database if it doesn't exist
-CREATE DATABASE IF NOT EXISTS GC35_Mesos_DB;
 USE GC35_Mesos_DB;
 
--- 2. Players table
+-- 1. Players table
 CREATE TABLE IF NOT EXISTS players (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nickname VARCHAR(50) UNIQUE NOT NULL
 );
 
--- 3. Matches table (The "Event")
+-- 2. Matches table (The "Event")
 CREATE TABLE IF NOT EXISTS matches (
     id INT AUTO_INCREMENT PRIMARY KEY,
     match_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     player_count INT NOT NULL
 );
 
--- 4. Junction table (The "Results")
+-- 3. Junction table (The "Results")
 -- This links players to matches and stores their specific score
 CREATE TABLE IF NOT EXISTS player_matches (
     player_id INT NOT NULL,
@@ -26,7 +24,7 @@ CREATE TABLE IF NOT EXISTS player_matches (
     FOREIGN KEY (match_id) REFERENCES matches(id) ON DELETE CASCADE
 );
 
--- 5. Optional: A view to simplify leaderboard queries
+-- 4. Optional: A view to simplify leaderboard queries
 CREATE OR REPLACE VIEW global_rankings AS
 SELECT p.nickname
     ,m.player_count

@@ -23,8 +23,7 @@ public class DatabaseManager {
 
     /**
      * Initializes the database connection with provided credentials.
-     * If the connection is successful, it proceeds to verify and create
-     * the necessary database schema.
+     * If the database or its tables do not exist, they are created automatically.
      *
      * @param username The database username provided via command line.
      * @param password The database password provided via command line.
@@ -35,23 +34,48 @@ public class DatabaseManager {
 
         String baseUrl = "jdbc:mysql://localhost:3306/?serverTimezone=UTC";
 
-        try {
-            try (Connection conn = DriverManager.getConnection(baseUrl, user, pass);
-                 Statement stmt = conn.createStatement()) {
+        try (Connection conn = DriverManager.getConnection(baseUrl, user, pass);
+             Statement stmt = conn.createStatement()) {
 
-                stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS GC35_Mesos_DB");
-                System.out.println("[DB] Database 'GC35_Mesos_DB' checked/created.");
+            boolean dbExisted = false;
+            try (ResultSet rs = conn.getMetaData().getCatalogs()) {
+                while (rs.next()) {
+                    if ("GC35_Mesos_DB".equalsIgnoreCase(rs.getString(1))) {
+                        dbExisted = true;
+                        break;
+                    }
+                }
             }
 
-            try (Connection conn = getConnection()) {
+            stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS GC35_Mesos_DB");
+
+            try (Connection dbConn = getConnection()) {
                 available = true;
-                checkAndCreateTables(conn);
-                System.out.println("[DB] Connection and schema are ready.");
+
+                if (!dbExisted || !doesTableExist(dbConn, "matches")) {
+                    System.out.println("[DB] Schema missing or fresh DB. Running initialization script...");
+                    executeSqlScript(dbConn);
+                    System.out.println("[DB] Schema created successfully.");
+                } else {
+                    System.out.println("[DB] Database and schema are already up to date.");
+                }
             }
 
         } catch (SQLException e) {
-            System.err.println("[DB] Critical Error: " + e.getMessage());
+            System.err.println("[DB] Critical Error during initialization: " + e.getMessage());
             available = false;
+        }
+    }
+
+    /**
+     * Helper method to safely check if a table exists by running a lightweight query.
+     */
+    private static boolean doesTableExist(Connection conn, String tableName) {
+        try (Statement stmt = conn.createStatement()) {
+            stmt.executeQuery("SELECT 1 FROM " + tableName + " LIMIT 1");
+            return true;
+        } catch (SQLException e) {
+            return false;
         }
     }
 
@@ -72,26 +96,6 @@ public class DatabaseManager {
      */
     public static boolean isAvailable() {
         return available;
-    }
-
-    /**
-     * Verifies the existence of the required tables and executes the
-     * initialization script if they are missing.
-     *
-     * @param conn The active database connection.
-     */
-    private static void checkAndCreateTables(Connection conn) {
-        try {
-            // Check if 'matches' table exists (adjust 'matches' to your actual table name)
-            ResultSet rs = conn.getMetaData().getTables(null, null, "matches", null);
-            if (!rs.next()) {
-                System.out.println("[DB] Schema not found. Running initialization script...");
-                executeSqlScript(conn);
-                System.out.println("[DB] Schema created successfully.");
-            }
-        } catch (SQLException e) {
-            System.err.println("[DB] Error during table verification: " + e.getMessage());
-        }
     }
 
     /**

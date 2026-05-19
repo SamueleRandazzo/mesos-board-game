@@ -68,29 +68,14 @@ public class GameBoardController extends SceneController {
     );
 
 
-    @FXML
-    private Label gameNotificationLabel;
-
-    @FXML
-    private VBox playersContainer;
-
-    @FXML
-    private HBox offerTrackContainer;
-
-    @FXML
-    private HBox upperCardsContainer;
-
-    @FXML
-    private HBox lowerCardsContainer;
-
-    @FXML
-    private Label gameLogLabel;
-
-    @FXML
-    private StackPane turnOrderContainer;
-
-    @FXML
-    private StackPane firstDeckCardContainer;
+    @FXML private Label gameNotificationLabel;
+    @FXML private VBox playersContainer;
+    @FXML private HBox offerTrackContainer;
+    @FXML private HBox upperCardsContainer;
+    @FXML private HBox lowerCardsContainer;
+    @FXML private Label gameLogLabel;
+    @FXML private StackPane turnOrderContainer;
+    @FXML private StackPane firstDeckCardContainer;
 
     @FXML private ImageView artistsIcon;
     @FXML private Label artistsCount;
@@ -131,6 +116,14 @@ public class GameBoardController extends SceneController {
     @FXML private Label tribeOverlayTitle;
 
     @FXML private Button endTurnButton;
+
+    @FXML private Label totalPrestigePointsOverlayLabel;
+    @FXML private Label currentFoodOverlayLabel;
+    @FXML private Label totalSustenanceDiscountOverlayLabel;
+    @FXML private Label totalBuildingsFoodDiscountOverlayLabel;
+    @FXML private Label shamanStarsOverlayLabel;
+    @FXML private Label extraCardFromUpperOverlayLabel;
+    @FXML private Label extraFoodFromBonusOverlayLabel;
 
     /**
      * Initializes the board scene with disabled offer tiles and  cards.
@@ -508,13 +501,8 @@ public class GameBoardController extends SceneController {
         updateTribeSlot("INVENTOR", cols.get("INVENTORS"), inventorsIcon, inventorsCount);
         updateTribeSlot("SHAMAN", cols.get("SHAMANS"), shamansIcon, shamansCount);
 
-        totalPrestigePointsLabel.setText(String.valueOf(tribe.getTotalPrestigePoints()));
-        currentFoodLabel.setText(String.valueOf(tribe.getCurrentFood()));
-        totalSustenanceDiscountLabel.setText(String.valueOf(tribe.getTotalSustenanceDiscount()));
-        totalBuildingsFoodDiscountLabel.setText(String.valueOf(tribe.getTotalBuildingsFoodDiscount()));
-        shamanStarsLabel.setText(String.valueOf(tribe.getShamanStars()));
-        updateBooleanLabel(extraCardFromUpperLabel, tribe.hasExtraCardFromUpper());
-        updateBooleanLabel(extraFoodFromBonusLabel, tribe.hasExtraFoodFromBonus());
+        setPlayerStatsLabel(tribe, totalPrestigePointsLabel, currentFoodLabel, totalSustenanceDiscountLabel,
+                            totalBuildingsFoodDiscountLabel, shamanStarsLabel, extraCardFromUpperLabel, extraFoodFromBonusLabel);
 
         initializeTribeIconClicks();
     }
@@ -801,8 +789,23 @@ public class GameBoardController extends SceneController {
         // Buildings section
         tribeCardsContainer.getChildren().add(createTribeSection("BUILDINGS", tribe.getBuildingIds()));
 
+        setPlayerStatsLabel(tribe, totalPrestigePointsOverlayLabel, currentFoodOverlayLabel, totalSustenanceDiscountOverlayLabel,
+                            totalBuildingsFoodDiscountOverlayLabel, shamanStarsOverlayLabel, extraCardFromUpperOverlayLabel, extraFoodFromBonusOverlayLabel);
+
         tribeOverlay.setManaged(true);
         tribeOverlay.setVisible(true);
+    }
+
+    private void setPlayerStatsLabel(TribeStatusDTO tribe, Label totalPrestigePointsOverlayLabel, Label currentFoodOverlayLabel,
+                                     Label totalSustenanceDiscountOverlayLabel, Label totalBuildingsFoodDiscountOverlayLabel,
+                                     Label shamanStarsOverlayLabel, Label extraCardFromUpperOverlayLabel, Label extraFoodFromBonusOverlayLabel) {
+        totalPrestigePointsOverlayLabel.setText(String.valueOf(tribe.getTotalPrestigePoints()));
+        currentFoodOverlayLabel.setText(String.valueOf(tribe.getCurrentFood()));
+        totalSustenanceDiscountOverlayLabel.setText(String.valueOf(tribe.getTotalSustenanceDiscount()));
+        totalBuildingsFoodDiscountOverlayLabel.setText(String.valueOf(tribe.getTotalBuildingsFoodDiscount()));
+        shamanStarsOverlayLabel.setText(String.valueOf(tribe.getShamanStars()));
+        updateBooleanLabel(extraCardFromUpperOverlayLabel, tribe.hasExtraCardFromUpper());
+        updateBooleanLabel(extraFoodFromBonusOverlayLabel, tribe.hasExtraFoodFromBonus());
     }
 
     /**
