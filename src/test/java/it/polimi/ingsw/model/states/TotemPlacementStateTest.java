@@ -25,12 +25,42 @@ class TotemPlacementStateTest {
 
         return new Game(
                 players,
-                new ArrayList<TribeDeck>(),
+                availableTribeDeck(),
                 new ArrayList<BuildingCard>(),
                 new ArrayList<BuildingCard>(),
                 new ArrayList<BuildingCard>(),
                 new OfferTrack(tiles)
         );
+    }
+
+    private static List<TribeDeck> availableTribeDeck() {
+        List<TribeDeck> deck = new ArrayList<>();
+        for (int i = 0; i < 9; i++) {
+            deck.add(new TestTribeCard("test_card_" + i));
+        }
+        return deck;
+    }
+
+    private record TestTribeCard(String id) implements TribeDeck {
+        @Override
+        public String getId() {
+            return id;
+        }
+
+        @Override
+        public int getEra() {
+            return 1;
+        }
+
+        @Override
+        public boolean getIsObtainable() {
+            return true;
+        }
+
+        @Override
+        public void applyTo(Player p) {
+            p.changePrestigePoints(1);
+        }
     }
 
     @SuppressWarnings("unchecked")

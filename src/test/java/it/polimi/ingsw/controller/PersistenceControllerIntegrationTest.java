@@ -49,7 +49,9 @@ class PersistenceControllerIntegrationTest {
                 .orElseThrow();
 
         assertFalse(restoredPlayer.getTribe().getOwnedCards().isEmpty());
-        assertEquals("p2", afterCardPick.getCurrentActivePlayer().getNickname());
+        assertEquals(2, afterCardPick.getCurrentRound());
+        assertEquals("p1", afterCardPick.getCurrentActivePlayer().getNickname());
+        assertTrue(afterCardPick.getOfferTrack().getTiles().stream().allMatch(OfferTile::isAvailable));
     }
 
     private static Game newGame() {

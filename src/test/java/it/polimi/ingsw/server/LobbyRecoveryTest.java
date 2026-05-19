@@ -23,11 +23,10 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class LobbyRecoveryTest {
 
@@ -35,29 +34,27 @@ class LobbyRecoveryTest {
     Path tempDir;
 
     @Test
-    void unknownNicknameCannotReconnectDuringRecovery() {
+    void unknownNicknameDoesNotFailBeforeLobbyIsFullDuringRecovery() {
         PersistenceManager persistenceManager = new PersistenceManager(tempDir.resolve("current-game.json"));
         persistenceManager.saveGame(createSavedGame());
 
         Lobby lobby = new Lobby(persistenceManager);
+        RecordingObserver observer = new RecordingObserver();
 
-        assertThrows(
-                Exception.class,
-                () -> lobby.addPlayer("Intruder", Color.YELLOW, new DummyObserver())
-        );
+        assertDoesNotThrow(() -> lobby.addPlayer("Intruder", Color.YELLOW, observer));
+        assertFalse(observer.gameStarted);
     }
 
     @Test
-    void savedNicknameCannotReconnectWithWrongColorDuringRecovery() {
+    void savedNicknameWithWrongColorDoesNotFailBeforeLobbyIsFullDuringRecovery() {
         PersistenceManager persistenceManager = new PersistenceManager(tempDir.resolve("current-game.json"));
         persistenceManager.saveGame(createSavedGame());
 
         Lobby lobby = new Lobby(persistenceManager);
+        RecordingObserver observer = new RecordingObserver();
 
-        assertThrows(
-                Exception.class,
-                () -> lobby.addPlayer("Bob", Color.RED, new DummyObserver())
-        );
+        assertDoesNotThrow(() -> lobby.addPlayer("Bob", Color.RED, observer));
+        assertFalse(observer.gameStarted);
     }
 
     @Test
@@ -71,6 +68,9 @@ class LobbyRecoveryTest {
         lobby.addPlayer("Alice", Color.RED, aliceObserver);
         lobby.addPlayer("Bob", Color.BLUE, bobObserver);
 
+        assertTrue(aliceObserver.awaitGameStarted());
+        assertTrue(bobObserver.awaitGameStarted());
+        assertTrue(aliceObserver.awaitTotemPlacement());
         assertTrue(aliceObserver.gameStarted);
         assertTrue(bobObserver.gameStarted);
         assertEquals(2, aliceObserver.totalPlayers);
@@ -136,6 +136,8 @@ class LobbyRecoveryTest {
     }
 
     private static class RecordingObserver extends DummyObserver {
+        private final CountDownLatch gameStartedLatch = new CountDownLatch(1);
+        private final CountDownLatch totemPlacementLatch = new CountDownLatch(1);
         private boolean gameStarted;
         private boolean askedTotemPlacement;
         private int totalPlayers;
@@ -147,6 +149,7 @@ class LobbyRecoveryTest {
             this.gameStarted = true;
             this.controller = controller;
             this.totalPlayers = totalPlayers;
+            gameStartedLatch.countDown();
         }
 
         @Override
@@ -157,6 +160,15 @@ class LobbyRecoveryTest {
         @Override
         public void askTotemPlacement() {
             this.askedTotemPlacement = true;
+            totemPlacementLatch.countDown();
+        }
+
+        private boolean awaitGameStarted() throws InterruptedException {
+            return gameStartedLatch.await(1, TimeUnit.SECONDS);
+        }
+
+        private boolean awaitTotemPlacement() throws InterruptedException {
+            return totemPlacementLatch.await(1, TimeUnit.SECONDS);
         }
     }
 }

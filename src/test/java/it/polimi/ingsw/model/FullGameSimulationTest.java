@@ -66,8 +66,6 @@ class FullGameSimulationTest {
             game.placePlayerTotem(0);
             game.placePlayerTotem(1);
 
-            game.resolveEndTurn();
-
             assertTrue(
                     game.getBoard().getBottomRow().size() > 0,
                     "The lower row should contain at least one card to pick during round " + expectedRound
@@ -115,7 +113,7 @@ class FullGameSimulationTest {
     }
 
     @Test
-    void actionResolution_shouldRequireAllGrantedPicksBeforeTurnEnds() {
+    void actionResolution_shouldAutoSkipPlayersWithoutAvailableActionsAfterRequiredPicks() {
         List<Player> players = List.of(
                 new Player(Color.RED, "p1"),
                 new Player(Color.BLUE, "p2")
@@ -142,8 +140,10 @@ class FullGameSimulationTest {
 
         game.resolveLowerCardPlayerPick(0);
 
-        assertEquals("p2", game.getCurrentActivePlayer().getNickname());
+        assertEquals(2, game.getCurrentRound());
+        assertEquals("p1", game.getCurrentActivePlayer().getNickname());
         assertTrue(game.getOfferTrack().getTiles().get(0).isAvailable());
+        assertTrue(game.getOfferTrack().getTiles().get(1).isAvailable());
     }
 
     private static List<TribeDeck> deterministicTribeDeck() {
