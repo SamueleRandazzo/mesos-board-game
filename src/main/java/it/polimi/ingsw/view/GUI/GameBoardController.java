@@ -39,7 +39,6 @@ public class GameBoardController extends SceneController {
 
     private final Map<String, Color> playersInfo = new LinkedHashMap<>();
 
-    //TODO: Verificare le OfferTile effettive per ogni giocatore
     private static final Map<Integer, List<String>> OFFER_TILE_IMAGES = Map.of(
             2, List.of("/images/Map/Front/Font Map 2.png","/images/Map/Front/Font Map 3.png","/images/Map/Front/Font Map 5.png","/images/Map/Front/Font Map 6.png"),
             3, List.of("/images/Map/Front/Font Map 2.png","/images/Map/Front/Font Map 3.png","/images/Map/Front/Font Map 4.png","/images/Map/Front/Font Map 5.png","/images/Map/Front/Font Map 6.png"),
@@ -361,7 +360,6 @@ public class GameBoardController extends SceneController {
 
             List <String> map_images = OFFER_TILE_IMAGES.get(total);
 
-
             for (int i = 0; i < map_images.size(); i++) {
 
                 String imagePath = map_images.get(i);
@@ -531,9 +529,23 @@ public class GameBoardController extends SceneController {
         tileButton.setMaxSize(OFFER_TILE_WIDTH + 12, OFFER_TILE_HEIGHT + 12);
 
         tileButton.setGraphic(createOfferTileGraphic(tile, imagePath));
-        tileButton.setStyle(offerTileStyle(tile.isAvailable()));
+
+        String baseStyle = offerTileStyle(tile.isAvailable());
+        tileButton.setStyle(baseStyle);
 
         if (tile.isAvailable()) {
+            tileButton.setOpacity(0.9);
+
+            tileButton.setOnMouseEntered(event -> {
+                tileButton.setOpacity(1.0);
+                tileButton.setStyle(baseStyle + "-fx-border-color: #f4d58d; -fx-effect: dropshadow(three-pass-box, rgba(244,213,141,0.6), 10, 0, 0, 0);");
+            });
+
+            tileButton.setOnMouseExited(event -> {
+                tileButton.setOpacity(0.9);
+                tileButton.setStyle(baseStyle);
+            });
+
             tileButton.setOnAction(event -> {
                 try {
                     setOfferTrackEnabled(false);
@@ -545,6 +557,7 @@ public class GameBoardController extends SceneController {
             });
         } else {
             tileButton.setCursor(Cursor.DEFAULT);
+            tileButton.setOpacity(0.5);
         }
 
         return tileButton;
@@ -706,36 +719,57 @@ public class GameBoardController extends SceneController {
         ImageView imageView = createImageView(imagePath, CARD_WIDTH, CARD_HEIGHT);
         cardPane.getChildren().add(imageView);
 
-
         //Choose if a card is a building or a tribe card
         boolean isEventCard = cardId != null && cardId.startsWith("event");
-
 
         if (cardSelectionEnabled) {
             if (isEventCard) {
                 cardPane.setStyle(nonSelectableCardStyle());
+                cardPane.setOpacity(0.65);
+                cardPane.setCursor(Cursor.DEFAULT);
+
                 cardPane.setOnMouseClicked(event -> {
                     showErrorMessage("You cannot select event cards.");
                 });
+
+                cardPane.setOnMouseEntered(null);
+                cardPane.setOnMouseExited(null);
             } else {
-                    cardPane.setStyle(selectableCardStyle());
+                String baseSelectableStyle = selectableCardStyle();
+                cardPane.setStyle(baseSelectableStyle);
+                cardPane.setCursor(Cursor.HAND);
 
-                    cardPane.setOnMouseClicked(event -> {
-                        try {
-                            setCardSelectionEnabled(false);
+                cardPane.setOpacity(0.9);
 
-                            // Forwards the input (e.g., "T0") to the NetworkManager regex parser
-                            network.cardSelection(prefix + index);
-                        } catch (Exception e) {
-                            setCardSelectionEnabled(true);
-                            showErrorMessage(handleNetworkError(e));
+                cardPane.setOnMouseEntered(event -> {
+                    cardPane.setOpacity(1.0);
+                    cardPane.setStyle(baseSelectableStyle + "-fx-effect: dropshadow(three-pass-box, rgba(244, 213, 141, 0.7), 12, 0, 0, 0);");
+                });
 
-                        }
-                    });
+                cardPane.setOnMouseExited(event -> {
+                    cardPane.setOpacity(0.9);
+                    cardPane.setStyle(baseSelectableStyle);
+                });
+
+                cardPane.setOnMouseClicked(event -> {
+                    try {
+                        setCardSelectionEnabled(false);
+                        // Forwards the input (e.g., "T0") to the NetworkManager regex parser
+                        network.cardSelection(prefix + index);
+                    } catch (Exception e) {
+                        setCardSelectionEnabled(true);
+                        showErrorMessage(handleNetworkError(e));
+                    }
+                });
             }
-        } else { //if is not player turn, all card are not clickable
+        } else { //if is not player turn, all cards are not clickable
             cardPane.setStyle(disabledCardStyle());
+            cardPane.setOpacity(0.5);
+            cardPane.setCursor(Cursor.DEFAULT);
+
             cardPane.setOnMouseClicked(null);
+            cardPane.setOnMouseEntered(null);
+            cardPane.setOnMouseExited(null);
         }
 
         return cardPane;
