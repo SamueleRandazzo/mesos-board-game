@@ -4,7 +4,6 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.effect.DropShadow?>
-<?import javafx.scene.paint.Color?>
 
 <VBox alignment="CENTER" spacing="25.0" prefWidth="750.0" prefHeight="580.0"
       style="-fx-background-color: linear-gradient(to bottom right, #1a1a1a, #000000, #2c1a04);"
@@ -15,24 +14,21 @@
         <Insets bottom="35.0" left="45.0" right="45.0" top="35.0"/>
     </padding>
 
-    <Label text="🏆 HALL OF FAME 🏆" style="-fx-text-fill: #f1c40f; -fx-font-size: 36px; -fx-font-weight: bold; -fx-letter-spacing: 3px;">
+    <Label text="🏆 HALL OF FAME 🏆"
+           style="-fx-text-fill: #f1c40f; -fx-font-size: 36px; -fx-font-weight: bold; -fx-letter-spacing: 3px;">
         <effect>
-            <DropShadow blurType="GAUSSIAN" height="20" width="20">
-                <color><Color red="0.95" green="0.77" blue="0.06" opacity="0.6" /></color>
-            </DropShadow>
+            <DropShadow blurType="GAUSSIAN" height="20" width="20" color="rgba(241, 196, 15, 0.6)" />
         </effect>
     </Label>
 
-    <TableView fx:id="globalLeaderboardTable" VBox.vgrow="ALWAYS"
-               style="-fx-background-radius: 15; -fx-background-color: rgba(40, 40, 40, 0.7); -fx-border-color: #f1c40f; -fx-border-radius: 15; -fx-padding: 8;">
-        <columns>
-            <TableColumn fx:id="posColumn" text="RANK" reorderable="false" resizable="false" />
-            <TableColumn fx:id="nameColumn" text="PLAYER" prefWidth="250.0" reorderable="false" />
-            <TableColumn fx:id="prestigeColumn" text="SCORE" prefWidth="130.0" reorderable="false" />
-        </columns>
-        <columnResizePolicy>
-            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-        </columnResizePolicy>
-    </TableView>
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                style="-fx-background: transparent; -fx-background-color: transparent; -fx-padding: 0;">
+
+        <VBox fx:id="globalLeaderboardRowsContainer" spacing="12.0" style="-fx-background-color: transparent;">
+            <padding>
+                <Insets right="10.0" left="2.0" top="2.0" bottom="2.0"/>
+            </padding>
+        </VBox>
+    </ScrollPane>
 
 </VBox>

@@ -2,69 +2,102 @@ package it.polimi.ingsw.view.GUI;
 
 import it.polimi.ingsw.network.DTO.GlobalLeaderboardDTO;
 import it.polimi.ingsw.network.DTO.GlobalPlayerRankDTO;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 
 /**
  * Controller class for the Global Leaderboard scene in the GUI.
  * <p>
  * This class handles the display of historical player rankings accumulated across multiple game sessions.
- * It populates a JavaFX {@link TableView} using dedicated data transfer objects containing absolute positions,
- * player nicknames, and total points accumulated globally.
+ * It populates a modern fluid list container using dedicated data transfer objects containing absolute positions,
+ * player nicknames, and total points accumulated globally, ensuring all components are centered.
  * </p>
  *
  * @see SceneController
  */
 public class GlobalLeaderboardController extends SceneController {
 
-    /** Table view container displaying the persistent global ranking rows. */
-    @FXML private TableView<GlobalPlayerRankDTO> globalLeaderboardTable;
-
-    /** Column rendering the player's historical global position (e.g., "1°"). */
-    @FXML private TableColumn<GlobalPlayerRankDTO, String> posColumn;
-
-    /** Column rendering the unique player nickname fetched from the server's database. */
-    @FXML private TableColumn<GlobalPlayerRankDTO, String> nameColumn;
-
-    /** Column rendering the total cumulative points achieved by the player throughout their career. */
-    @FXML private TableColumn<GlobalPlayerRankDTO, Integer> prestigeColumn;
-
-    /**
-     * Initializes the controller automatically after its FXML elements have been completely loaded.
-     * <p>
-     * Sets up a custom property factory lambda for the {@code posColumn} to format the ranking with an ordinal indicator,
-     * extracts text names for the {@code nameColumn}, and maps the {@code prestigeColumn} directly to the
-     * corresponding structural fields inside the {@link GlobalPlayerRankDTO}.
-     * </p>
-     */
-    @FXML
-    public void initialize() {
-        // Mapping DTO fields to columns
-        posColumn.setCellValueFactory(data ->
-                new javafx.beans.property.SimpleStringProperty(data.getValue().getRank() + "°"));
-
-        nameColumn.setCellValueFactory(data -> {
-            String name = data.getValue().getNickname();
-            return new javafx.beans.property.SimpleStringProperty(name);
-        });
-
-        prestigeColumn.setCellValueFactory(new PropertyValueFactory<>("totalPoints"));
-    }
+    /** Scrollable VBox container designated to host dynamically generated rows for the Hall of Fame. */
+    @FXML private VBox globalLeaderboardRowsContainer;
 
     /**
      * Populates the global standings table with data packages retrieved from the server.
      * <p>
-     * Converts the ranking records list into a JavaFX observable array list to bind it directly
-     * to the graphical user interface.
+     * Iterates over the persistent records to build modern centered row cards inside the fluid container.
      * </p>
      *
      * @param globalLeaderboard data packet containing the comprehensive global rankings list
      */
     @Override
     public void displayGlobalLeaderboard(GlobalLeaderboardDTO globalLeaderboard) {
-        globalLeaderboardTable.setItems(FXCollections.observableArrayList(globalLeaderboard.getRankings()));
+        // Clear old records to guarantee clean redraws
+        globalLeaderboardRowsContainer.getChildren().clear();
+
+        // Dynamically build and add each ranking card
+        for (GlobalPlayerRankDTO dto : globalLeaderboard.getRankings()) {
+            HBox row = createGlobalRankRow(dto);
+            globalLeaderboardRowsContainer.getChildren().add(row);
+        }
+    }
+
+    /**
+     * Factory utility to programmatically build an elegant horizontal rank card.
+     * Evenly distributes three dynamic columns and centers their inner text properties.
+     *
+     * @param dto data token representing global structural metrics for an single profile career
+     * @return a fully styled, centered {@link HBox} element ready for node trees
+     */
+    private HBox createGlobalRankRow(GlobalPlayerRankDTO dto) {
+        HBox row = new HBox();
+        row.setAlignment(Pos.CENTER); // Center elements vertically inside the card
+        row.setPadding(new Insets(14.0, 20.0, 14.0, 20.0));
+
+        // Base background matching the custom original charcoal #282828 and gold accenting
+        String style = "-fx-background-radius: 12; -fx-border-radius: 12; ";
+        if (dto.getRank() == 1) {
+            // Premium radiant layout styling dedicated specifically to the overall global #1 master
+            style += "-fx-background-color: rgba(241, 196, 15, 0.12); " +
+                    "-fx-border-color: #f1c40f; " +
+                    "-fx-border-width: 1.8;";
+        } else {
+            // Clean custom dark gray framework rows for standard database records
+            style += "-fx-background-color: rgba(40, 40, 40, 0.65); " +
+                    "-fx-border-color: rgba(241, 196, 15, 0.25); " +
+                    "-fx-border-width: 1.0;";
+        }
+        row.setStyle(style);
+
+        // --- EQUAL THREE-COLUMN DISTRIBUTION WITH TOTAL CENTERING ---
+
+        // 1. POSITION / RANK COLUMN
+        Label posLabel = new Label(dto.getRank() + "°");
+        posLabel.setAlignment(Pos.CENTER);
+        posLabel.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(posLabel, Priority.ALWAYS); // Claim equal fractional horizontal row space
+        posLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; " +
+                (dto.getRank() == 1 ? "-fx-text-fill: #f1c40f;" : "-fx-text-fill: #bdc3c7;"));
+
+        // 2. PLAYER IDENTIFIER COLUMN
+        Label nameLabel = new Label(dto.getNickname());
+        nameLabel.setAlignment(Pos.CENTER);
+        nameLabel.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(nameLabel, Priority.ALWAYS); // Claim equal fractional horizontal row space
+        nameLabel.setStyle("-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;");
+
+        // 3. CUMULATIVE PRESTIGE SCORE COLUMN
+        Label scoreLabel = new Label("✨ " + dto.getTotalPoints() + " PTS");
+        scoreLabel.setAlignment(Pos.CENTER);
+        scoreLabel.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(scoreLabel, Priority.ALWAYS); // Claim equal fractional horizontal row space
+        scoreLabel.setStyle("-fx-text-fill: #f1c40f; -fx-font-size: 15px; -fx-font-weight: bold;");
+
+        // Populate and combine components into unified tree branch layout
+        row.getChildren().addAll(posLabel, nameLabel, scoreLabel);
+        return row;
     }
 }
