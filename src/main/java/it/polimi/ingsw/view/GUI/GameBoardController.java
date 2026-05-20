@@ -888,45 +888,37 @@ public class GameBoardController extends SceneController {
         label.setTextFill(javafx.scene.paint.Color.WHITE);
         label.setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-letter-spacing: 0.5px;");
 
-        Pane stack = createOverlappedCardStack(cards);
+        VBox list = createVerticalCardList(cards);
 
-        section.getChildren().addAll(label, stack);
+        section.getChildren().addAll(label, list);
         return section;
     }
 
     /**
-     * Renders cards as an overlapped vertical stack where only a small top strip is visible.
+     * Renders the given cards as a vertical list where every card is fully visible.
+     * The overlay ScrollPane provides scrolling when the list grows.
      */
-    private Pane createOverlappedCardStack(List<CardDTO> cards) {
-        final int stackOffsetPx = 24;
+    private VBox createVerticalCardList(List<CardDTO> cards) {
 
-        Pane pane = new Pane();
-        pane.setStyle("-fx-background-color: transparent;");
+        VBox box = new VBox(8);
+        box.setAlignment(Pos.TOP_CENTER);
+        box.setStyle("-fx-background-color: transparent;");
 
         if (cards == null || cards.isEmpty()) {
-            pane.setPrefSize(CARD_WIDTH, CARD_HEIGHT);
-            return pane;
+            return box;
         }
 
-        double height = CARD_HEIGHT + (double) (cards.size() - 1) * stackOffsetPx;
-        pane.setPrefSize(CARD_WIDTH, height);
-        pane.setMinSize(CARD_WIDTH, height);
-        pane.setMaxWidth(CARD_WIDTH);
-
-        for (int i = 0; i < cards.size(); i++) {
-            CardDTO dto = cards.get(i);
-            if (dto == null) continue;
+        for (CardDTO dto : cards) {
 
             String imagePath = LocalCardDictionary.getInstance().getImagePath(dto.getCardId());
             ImageView view = createImageView(imagePath, CARD_WIDTH, CARD_HEIGHT);
-            view.setLayoutX(0);
-            view.setLayoutY((double) i * stackOffsetPx);
 
-            pane.getChildren().add(view);
+            box.getChildren().add(view);
         }
 
-        return pane;
+        return box;
     }
+
 
     /**
      * Updates a boolean status label with a green checkmark or a red cross.
