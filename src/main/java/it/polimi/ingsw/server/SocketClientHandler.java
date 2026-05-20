@@ -4,28 +4,68 @@ import it.polimi.ingsw.network.RemoteController;
 import it.polimi.ingsw.network.commands.ClientCommandFactory;
 import it.polimi.ingsw.network.commands.ClientCommandHandler;
 import it.polimi.ingsw.model.Enum.Color;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.*;
 
+/**
+ * Handles network communication with a single client connected via TCP Socket.
+ * This class runs on a dedicated thread, managing the initial login phase and
+ * continuously parsing incoming network commands from the client.
+ */
 public class SocketClientHandler extends Thread {
+    /**
+     * The TCP socket connection to the client.
+     */
     private final Socket socket;
+
+    /**
+     * The main game lobby instance where players are registered.
+     */
     private final Lobby lobby;
+
+    /**
+     * The remote game controller used to forward valid player actions.
+     */
     private RemoteController controller;
+
+    /**
+     * The unique nickname of the player associated with this handler.
+     */
     private String nickname;
+
+    /**
+     * The virtual view instance acting as the network proxy for client callbacks.
+     */
     private SocketVirtualView vView;
 
+    /**
+     * Constructs a new SocketClientHandler for the specified socket connection.
+     *
+     * @param s the connected socket from the client
+     * @param l the server lobby instance
+     */
     public SocketClientHandler(Socket s, Lobby l) {
         this.socket = s;
         this.lobby = l;
     }
 
+    /**
+     * Sets the game controller instance for this connection, enabling
+     * command execution on the game state.
+     *
+     * @param controller the remote game controller to be linked
+     */
     public void setController(RemoteController controller) {
         this.controller = controller;
     }
 
+    /**
+     * The main execution loop of the thread. It opens input and output streams,
+     * triggers the login phase, and then loops indefinitely to read and dispatch
+     * incoming player commands until the client disconnects.
+     */
     @Override
     public void run() {
         try (Scanner in = new Scanner(socket.getInputStream());
@@ -55,6 +95,14 @@ public class SocketClientHandler extends Thread {
         }
     }
 
+    /**
+     * Manages the initial negotiation phase until the player successfully logs in.
+     * It expects a specific format: "LOGIN nickname color".
+     *
+     * @param in  the scanner hooked to the socket input stream
+     * @param out the print writer hooked to the socket output stream
+     * @return true if the login process completed successfully, false otherwise
+     */
     private boolean handleLogin(Scanner in, PrintWriter out) {
         while (in.hasNextLine()) {
             String line = in.nextLine();
@@ -78,4 +126,3 @@ public class SocketClientHandler extends Thread {
         return false;
     }
 }
-

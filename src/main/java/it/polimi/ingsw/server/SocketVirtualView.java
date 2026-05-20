@@ -12,31 +12,68 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Acts as a virtual view on the server side for a client connected via TCP Socket.
+ * It implements the {@link GameObserver} interface, translating model events and
+ * controller requests into plain-text protocol strings or JSON payloads sent over the socket.
+ */
 public class SocketVirtualView implements GameObserver {
+    /**
+     * The print writer linked to the client's socket output stream.
+     */
     private PrintWriter out;
+
+    /**
+     * The network handler associated with this client connection.
+     */
     private SocketClientHandler handler;
 
+    /**
+     * Constructs a new SocketVirtualView with the specified output stream and network handler.
+     *
+     * @param out     the network print writer used to send messages to the client
+     * @param handler the client handler associated with this connection
+     */
     public SocketVirtualView(PrintWriter out, SocketClientHandler handler) {
         this.out = out;
         this.handler = handler;
     }
 
+    /**
+     * Notifies the client that a player has joined the lobby, providing the current count.
+     *
+     * @param current the current number of players in the lobby
+     * @param target  the required number of players to start the match
+     */
     @Override
     public void onPlayerJoined(int current, int target) {
         out.println("PLAYER_JOINED " + current + "/" + target);
     }
 
+    /**
+     * Notifies the client that the game has started, attaches the active controller
+     * to the network handler, and sends the total player count.
+     *
+     * @param controller   the remote controller managing the match state
+     * @param totalPlayers the total number of players participating
+     */
     @Override
     public void onGameStarted(RemoteController controller, int totalPlayers) {
         this.handler.setController(controller);
         out.println("GAME_STARTED " + totalPlayers);
     }
 
+    /**
+     * Requests the first player to define the maximum number of players for the match.
+     */
     @Override
     public void askMaxPlayers() {
         out.println("ASK_MAX_PLAYERS");
     }
 
+    /**
+     * Requests the client to choose where to place their initial totem on the board.
+     */
     @Override
     public void askTotemPlacement() {
         try {
@@ -46,6 +83,11 @@ public class SocketVirtualView implements GameObserver {
         }
     }
 
+    /**
+     * Sends the current list of available offer tiles on the track serialized as a single-line JSON string.
+     *
+     * @param tiles the list of OfferTileDTO objects representing the track state
+     */
     @Override
     public void onDisplayOfferTrack(List<OfferTileDTO> tiles) {
         try {
@@ -61,6 +103,9 @@ public class SocketVirtualView implements GameObserver {
         }
     }
 
+    /**
+     * Requests the client to pick a card during their choice phase.
+     */
     @Override
     public void askCardChoose() {
         try {
@@ -70,6 +115,11 @@ public class SocketVirtualView implements GameObserver {
         }
     }
 
+    /**
+     * Forwards a generic text message or notification to the client.
+     *
+     * @param message the string content to display
+     */
     @Override
     public void onShowMessage(String message) {
         try {
@@ -79,6 +129,11 @@ public class SocketVirtualView implements GameObserver {
         }
     }
 
+    /**
+     * Sends the turn sequence of players for the current round as a comma-separated string.
+     *
+     * @param playersOrder the ordered list of player nicknames
+     */
     @Override
     public void onShowPlayersOrder(List<String> playersOrder) {
         try {
@@ -89,6 +144,12 @@ public class SocketVirtualView implements GameObserver {
         }
     }
 
+    /**
+     * Sends general registration info linking each active player to their chosen color.
+     * Format: nickname1:COLOR1,nickname2:COLOR2...
+     *
+     * @param playersInfo a map pairing player nicknames with their assigned colors
+     */
     @Override
     public void onShowPlayersInfo(Map<String, Color> playersInfo) {
         String payload = playersInfo.entrySet().stream()
@@ -119,6 +180,11 @@ public class SocketVirtualView implements GameObserver {
         }
     }
 
+    /**
+     * Sends the updated game board state to the client as a single-line JSON payload.
+     *
+     * @param board the complete BoardDTO object representing the grid/map status
+     */
     @Override
     public void onDisplayBoard(BoardDTO board) {
         try {
@@ -139,6 +205,12 @@ public class SocketVirtualView implements GameObserver {
         }
     }
 
+    /**
+     * Sends the final match leaderboard alongside the player's updated historical global ranking.
+     *
+     * @param leaderboard the match results summary data transfer object
+     * @param globalRank  the updated global ranking position text for the client
+     */
     @Override
     public void onDisplayLeaderboard(LeaderboardDTO leaderboard, String globalRank) {
         try {
@@ -154,6 +226,12 @@ public class SocketVirtualView implements GameObserver {
         }
     }
 
+    /**
+     * Sends a connection heartbeat check to the client. Throws a RemoteException
+     * if the printer stream flags an internal socket error.
+     *
+     * @throws RemoteException if the TCP link is closed or broken during transmission
+     */
     @Override
     public void ping() throws RemoteException{
         out.println("PING");
@@ -162,6 +240,11 @@ public class SocketVirtualView implements GameObserver {
         }
     }
 
+    /**
+     * Transmits a severe or unrecoverable error message that forces a client-side shutdown or disconnect.
+     *
+     * @param error the fatal error context string
+     */
     @Override
     public void onShowFatalError(String error) {
         try {
@@ -172,6 +255,11 @@ public class SocketVirtualView implements GameObserver {
         }
     }
 
+    /**
+     * Sends the entire global database records leaderboard to the client as a single-line JSON payload.
+     *
+     * @param leaderboard the top rankings data collected from the database tier
+     */
     @Override
     public void onDisplayGlobalLeaderboard(GlobalLeaderboardDTO leaderboard) {
         try {
@@ -186,6 +274,11 @@ public class SocketVirtualView implements GameObserver {
         }
     }
 
+    /**
+     * Sends a non-fatal validation error notification (e.g., an illegal game move) back to the client.
+     *
+     * @param error the description message detailing what went wrong
+     */
     public void onShowError(String error) {
         try {
             out.println("ERROR " + error);
@@ -194,6 +287,11 @@ public class SocketVirtualView implements GameObserver {
         }
     }
 
+    /**
+     * Dispatches the updated layout of active turn order tiles to the client.
+     *
+     * @param turnOrderTile the list containing the current order sequence metadata
+     */
     @Override
     public void onDisplayTurnOrderTile(List<TurnOrderTileDTO> turnOrderTile) {
         try {
@@ -207,6 +305,12 @@ public class SocketVirtualView implements GameObserver {
         }
     }
 
+    /**
+     * Sends an atmospheric or systemic in-game log event narrative statement over the stream.
+     *
+     * @param message the event log narrative text
+     * @throws RemoteException if a network socket error occurs during writing
+     */
     @Override
     public void onShowEventMessage(String message) throws RemoteException {
         try {
@@ -216,6 +320,12 @@ public class SocketVirtualView implements GameObserver {
         }
     }
 
+    /**
+     * Directs the client to make a choice during their resolution phase between passing
+     * (ending their turn) or completing a structural asset building purchase.
+     *
+     * @throws RemoteException if a network socket error occurs during writing
+     */
     @Override
     public void askEndTurnOrBuyBuilding() throws RemoteException {
         try {

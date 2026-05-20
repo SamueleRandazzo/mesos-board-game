@@ -12,8 +12,8 @@ public class ServerMain {
     private static final int TCP_PORT = 1235;
 
     public static void main(String[] args) {
-        // String serverIp = "127.0.0.1";
-        //System.setProperty("java.rmi.server.hostname", serverIp);
+        String serverIp = "127.0.0.1";
+        System.setProperty("java.rmi.server.hostname", serverIp);
 
         if (args.length < 3) {
             System.err.println("WARNING: DB credential not provided");
