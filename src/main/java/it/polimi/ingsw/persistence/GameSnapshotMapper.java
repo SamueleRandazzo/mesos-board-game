@@ -18,15 +18,38 @@ import it.polimi.ingsw.model.states.EndGameState;
 import it.polimi.ingsw.model.states.GameState;
 import it.polimi.ingsw.model.states.SetupGameState;
 import it.polimi.ingsw.model.states.TotemPlacementState;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * Data Mapper responsible for bidirectional conversions between the live runtime {@link Game}
+ * domain model and its serializable, detached {@link GameSnapshot} representation.
+ * <p>
+ * This coordinator isolates the core game state machine from data persistence schemas,
+ * implementing full flattening routines during serialization and deterministic pointer
+ * re-linking (re-hydrating player mappings and factory lookups) during deserialization.
+ * </p>
+ *
+ * @see Game
+ * @see GameSnapshot
+ * @see GameDataLoader
+ */
 public class GameSnapshotMapper {
 
+    /**
+     * Extracts and flattens the structural runtime state of a live {@link Game} engine into a
+     * clean, deep-copied, serializable {@link GameSnapshot} architecture.
+     * <p>
+     * This mapping captures structural variables, operational track layers, dynamic state records,
+     * and maps complex cross-references into flat alphanumeric ID tokens.
+     * </p>
+     *
+     * @param game the active {@link Game} engine instance acting as the mapping source
+     * @return a fully populated, serializable {@link GameSnapshot} data container
+     */
     public GameSnapshot toSnapshot(Game game) {
         GameSnapshot snapshot = new GameSnapshot();
         snapshot.numPlayers = game.getNumPlayers();
@@ -55,6 +78,20 @@ public class GameSnapshotMapper {
         return snapshot;
     }
 
+    /**
+     * Reconstructs and fully re-hydrates a live, interactive {@link Game} engine session
+     * from a detached, serialized {@link GameSnapshot} schema template.
+     * <p>
+     * This method orchestrates resource boots using the {@link GameDataLoader} to bind
+     * static card definitions by ID, enforces transactional sanity checks on user structures,
+     * and reconstructs precise reference points across player arrays, tracks, and finite state handlers.
+     * </p>
+     *
+     * @param snapshot the flat {@link GameSnapshot} file template acting as the data source
+     * @return a live, executable {@link Game} engine session matching the saved footprint
+     * @throws IllegalArgumentException if an asset ID is unknown, an unowned card structure is corrupted,
+     *                                  or if an unmapped game state label is intercepted
+     */
     public Game toGame(GameSnapshot snapshot) {
         GameDataLoader loader = new GameDataLoader();
         Map<String, TribeDeck> tribeCards = loader.loadAllTribeCardsById(snapshot.numPlayers);
@@ -97,6 +134,9 @@ public class GameSnapshotMapper {
         );
     }
 
+    /**
+     * Converts a single live player object into a flat, detached data record block.
+     */
     private PlayerSnapshot toPlayerSnapshot(Player player) {
         PlayerSnapshot snapshot = new PlayerSnapshot();
         snapshot.nickname = player.getNickname();
@@ -111,6 +151,9 @@ public class GameSnapshotMapper {
         return snapshot;
     }
 
+    /**
+     * Extracts card blueprints from the central game board slots and reduces them to text coordinate lines.
+     */
     private BoardSnapshot toBoardSnapshot(Board board) {
         BoardSnapshot snapshot = new BoardSnapshot();
         snapshot.upperTribeCards = tribeIds(board.getTopRow());
@@ -122,6 +165,9 @@ public class GameSnapshotMapper {
         return snapshot;
     }
 
+    /**
+     * Records the grid properties and player allocation hooks of the current offer/totem selection track.
+     */
     private OfferTrackSnapshot toOfferTrackSnapshot(OfferTrack offerTrack) {
         OfferTrackSnapshot snapshot = new OfferTrackSnapshot();
         for (OfferTile tile : offerTrack.getTiles()) {
@@ -139,6 +185,9 @@ public class GameSnapshotMapper {
         return snapshot;
     }
 
+    /**
+     * Captures player positioning maps and bonus matrices from the core turn sequence tracks.
+     */
     private TurnOrderSnapshot toTurnOrderSnapshot(TurnOrderTile turnOrderTile) {
         TurnOrderSnapshot snapshot = new TurnOrderSnapshot();
         for (TurnOrderSlot slot : turnOrderTile.getSlots()) {
@@ -152,6 +201,9 @@ public class GameSnapshotMapper {
         return snapshot;
     }
 
+    /**
+     * Isolates and saves operational context tracking values from an active action resolution sub-phase loop.
+     */
     private ActionResolutionSnapshot toActionResolutionSnapshot(ActionResolutionState state) {
         ActionResolutionSnapshot snapshot = new ActionResolutionSnapshot();
         snapshot.currentActivePlayerNickname = state.getCurrentActivePlayerForState() == null
@@ -161,6 +213,10 @@ public class GameSnapshotMapper {
         return snapshot;
     }
 
+    /**
+     * Re-applies and registers card instances back into a player's hand or tribe tableau records,
+     * validating structural card type criteria.
+     */
     private void restorePlayerCards(Player player,
                                     List<String> ownedCardIds,
                                     Map<String, TribeDeck> tribeCards,
@@ -180,6 +236,9 @@ public class GameSnapshotMapper {
         }
     }
 
+    /**
+     * Rebuilds the central common Board engine container by resolving saved textual identifiers back into structural card lists.
+     */
     private Board restoreBoard(BoardSnapshot snapshot,
                                Map<String, TribeDeck> tribeCards,
                                Map<String, BuildingCard> buildingCards) {
@@ -193,6 +252,9 @@ public class GameSnapshotMapper {
         );
     }
 
+    /**
+     * Restores totem grid placement properties onto the newly mapped player reference parameters.
+     */
     private OfferTrack restoreOfferTrack(OfferTrackSnapshot snapshot, Map<String, Player> playersByNickname) {
         List<OfferTile> tiles = new ArrayList<>();
         for (OfferTileSnapshot tileSnapshot : snapshot.tiles) {
@@ -211,6 +273,9 @@ public class GameSnapshotMapper {
         return new OfferTrack(tiles);
     }
 
+    /**
+     * Resolves and re-establishes structural occupant pointer parameters inside turn priority tracking blocks.
+     */
     private TurnOrderTile restoreTurnOrderTile(TurnOrderSnapshot snapshot, Map<String, Player> playersByNickname) {
         List<TurnOrderSlot> slots = new ArrayList<>();
         for (TurnOrderSlotSnapshot slotSnapshot : snapshot.slots) {
@@ -223,6 +288,9 @@ public class GameSnapshotMapper {
         return new TurnOrderTile(slots);
     }
 
+    /**
+     * Instantiates and configures the exact behavioral State machine object context active when the snapshot was saved.
+     */
     private GameState restoreState(GameSnapshot snapshot, Map<String, Player> playersByNickname) {
         return switch (snapshot.currentStateName) {
             case "SetupGameState" -> new SetupGameState();
@@ -243,20 +311,24 @@ public class GameSnapshotMapper {
         };
     }
 
+    /** Extracts standard text string labels from a generic collection of tribe-related card elements. */
     private List<String> tribeIds(List<TribeDeck> cards) {
         return cards.stream().map(TribeDeck::getId).toList();
     }
 
+    /** Extracts standard text string labels from a generic collection of structural building cards. */
     private List<String> buildingIds(List<BuildingCard> cards) {
         return cards.stream().map(BuildingCard::getId).toList();
     }
 
+    /** Resolves an ordered list of player profile names back into active player entity references. */
     private List<Player> resolvePlayers(List<String> nicknames, Map<String, Player> playersByNickname) {
         return nicknames.stream()
                 .map(nickname -> resolvePlayer(nickname, playersByNickname))
                 .toList();
     }
 
+    /** Lookups and maps a player registration reference node using their unique nickname key. */
     private Player resolvePlayer(String nickname, Map<String, Player> playersByNickname) {
         Player player = playersByNickname.get(nickname);
         if (player == null) {
@@ -265,10 +337,15 @@ public class GameSnapshotMapper {
         return player;
     }
 
+    /** Convenience overload targeting map-backed resource registries for resolving tokenized collections. */
     private <T> List<T> resolveIds(List<String> ids, Map<String, T> cardsById, String type) {
         return resolveIds(ids, cardsById::get, type);
     }
 
+    /**
+     * Evaluates flat text structural array collections, looking up and returning concrete
+     * instance blocks using functional extractor tools.
+     */
     private <T> List<T> resolveIds(List<String> ids, Function<String, T> resolver, String type) {
         List<T> cards = new ArrayList<>();
         for (String id : ids) {

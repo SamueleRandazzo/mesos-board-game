@@ -4,7 +4,6 @@ import it.polimi.ingsw.model.Cards.*;
 import it.polimi.ingsw.model.Interfaces.*;
 import it.polimi.ingsw.network.DTO.BoardDTO;
 import it.polimi.ingsw.network.DTO.CardDTO;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;

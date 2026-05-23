@@ -5,17 +5,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Represents a Turn Order Tile, which groups together a sequence of {@link TurnOrderSlot}s.
+ * This class manages player placement to determine the playing order for the subsequent round
+ * and handles the distribution of associated food modifiers.
+ */
 public class TurnOrderTile {
 
     private final List<TurnOrderSlot> slots;
 
-    /** Constructor: create the tile with the exact number and type of slot*/
+    /**
+     * Constructs a TurnOrderTile and initializes it with the specified list of slots.
+     *
+     * @param slots the list of {@link TurnOrderSlot}s that make up this tile
+     */
     public TurnOrderTile(List<TurnOrderSlot> slots){
         this.slots = new ArrayList<>(slots);
     }
 
-    /** place the param in the first free slot, return the food modifier of the slot, throws an IllegalStateException if all
-    * slots are already occupied */
+    /**
+     * Places a player's totem into the first available (unoccupied) slot on this tile.
+     *
+     * @param player the {@link Player} placing their totem
+     * @return the food modifier value (bonus or malus) of the newly occupied slot
+     * @throws IllegalStateException if all slots on this tile are already occupied
+     */
     public int placeTotem(Player player){
 
         for(TurnOrderSlot slot : slots){
@@ -31,8 +45,12 @@ public class TurnOrderTile {
         throw new IllegalStateException("Cannot place totem: the Turn Order Track is full.");
     }
 
-    /** Calculates the turn order for next round
-        return the list of totem in the order they will play
+    /**
+     * Calculates and returns the turn order for the upcoming round based on the
+     * order of occupied slots.
+     *
+     * @return a {@link List} of {@link Player}s arranged in the order they will play next round
+     * @throws IllegalStateException if a slot is marked as occupied but contains no player data
      */
     public List<Player> getNextRoundOrder(){
 
@@ -43,7 +61,10 @@ public class TurnOrderTile {
                 .collect(Collectors.toList());
     }
 
-    /** Clean the turn order tile occupied by a specific player
+    /**
+     * Frees any slot currently occupied by the specified player on this tile.
+     *
+     * @param player the {@link Player} whose totem should be removed from the slots
      */
     public void cleanTurnOrderSlot(Player player) {
         for (TurnOrderSlot slot : slots) {
@@ -54,7 +75,9 @@ public class TurnOrderTile {
     }
 
     /**
-     * return turn order slot list
+     * Returns the list of turn order slots contained within this tile.
+     *
+     * @return the {@link List} of {@link TurnOrderSlot}s
      */
     public List<TurnOrderSlot> getSlots() {
         return slots;

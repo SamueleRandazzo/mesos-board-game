@@ -1,9 +1,7 @@
 package it.polimi.ingsw.database;
 
-import it.polimi.ingsw.model.Player;
 import it.polimi.ingsw.network.DTO.GlobalPlayerRankDTO;
 import it.polimi.ingsw.network.DTO.PlayerRankDTO;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
