@@ -367,9 +367,7 @@ public class GameBoardController extends SceneController {
         }
 
     /**
-     *
-      * Methot that creates the TurnOrerTile which is at the first position of the offerTrackContainer
-     * TODO: Forse sarebbe meglio creare un container apposta per la turnOrderTile
+     * Method that creates the TurnOrerTile which is at the first position of the offerTrackContainer
      */
     @Override
     public void displayTurnOrderTile(List<TurnOrderTileDTO> turnOrderTile) {
@@ -391,7 +389,7 @@ public class GameBoardController extends SceneController {
                 return;
             }
 
-            //createStaticStartMapTile return a stackpane which is a static container, the player don't need to click on the turnOrderTile
+            //createStaticStartMapTile return a stack pane which is a static container, the player don't need to click on the turnOrderTile
             StackPane startTile = createStaticStartMapTile(imagePath);
 
             turnOrderContainer.getChildren().add(startTile);

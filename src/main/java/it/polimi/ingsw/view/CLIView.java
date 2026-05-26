@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import static it.polimi.ingsw.exception.CustomException.cleanRemoteException;
@@ -67,6 +68,12 @@ public class CLIView implements View {
     private String myNickname = "MY_NICKNAME_HERE";
 
     private volatile List<TurnOrderTileDTO> lastTurnOrderTiles = null;
+
+    /** List containing active live event notifications. */
+    private volatile List<String> activeEventMessages = new CopyOnWriteArrayList<>();
+
+    /** Cached list containing the order of active players for the current game session. */
+    private volatile List<String> lastPlayersOrder = null;
 
     /**
      * Clears the terminal screen reliably across different operating systems.
@@ -162,26 +169,38 @@ public class CLIView implements View {
             lines.add("");
         }
 
-        // 2. TURN ORDER TILES
+        // 2. TURN ORDER TILE
         lines.add("");
         lines.add(YELLOW + BOLD + "=".repeat(17) + " TURN ORDER TILE " + "=".repeat(17) + RESET);
         lines.add("");
 
         if (lastTurnOrderTiles != null && !lastTurnOrderTiles.isEmpty()) {
-            lines.add(String.format("  %-4s | %-25s | %-10s", "Pos", "Player (Color)", "Food Bonus"));
-            lines.add("  " + "-".repeat(50));
+            lines.add(String.format("  %-4s | %-10s", "Pos", "Food Bonus"));
+            lines.add("  " + "-".repeat(18));
+
             int pos = 1;
             for (TurnOrderTileDTO tile : lastTurnOrderTiles) {
-                String pColor = tile.getColor() != null ? tile.getColor().toString() : "N/D";
-                String playerInfo = tile.getNickname() + " (" + pColor + ")";
-                lines.add(String.format("  %-4d | %-25s | %-10d", pos, playerInfo, tile.getFoodBonus()));
+                lines.add(String.format("  %-4d | %-10d", pos, tile.getFoodBonus()));
                 pos++;
             }
         } else {
             lines.add(" Waiting for turn order data...");
         }
 
-        // 3. CENTRAL BOARD
+        // 3. PLAYERS ORDER
+        lines.add("");
+        lines.add(YELLOW + BOLD + "=".repeat(16) + " PLAYERS TURN ORDER " + "=".repeat(16) + RESET);
+        lines.add("");
+
+        if (lastPlayersOrder != null && !lastPlayersOrder.isEmpty()) {
+            for (int i = 0; i < lastPlayersOrder.size(); i++) {
+                lines.add(String.format("  %d. %s", (i + 1), lastPlayersOrder.get(i)));
+            }
+        } else {
+            lines.add(" Waiting for players turn order...");
+        }
+
+        // 4. CENTRAL BOARD
         lines.add("");
         lines.add(YELLOW + BOLD + "=".repeat(22) + " BOARD " + "=".repeat(22) + RESET);
         lines.add("");
@@ -255,7 +274,7 @@ public class CLIView implements View {
         this.letterToCodeMap = tempLetterMap;
 
         lines.add("");
-        // 4. OFFERS
+        // 5. OFFERS
         lines.add(YELLOW + BOLD + "=".repeat(21) + " OFFERS " + "=".repeat(21) + RESET);
         lines.add("");
 
@@ -375,6 +394,15 @@ public class CLIView implements View {
         }
         System.out.println("\n");
 
+        // --- EVENT NOTIFICATIONS ---
+        if (!activeEventMessages.isEmpty()) {
+            System.out.println(PURPLE + BOLD + "--- RECENT GAME EVENTS ---" + RESET);
+            for (String msg : activeEventMessages) {
+                System.out.println(" " + msg);
+            }
+            System.out.println();
+        }
+
         // Appends the error message to the bottom of the board so it doesn't get cleared
         if (lastErrorMessage != null) {
             System.out.println(RED + BOLD + "[ERROR]: " + lastErrorMessage + RESET);
@@ -453,6 +481,10 @@ public class CLIView implements View {
      */
     @Override
     public void askCardChoose() {
+        // Clear past events if present
+        if (!activeEventMessages.isEmpty())
+            activeEventMessages.clear();
+
         clearInputBuffer();
 
         System.out.print("Enter your choice (e.g. A) or manual code (e.g. T0): ");
@@ -630,16 +662,15 @@ public class CLIView implements View {
     }
 
     /**
-     * Displays the full initial turn order list mapping of all current active players.
+     * Caches the full initial turn order list mapping and triggers a console
+     * dashboard refresh to display it inside the CLI.
      *
      * @param playersOrder An ordered list containing player nicknames.
      */
     @Override
     public void showPlayersOrder(List<String> playersOrder) {
-        String orderMessage = IntStream.range(0, playersOrder.size())
-                .mapToObj(i -> (i + 1) + ". " + playersOrder.get(i))
-                .collect(Collectors.joining("\n"));
-        System.out.println("Players order is:\n" + orderMessage);
+        this.lastPlayersOrder = playersOrder;
+        renderDashboard();
     }
 
     /**
@@ -666,7 +697,7 @@ public class CLIView implements View {
     }
 
     /**
-     * Caches the central card board state information and completely re-renders the dashboard UI.
+     * Caches the central board state information and completely re-renders the dashboard UI.
      *
      * @param board The updated board state DTO.
      */
@@ -784,12 +815,17 @@ public class CLIView implements View {
 
     /**
      * Formats and prints specialized real-time in-game engine narrative events.
+     * Adds the message to a temporary notification list, schedules its automatic
+     * removal after a set time, and refreshes the dashboard interface.
      *
-     * @param message Structured notification log detailing events like card updates or triggers.
+     * @param message Structured notification log detailing events.
      */
     @Override
     public void showEventMessage(String message) {
-        showMessage(message);
+        if (message == null || message.isBlank()) return;
+
+        // Add the new message to the end of the active list
+        activeEventMessages.add(PURPLE + "[EVENT]: " + message + RESET);
     }
 
     /**
