@@ -9,8 +9,9 @@
     "bonusOnSetCharacters": true,
     "bonusOnDuplicateInventor": false,
     "foodBonus": 5,
-    "setDim": 6
-  },
+    "setDim": 6,
+    "title": "Character set bonus building"
+},
   {
     "id": "building_2",
     "subtype": "sustenance",
@@ -19,7 +20,8 @@
     "foodCost": 4,
     "prestigePoints": 4,
     "foodBonus": 1,
-    "countType": "GATHERERS_COUNT"
+    "countType": "GATHERERS_COUNT",
+    "title": "Gatherers Sustenance Discount Building"
   },
   {
     "id": "building_3",
@@ -29,7 +31,8 @@
     "foodCost": 5,
     "prestigePoints": 3,
     "foodBonus": 1,
-    "countType": "ARTISTS_COUNT"
+    "countType": "ARTISTS_COUNT",
+    "title": "Artists Sustenance Discount Building"
   },
   {
     "id": "building_4",
@@ -42,7 +45,8 @@
     "preventLoss": true,
     "doubleOnWinning": false,
     "extraCardFromUpper": false,
-    "extraFoodFromBonus": false
+    "extraFoodFromBonus": false,
+    "title": "Shamanic Ritual Protection Building"
   },
   {
     "id": "building_5",
@@ -55,7 +59,8 @@
     "preventLoss": false,
     "doubleOnWinning": false,
     "extraCardFromUpper": false,
-    "extraFoodFromBonus": true
+    "extraFoodFromBonus": true,
+    "title": "Turn Order Food Bonus Building"
   },
   {
     "id": "building_6",
@@ -67,6 +72,7 @@
     "bonusOnDuplicateInventor": true,
     "bonusOnSetCharacters": false,
     "foodBonus": 3,
-    "setDim": 2
+    "setDim": 2,
+    "title": "Inventor Pair Bonus Building"
   }
 ]

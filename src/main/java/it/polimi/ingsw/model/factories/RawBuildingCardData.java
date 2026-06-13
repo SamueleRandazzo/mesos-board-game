@@ -21,6 +21,9 @@ public class RawBuildingCardData {
     /** The unique string identifier of the building card. */
     public String id;
 
+    /** The descriptive title for CLI visualization of the building card. */
+    public String title;
+
     /** The specific structural sub-category of the building (e.g., "SCORING", "HUNT", "INSTANT"). */
     public String subtype;
 

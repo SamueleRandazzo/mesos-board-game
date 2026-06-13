@@ -183,8 +183,13 @@ public class LocalCardDictionary {
             String icon = node.has("inventionIcon") ? node.get("inventionIcon").asText() : "";
             desc.append(VALUE_TRANSLATOR.getOrDefault(icon, icon)).append(" Inventor");
         } else {
-            // Default subtypes (GATHERER, SHAMAN, BUILDER, ARTIST, HUNTER, BUILDING)
-            desc.append(subtype);
+            // Check if a dedicated custom title field exists in the JSON node
+            if (node.has("title")) {
+                desc.append(node.get("title").asText());
+            } else {
+                // Default fallback to raw subtype
+                desc.append(subtype);
+            }
         }
 
         // 2. Body Generation (Properties)

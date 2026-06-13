@@ -9,8 +9,9 @@
     "fixedPoints": 0,
     "multiplier": 3,
     "pointsPerUnit": 3,
-    "countType": "HUNTERS_COUNT"
-  },
+    "countType": "HUNTERS_COUNT",
+	"title": "End-Game (3 PP X Hunters) Building"
+},
   {
     "id": "building_12",
     "subtype": "scoring",
@@ -21,8 +22,9 @@
     "fixedPoints": 0,
     "multiplier": 4,
     "pointsPerUnit": 4,
-    "countType": "GATHERERS_COUNT"
-  },
+    "countType": "GATHERERS_COUNT",
+	"title": "End-Game (4 PP X Gatherers) Building"
+},
   {
     "id": "building_13",
     "subtype": "scoring",
@@ -33,8 +35,9 @@
     "fixedPoints": 0,
     "multiplier": 4,
     "pointsPerUnit": 4,
-    "countType": "SHAMANS_COUNT"
-  },
+    "countType": "SHAMANS_COUNT",
+	"title": "End-Game (4 PP X Shamans) Building"
+},
   {
     "id": "building_14",
     "subtype": "scoring",
@@ -46,7 +49,9 @@
     "multiplier": 4,
     "pointsPerUnit": 4,
     "countType": "BUILDERS_COUNT"
-  },
+  ,
+	"title": "End-Game (4 PP X Builders) Building"
+},
   {
     "id": "building_15",
     "subtype": "scoring",
@@ -58,7 +63,9 @@
     "multiplier": 4,
     "pointsPerUnit": 4,
     "countType": "ARTISTS_COUNT"
-  },
+  ,
+	"title": "End-Game (4 PP X Artists) Building"
+},
   {
     "id": "building_16",
     "subtype": "scoring",
@@ -69,8 +76,9 @@
     "fixedPoints": 0,
     "multiplier": 2,
     "pointsPerUnit": 2,
-    "countType": "INVENTORS_COUNT"
-  },
+    "countType": "INVENTORS_COUNT",
+	"title": "End-Game (2 PP X Inventors) Building"
+},
   {
     "id": "building_17",
     "subtype": "instant",
@@ -82,8 +90,9 @@
     "preventLoss": false,
     "doubleOnWinning": false,
     "extraCardFromUpper": true,
-    "extraFoodFromBonus": false
-  },
+    "extraFoodFromBonus": false,
+	"title": "End of Round Top Row Card Draft Bonus Building"
+},
   {
     "id": "building_18",
     "subtype": "scoring",
@@ -93,6 +102,7 @@
     "prestigePoints": 25,
     "fixedPoints": 0,
     "multiplier": 0,
-    "pointsPerUnit": 0
-  }
+    "pointsPerUnit": 0,
+	"title": "Huge Prestige Points Bonus Building"
+}
 ]
