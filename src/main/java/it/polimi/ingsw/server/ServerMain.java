@@ -12,8 +12,15 @@ public class ServerMain {
     private static final int TCP_PORT = 1235;
 
     public static void main(String[] args) {
-        String serverIp = "127.0.0.1";
-        System.setProperty("java.rmi.server.hostname", serverIp);
+        String serverIp;
+        try {
+            serverIp = java.net.InetAddress.getLocalHost().getHostAddress();
+            System.out.println("[SERVER] Detected local IP: " + serverIp);
+            System.setProperty("java.rmi.server.hostname", serverIp);
+        } catch (Exception e) {
+            System.err.println("Unable to detect local IP automatically, using localhost");
+            System.setProperty("java.rmi.server.hostname", "127.0.0.1");
+        }
 
         if (args.length < 3) {
             System.err.println("WARNING: DB credential not provided");

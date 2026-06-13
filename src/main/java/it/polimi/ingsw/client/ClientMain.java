@@ -12,13 +12,14 @@ public class ClientMain {
     static final int RMI_PORT = 1234;
     static final int SOCKET_PORT = 1235;
     //static final String IP = "10.72.192.51";
-    static final String IP = "127.0.0.1";
+    static String IP;
 
     public static void main(String[] args) {
         //System.setProperty("java.rmi.server.hostname", IP);
 
         List<String> argList = Arrays.asList(args);
         NetworkManager network;
+        IP = argList.getFirst();
         int currentPort;
 
         if (argList.contains("--socket")) {
