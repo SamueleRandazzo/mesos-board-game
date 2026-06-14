@@ -143,47 +143,40 @@ public class CardFactory {
             throw new IllegalArgumentException("Event effectType cannot be null.");
         }
 
-        EventEffect effect;
-
-        switch (data.effectType.toUpperCase()) {
-            case "HUNT":
+        EventEffect effect = switch (data.effectType.toUpperCase()) {
+            case "HUNT" -> {
                 if (data.prestigePerHunter == null) {
                     throw new IllegalArgumentException("HUNT requires prestigePerHunter.");
                 }
-                effect = new Hunt(data.prestigePerHunter);
-                break;
-
-            case "SUSTENANCE":
+                yield new Hunt(data.prestigePerHunter);
+            }
+            case "SUSTENANCE" -> {
                 if (data.prestigeLossPerUnfed == null) {
                     throw new IllegalArgumentException("SUSTENANCE requires prestigeLossPerUnfed.");
                 }
-                effect = new Sustenance(data.prestigeLossPerUnfed);
-                break;
-
-            case "SHAMANIC_RITUAL":
+                yield new Sustenance(data.prestigeLossPerUnfed);
+            }
+            case "SHAMANIC_RITUAL" -> {
                 if (data.majorityPrestigeGain == null || data.minorityPrestigeLoss == null) {
                     throw new IllegalArgumentException("SHAMANIC_RITUAL requires majorityPrestigeGain and minorityPrestigeLoss.");
                 }
-                effect = new ShamanicRitual(
+                yield new ShamanicRitual(
                         data.majorityPrestigeGain,
                         data.minorityPrestigeLoss
                 );
-                break;
-
-            case "CAVE_PAINTINGS":
+            }
+            case "CAVE_PAINTINGS" -> {
                 if (data.minArtists == null || data.prestigeLossIfBelow == null || data.prestigePerArtistIfAbove == null) {
                     throw new IllegalArgumentException("CAVE_PAINTINGS requires minArtists, prestigeLossIfBelow and prestigePerArtistIfAbove.");
                 }
-                effect = new CavePaintings(
+                yield new CavePaintings(
                         data.minArtists,
                         data.prestigeLossIfBelow,
                         data.prestigePerArtistIfAbove
                 );
-                break;
-
-            default:
-                throw new IllegalArgumentException("Unknown event type: " + data.effectType);
-        }
+            }
+            default -> throw new IllegalArgumentException("Unknown event type: " + data.effectType);
+        };
 
         return new EventCard(
                 data.id,
@@ -214,91 +207,78 @@ public class CardFactory {
         int foodCost = data.foodCost != null ? data.foodCost : 0;
         int prestigePoints = data.prestigePoints != null ? data.prestigePoints : 0;
 
-        switch (data.subtype.toLowerCase()) {
-            case "hunt":
-                return new HuntBuilding(
-                        data.id,
-                        data.era,
-                        data.minPlayers,
-                        isObtainable,
-                        foodCost,
-                        prestigePoints,
-                        data.extraFood != null ? data.extraFood : 0,
-                        data.extraPoints != null ? data.extraPoints : 0,
-                        resolveCountType(data.countType)
-                );
-
-            case "sustenance":
-                return new SustenanceBuilding(
-                        data.id,
-                        data.era,
-                        data.minPlayers,
-                        isObtainable,
-                        foodCost,
-                        prestigePoints,
-                        data.foodBonus != null ? data.foodBonus : 0,
-                        resolveCountType(data.countType)
-                );
-
-            case "scoring":
-                return new ScoringBuilding(
-                        data.id,
-                        data.era,
-                        data.minPlayers,
-                        isObtainable,
-                        foodCost,
-                        prestigePoints,
-                        data.fixedPoints != null ? data.fixedPoints : 0,
-                        data.multiplier != null ? data.multiplier : 0,
-                        data.pointsPerUnit != null ? data.pointsPerUnit : 0,
-                        data.setDim != null ? data.setDim : 0,
-                        resolveCountType(data.countType)
-                );
-
-            case "cave_painting":
-                return new CavePaintingBuilding(
-                        data.id,
-                        data.era,
-                        data.minPlayers,
-                        isObtainable,
-                        foodCost,
-                        prestigePoints,
-                        data.extraFood != null ? data.extraFood : 0,
-                        resolveCountType(data.countType)
-                );
-
-            case "instant":
-                return new InstantEffectBuilding(
-                        data.id,
-                        data.era,
-                        data.minPlayers,
-                        isObtainable,
-                        foodCost,
-                        prestigePoints,
-                        data.extraStars != null ? data.extraStars : 0,
-                        data.preventLoss != null && data.preventLoss,
-                        data.doubleOnWinning != null && data.doubleOnWinning,
-                        data.extraCardFromUpper != null && data.extraCardFromUpper,
-                        data.extraFoodFromBonus != null && data.extraFoodFromBonus
-                );
-
-            case "card_added":
-                return new CardAddedBuilding(
-                        data.id,
-                        data.era,
-                        data.minPlayers,
-                        isObtainable,
-                        foodCost,
-                        prestigePoints,
-                        data.bonusOnDuplicateInventor != null && data.bonusOnDuplicateInventor,
-                        data.bonusOnSetCharacters != null && data.bonusOnSetCharacters,
-                        data.foodBonus != null ? data.foodBonus : 0,
-                        data.setDim != null ? data.setDim : 0
-                );
-
-            default:
-                throw new IllegalArgumentException("Unknown building subtype: " + data.subtype);
-        }
+        return switch (data.subtype.toLowerCase()) {
+            case "hunt" -> new HuntBuilding(
+                    data.id,
+                    data.era,
+                    data.minPlayers,
+                    isObtainable,
+                    foodCost,
+                    prestigePoints,
+                    data.extraFood != null ? data.extraFood : 0,
+                    data.extraPoints != null ? data.extraPoints : 0,
+                    resolveCountType(data.countType)
+            );
+            case "sustenance" -> new SustenanceBuilding(
+                    data.id,
+                    data.era,
+                    data.minPlayers,
+                    isObtainable,
+                    foodCost,
+                    prestigePoints,
+                    data.foodBonus != null ? data.foodBonus : 0,
+                    resolveCountType(data.countType)
+            );
+            case "scoring" -> new ScoringBuilding(
+                    data.id,
+                    data.era,
+                    data.minPlayers,
+                    isObtainable,
+                    foodCost,
+                    prestigePoints,
+                    data.fixedPoints != null ? data.fixedPoints : 0,
+                    data.multiplier != null ? data.multiplier : 0,
+                    data.pointsPerUnit != null ? data.pointsPerUnit : 0,
+                    data.setDim != null ? data.setDim : 0,
+                    resolveCountType(data.countType)
+            );
+            case "cave_painting" -> new CavePaintingBuilding(
+                    data.id,
+                    data.era,
+                    data.minPlayers,
+                    isObtainable,
+                    foodCost,
+                    prestigePoints,
+                    data.extraFood != null ? data.extraFood : 0,
+                    resolveCountType(data.countType)
+            );
+            case "instant" -> new InstantEffectBuilding(
+                    data.id,
+                    data.era,
+                    data.minPlayers,
+                    isObtainable,
+                    foodCost,
+                    prestigePoints,
+                    data.extraStars != null ? data.extraStars : 0,
+                    data.preventLoss != null && data.preventLoss,
+                    data.doubleOnWinning != null && data.doubleOnWinning,
+                    data.extraCardFromUpper != null && data.extraCardFromUpper,
+                    data.extraFoodFromBonus != null && data.extraFoodFromBonus
+            );
+            case "card_added" -> new CardAddedBuilding(
+                    data.id,
+                    data.era,
+                    data.minPlayers,
+                    isObtainable,
+                    foodCost,
+                    prestigePoints,
+                    data.bonusOnDuplicateInventor != null && data.bonusOnDuplicateInventor,
+                    data.bonusOnSetCharacters != null && data.bonusOnSetCharacters,
+                    data.foodBonus != null ? data.foodBonus : 0,
+                    data.setDim != null ? data.setDim : 0
+            );
+            default -> throw new IllegalArgumentException("Unknown building subtype: " + data.subtype);
+        };
     }
 
     /**
@@ -313,27 +293,14 @@ public class CardFactory {
             return null;
         }
 
-        switch (countType.toUpperCase()) {
-            case "BUILDERS_COUNT":
-                return new BuildersCount();
-
-            case "HUNTERS_COUNT":
-                return new HuntersCount();
-
-            case "GATHERERS_COUNT":
-                return new GatherersCount();
-
-            case "ARTISTS_COUNT":
-                return new ArtistsCount();
-
-            case "SHAMANS_COUNT":
-                return new ShamansCount();
-
-            case "INVENTORS_COUNT":
-                return new InventorsCount();
-
-            default:
-                throw new IllegalArgumentException("Unknown countType: " + countType);
-        }
+        return switch (countType.toUpperCase()) {
+            case "BUILDERS_COUNT" -> new BuildersCount();
+            case "HUNTERS_COUNT" -> new HuntersCount();
+            case "GATHERERS_COUNT" -> new GatherersCount();
+            case "ARTISTS_COUNT" -> new ArtistsCount();
+            case "SHAMANS_COUNT" -> new ShamansCount();
+            case "INVENTORS_COUNT" -> new InventorsCount();
+            default -> throw new IllegalArgumentException("Unknown countType: " + countType);
+        };
     }
 }

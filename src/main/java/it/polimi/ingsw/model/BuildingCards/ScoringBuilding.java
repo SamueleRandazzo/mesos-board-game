@@ -68,7 +68,9 @@ public class ScoringBuilding extends BuildingCard {
 
         i += multiplier * t.totalBuildersPoints();
 
-        i += t.getSetCountOfDifferentCard(setDim) * pointsPerUnit;
+        if (setDim != 0) {
+            i += t.getSetCountOfDifferentCard(setDim) * pointsPerUnit;
+        }
 
         if (countType != null) {
             i += pointsPerUnit * countType.cardNumber(t);

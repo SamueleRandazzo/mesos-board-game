@@ -48,8 +48,7 @@
     "fixedPoints": 0,
     "multiplier": 4,
     "pointsPerUnit": 4,
-    "countType": "BUILDERS_COUNT"
-  ,
+    "countType": "BUILDERS_COUNT",
 	"title": "End-Game (4 PP X Builders) Building"
 },
   {
@@ -62,8 +61,7 @@
     "fixedPoints": 0,
     "multiplier": 4,
     "pointsPerUnit": 4,
-    "countType": "ARTISTS_COUNT"
-  ,
+    "countType": "ARTISTS_COUNT",
 	"title": "End-Game (4 PP X Artists) Building"
 },
   {
