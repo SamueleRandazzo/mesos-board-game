@@ -155,7 +155,7 @@ public class ActionResolutionState extends GameState {
         context.executeUpperBuildingPick(player, pos);
         context.notifyShowTribe(player.getNickname());
 
-        player.setUpperPick(-1);
+        player.changeUpperPick(-1);
 
         if (player.getLowerPick() == 0 && player.getUpperPick() == 0) {
             context.resolveEndTurn();
