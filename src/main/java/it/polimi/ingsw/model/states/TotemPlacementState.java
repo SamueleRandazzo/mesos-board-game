@@ -6,6 +6,9 @@ import it.polimi.ingsw.model.Player;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * State representing the phase where players place their totems on the offer track.
+ */
 public class TotemPlacementState extends GameState {
 
     /**

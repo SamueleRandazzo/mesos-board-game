@@ -23,6 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Controller for the main GUI game board scene.
+ */
 public class GameBoardController extends SceneController {
 
     private static final int OFFER_TILE_WIDTH = 92;

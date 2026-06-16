@@ -29,12 +29,19 @@ public class TribeStatusDTO implements Serializable {
      */
     private List<CardDTO> buildingIds;
 
+    /** Total prestige points currently owned by the tribe. */
     private int totalPrestigePoints;
+    /** Current food reserves of the player. */
     private int currentFood;
+    /** Total discount applied during Sustenance events. */
     private int totalSustenanceDiscount;
+    /** Total discount applied when buying buildings. */
     private int totalBuildingsFoodDiscount;
+    /** Total number of shaman stars accumulated by the tribe. */
     private int shamanStars;
+    /** Whether the tribe can choose an extra card from the upper row. */
     private boolean extraCardFromUpper;
+    /** Whether the tribe receives extra food from positive turn order bonuses. */
     private boolean extraFoodFromBonus;
 
     /**
@@ -53,6 +60,8 @@ public class TribeStatusDTO implements Serializable {
      * @param totalSustenanceDiscount    Total food discount for sustenance event.
      * @param totalBuildingsFoodDiscount Total food discount for buying buildings.
      * @param shamanStars                Total count of shaman stars accumulated.
+     * @param extraCardFromUpper         True if the tribe can choose an extra card from the upper row.
+     * @param extraFoodFromBonus         True if positive turn order bonuses grant one additional food.
      */
     public TribeStatusDTO(
             LinkedHashMap<String, List<CardDTO>> charactersByColumn,

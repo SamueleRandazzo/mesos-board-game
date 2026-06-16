@@ -17,10 +17,15 @@ public class OfferTileDTO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /** Tile position inside the offer track. */
     private int index;
+    /** Food awarded by this tile. */
     private int foodBonus;
+    /** Number of upper-row card draws granted by this tile. */
     private int topRowDraws;
+    /** Number of lower-row card draws granted by this tile. */
     private int bottomRowDraws;
+    /** Nickname of the occupying player, or {@code null} when available. */
     private String nickname;
 
     /**

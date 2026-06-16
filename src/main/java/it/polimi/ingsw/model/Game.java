@@ -138,6 +138,22 @@ public class Game {
         this.currentState = new SetupGameState();
     }
 
+    /**
+     * Recreates a Game instance from a persisted snapshot.
+     *
+     * @param players players restored for the game
+     * @param board board state restored from the save
+     * @param offerTrack offer track state restored from the save
+     * @param turnOrderTile turn order tile state restored from the save
+     * @param eraBuildingDecks remaining building decks for later eras
+     * @param currentEra restored current era
+     * @param currentRound restored current round
+     * @param currentPlayerIndex restored active player index
+     * @param roundTurnOrder restored order of players for the current phase
+     * @param currentState restored game state
+     * @throws IllegalArgumentException if player count is outside 2-5
+     * @throws NullPointerException if any reference argument is null
+     */
     public Game(List<Player> players,
                 Board board,
                 OfferTrack offerTrack,
@@ -609,6 +625,8 @@ public class Game {
 
     /**
      * Returns the player whose turn it is currently.
+     *
+     * @return the current active player, or {@code null} if the turn order is not available
      */
     public Player getCurrentActivePlayer() {
 
@@ -618,10 +636,20 @@ public class Game {
         return roundTurnOrder.get(currentPlayerIndex);
     }
 
+    /**
+     * Returns the current phase turn order.
+     *
+     * @return an unmodifiable list of players in the current turn order
+     */
     public List<Player> getRoundTurnOrder() {
         return Collections.unmodifiableList(roundTurnOrder);
     }
 
+    /**
+     * Returns defensive copies of the remaining building decks for later eras.
+     *
+     * @return copied building decks grouped by era
+     */
     public List<List<BuildingCard>> getEraBuildingDecks() {
         List<List<BuildingCard>> copy = new ArrayList<>();
         for (List<BuildingCard> deck : eraBuildingDecks) {
@@ -630,10 +658,20 @@ public class Game {
         return copy;
     }
 
+    /**
+     * Returns the simple class name of the current game state.
+     *
+     * @return current state name
+     */
     public String getCurrentStateName() {
         return currentState.getClass().getSimpleName();
     }
 
+    /**
+     * Returns the current state as an ActionResolutionState when applicable.
+     *
+     * @return optional action resolution state
+     */
     public Optional<ActionResolutionState> getActionResolutionState() {
         if (currentState instanceof ActionResolutionState actionResolutionState) {
             return Optional.of(actionResolutionState);
@@ -673,6 +711,8 @@ public class Game {
 
     /**
      * Entry point for totem placement. Delegates logic to the current state.
+     *
+     * @param tileIndex the zero-based index of the selected offer tile
      */
     public void placePlayerTotem(int tileIndex) {
         currentState.placeTotem(this, getCurrentActivePlayer(), tileIndex);
@@ -799,6 +839,9 @@ public class Game {
     /**
      * Actually performs the totem placement on the board data.
      * Called by TotemPlacementState after validation.
+     *
+     * @param player the player placing the totem
+     * @param tileIndex the zero-based index of the selected offer tile
      */
     public void executeTotemPlacement(Player player, int tileIndex) {
         OfferTile chosen = offerTrack.getTiles().get(tileIndex);
@@ -809,6 +852,9 @@ public class Game {
     /**
      * Actually performs the upper card acquisition.
      * Called by ActionResolutionState after validation.
+     *
+     * @param player the player acquiring the card
+     * @param pos the zero-based card position in the upper row
      */
     public void executeUpperCardPick(Player player, int pos) {
         TribeDeck c = this.board.takeCardFromTopRow(pos);
@@ -817,6 +863,9 @@ public class Game {
 
     /**
      * Actually performs the lower card acquisition.
+     *
+     * @param player the player acquiring the card
+     * @param pos the zero-based card position in the lower row
      */
     public void executeLowerCardPick(Player player, int pos) {
         TribeDeck c = this.board.takeCardFromBottomRow(pos);
@@ -825,6 +874,9 @@ public class Game {
 
     /**
      * Actually performs the upper building acquisition.
+     *
+     * @param player the player acquiring the building
+     * @param pos the zero-based building position in the upper row
      */
     public void executeUpperBuildingPick(Player player, int pos) {
         BuildingCard c = this.board.takeCardFromUpperBuildingRow(pos);
@@ -833,6 +885,9 @@ public class Game {
 
     /**
      * Actually performs the lower building acquisition.
+     *
+     * @param player the player acquiring the building
+     * @param pos the zero-based building position in the lower row
      */
     public void executeLowerBuildingPick(Player player, int pos) {
         BuildingCard c = this.board.takeCardFromLowerBuildingRow(pos);

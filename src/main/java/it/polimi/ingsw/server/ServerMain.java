@@ -7,10 +7,18 @@ import java.net.Socket;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
+/**
+ * Server launcher that starts the RMI and socket endpoints for game clients.
+ */
 public class ServerMain {
     private static final int RMI_PORT = 1234;
     private static final int TCP_PORT = 1235;
 
+    /**
+     * Starts the server infrastructure and initializes optional database ranking support.
+     *
+     * @param args command-line arguments containing optional database credentials
+     */
     public static void main(String[] args) {
         String serverIp;
         try {

@@ -5,11 +5,21 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import it.polimi.ingsw.network.NetworkManager;
 
+/**
+ * JavaFX application entry point used by the GUI client.
+ */
 public class JavaFXMain extends Application {
     private static NetworkManager staticNetwork;
     private static String IP;
     private static int port;
 
+    /**
+     * Stores the network connection parameters and launches the JavaFX application.
+     *
+     * @param network network manager used by the GUI view
+     * @param IP server IP address
+     * @param port server port
+     */
     public static void startGui(NetworkManager network, String IP, int port) {
         staticNetwork = network;
         JavaFXMain.IP = IP;

@@ -18,8 +18,11 @@ public class GlobalPlayerRankDTO implements Serializable {
     /** The serial version UID for ensuring structural binary compatibility during network deserialization. */
     private static final long serialVersionUID = 1L;
 
+    /** Final global ranking position. */
     private int rank;
+    /** Nickname of the ranked player. */
     private String nickname;
+    /** Total points accumulated across ranked games. */
     private int totalPoints;
 
     /**

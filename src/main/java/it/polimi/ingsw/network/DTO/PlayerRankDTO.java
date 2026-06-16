@@ -19,10 +19,15 @@ public class PlayerRankDTO implements Serializable {
     /** The serial version UID for ensuring structural binary compatibility during network deserialization. */
     private static final long serialVersionUID = 1L;
 
+    /** Nickname of the player represented by this leaderboard row. */
     private String nickname;
+    /** Prestige points scored by the player. */
     private int prestigePoints;
+    /** Food amount remaining at the end of the game. */
     private int foodAmount;
+    /** Final leaderboard position. */
     private int position;
+    /** Whether this player is one of the winners. */
     private boolean isWinner;
 
     /**

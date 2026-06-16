@@ -20,8 +20,11 @@ public class TurnOrderTileDTO implements Serializable {
     /** The serial version UID for ensuring structural binary compatibility during network deserialization. */
     private static final long serialVersionUID = 1L;
 
+    /** Nickname of the player occupying this slot, or {@code null} if empty. */
     private String nickname;
+    /** Color of the player occupying this slot, or {@code null} if empty. */
     private Color color;
+    /** Food modifier applied by this turn order slot. */
     private int foodBonus;
 
     /**

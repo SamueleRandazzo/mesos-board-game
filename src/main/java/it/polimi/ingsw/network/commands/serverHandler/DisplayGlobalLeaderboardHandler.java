@@ -5,6 +5,9 @@ import it.polimi.ingsw.network.DTO.GlobalLeaderboardDTO;
 import it.polimi.ingsw.network.commands.ServerCommandHandler;
 import it.polimi.ingsw.view.View;
 
+/**
+ * Handler for global leaderboard updates received from the server.
+ */
 public class DisplayGlobalLeaderboardHandler implements ServerCommandHandler {
 
     @Override

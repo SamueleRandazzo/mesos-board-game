@@ -24,6 +24,13 @@ public class ActionResolutionState extends GameState {
         this.currentActivePlayer = null;
     }
 
+    /**
+     * Restores the ActionResolutionState from a saved active player and extra-pick flag.
+     *
+     * @param context the current game context
+     * @param currentActivePlayer the player currently resolving actions
+     * @param extraCardChoose true if an extra upper-row card choice is pending
+     */
     public ActionResolutionState(Game context,
                                  Player currentActivePlayer,
                                  boolean extraCardChoose) {
@@ -31,10 +38,20 @@ public class ActionResolutionState extends GameState {
         this.extraCardChoose = extraCardChoose;
     }
 
+    /**
+     * Returns the player currently resolving actions in this state.
+     *
+     * @return the current active player, or {@code null} when not restored from a snapshot
+     */
     public Player getCurrentActivePlayerForState() {
         return currentActivePlayer;
     }
 
+    /**
+     * Checks whether an extra upper-row card choice is pending.
+     *
+     * @return {@code true} if the extra card choice flow is active
+     */
     public boolean isExtraCardChoose() {
         return extraCardChoose;
     }

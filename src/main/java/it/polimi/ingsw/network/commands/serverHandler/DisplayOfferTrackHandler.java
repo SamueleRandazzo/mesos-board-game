@@ -8,6 +8,9 @@ import it.polimi.ingsw.view.View;
 
 import java.util.List;
 
+/**
+ * Handler for offer track updates received from the server.
+ */
 public class DisplayOfferTrackHandler implements ServerCommandHandler {
     @Override
     public void handle(String[] args, View view, ObjectMapper mapper) {

@@ -18,8 +18,9 @@ public class Sustenance implements EventEffect {
 
     /**
      * Creates a Sustenance event.
-     * * @param pointsPenalty the positive amount of Prestige Points a player loses
-     * for each missing unit of food.
+     *
+     * @param pointsPenalty the positive amount of Prestige Points a player loses
+     *                      for each missing unit of food.
      * @throws IllegalArgumentException if pointsPenalty is negative.
      */
     public Sustenance(int pointsPenalty) {

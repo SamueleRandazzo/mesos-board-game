@@ -14,10 +14,16 @@ import java.util.Map;
  * and the game model, translating client actions into model state changes.
  */
 public class GameController extends UnicastRemoteObject implements RemoteController {
+    /** Game model instance controlled by this remote controller. */
     private Game game;
+    /** Persistence manager used to save or delete game snapshots after state changes. */
     private final PersistenceManager persistenceManager;
+    /** Maps socket/RMI command prefixes to the corresponding card-selection actions. */
     private final Map<String, RemoteAction> cardActions = new HashMap<>();
 
+    /**
+     * Remote action executed from a card-selection command.
+     */
     @FunctionalInterface
     protected interface RemoteAction {
         /**
@@ -40,6 +46,13 @@ public class GameController extends UnicastRemoteObject implements RemoteControl
         this(game, null);
     }
 
+    /**
+     * Constructs a new GameController with optional persistence support.
+     *
+     * @param game the game model instance this controller will manipulate.
+     * @param persistenceManager the persistence manager used to save the game after state changes.
+     * @throws RemoteException if there is an error during the export of the remote object.
+     */
     public GameController(Game game, PersistenceManager persistenceManager) throws RemoteException {
         super();
         this.game = game;

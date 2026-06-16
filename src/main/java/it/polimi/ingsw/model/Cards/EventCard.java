@@ -18,6 +18,7 @@ public class EventCard extends Card implements TribeDeck {
     /**
      * Creates an EventCard.
      *
+     * @param id          the unique identifier of the card
      * @param era         the era of the card
      * @param minPlayer   the minimum number of players required for this card to be in the deck
      * @param isFinal     true if this is a final event card, false otherwise
@@ -39,6 +40,7 @@ public class EventCard extends Card implements TribeDeck {
      * Resolves the event effect for the provided list of players.
      *
      * @param players the list of players participating in the event resolution
+     * @param game    the current game context used by the event effect
      * @throws IllegalArgumentException if the players list is null
      * @throws IllegalStateException    if the players list is empty
      */
@@ -73,7 +75,8 @@ public class EventCard extends Card implements TribeDeck {
 
     /**
      * Event cards cannot be obtained by a player.
-     * * @param player the player trying to obtain the card
+     *
+     * @param player the player trying to obtain the card
      * @throws IllegalArgumentException always, because event cards cannot be obtained
      */
     @Override

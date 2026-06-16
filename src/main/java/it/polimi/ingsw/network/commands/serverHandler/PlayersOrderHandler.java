@@ -7,6 +7,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Handler for updates to the player order shown by the client.
+ */
 public class PlayersOrderHandler implements ServerCommandHandler {
     @Override
     public void handle(String[] args, View view, ObjectMapper mapper) {

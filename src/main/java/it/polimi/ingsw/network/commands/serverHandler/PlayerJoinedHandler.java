@@ -4,6 +4,9 @@ import it.polimi.ingsw.network.commands.ServerCommandHandler;
 import it.polimi.ingsw.view.View;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * Handler for lobby updates after a player joins.
+ */
 public class PlayerJoinedHandler implements ServerCommandHandler {
     @Override
     public void handle(String[] args, View view, ObjectMapper mapper) {

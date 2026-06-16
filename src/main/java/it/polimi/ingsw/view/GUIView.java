@@ -14,6 +14,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * JavaFX implementation of the View interface.
+ */
 public class GUIView implements View {
     private final NetworkManager network;
     private Stage stage;
@@ -21,6 +24,12 @@ public class GUIView implements View {
     private int totalPlayers;
     private String myNickname;
 
+    /**
+     * Creates a GUI view bound to the given network manager and primary stage.
+     *
+     * @param network network manager used to communicate with the server
+     * @param stage primary JavaFX stage used to display scenes
+     */
     public GUIView(NetworkManager network, Stage stage) {
         this.network = network;
         this.stage = stage;
@@ -184,6 +193,12 @@ public class GUIView implements View {
         });
     }
 
+    /**
+     * Displays the current board on the active GUI scene.
+     *
+     * @param board board snapshot to render
+     */
+    @Override
     public void displayBoard(BoardDTO board) {
         Platform.runLater(() -> {
             if (currentController != null) {
@@ -252,8 +267,18 @@ public class GUIView implements View {
         });
     }
 
+    /**
+     * Returns the nickname selected by this client.
+     *
+     * @return current client nickname
+     */
     public String getMyNickname() { return myNickname; }
 
+    /**
+     * Stores the nickname selected by this client.
+     *
+     * @param myNickname nickname assigned to the current client
+     */
     public void setMyNickname(String myNickname) {
         this.myNickname = myNickname;
     }

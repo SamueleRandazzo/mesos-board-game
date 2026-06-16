@@ -4,6 +4,9 @@ import it.polimi.ingsw.network.commands.ServerCommandHandler;
 import it.polimi.ingsw.view.View;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * Handler for recoverable error messages received from the server.
+ */
 public class ErrorHandler implements ServerCommandHandler {
     @Override
     public void handle(String[] args, View view, ObjectMapper mapper) {

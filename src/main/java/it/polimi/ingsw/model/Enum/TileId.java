@@ -2,5 +2,18 @@ package it.polimi.ingsw.model.Enum;
 
 /** The letter associated to each TurnOrderTile*/
 public enum TileId {
-        A,B,C,D,E,F,G
-    }
+    /** First tile id. */
+    A,
+    /** Second tile id. */
+    B,
+    /** Third tile id. */
+    C,
+    /** Fourth tile id. */
+    D,
+    /** Fifth tile id. */
+    E,
+    /** Sixth tile id. */
+    F,
+    /** Seventh tile id. */
+    G
+}

@@ -16,10 +16,15 @@ public class BoardDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    /** Cards currently visible in the upper tribe row. */
     private List<CardDTO> upperTribeRow;
+    /** Cards currently visible in the lower tribe row. */
     private List<CardDTO> lowerTribeRow;
+    /** Buildings currently visible in the upper building row. */
     private List<CardDTO> upperBuildingRow;
+    /** Buildings currently visible in the lower building row. */
     private List<CardDTO> lowerBuildingRow;
+    /** Era of the first card in the tribe deck, used to render the correct card back. */
     private int firstCardEra;
 
     /**
@@ -35,6 +40,7 @@ public class BoardDTO implements Serializable {
      * @param lowerTribeRow     Cards in the lower tribe row (Characters/Events).
      * @param upperBuildingRow  Cards in the upper building row.
      * @param lowerBuildingRow  Cards in the lower building row.
+     * @param firstCardEra      Era of the first card in the tribe deck.
      */
     public BoardDTO(List<CardDTO> upperTribeRow,
                     List<CardDTO> lowerTribeRow,
@@ -76,6 +82,9 @@ public class BoardDTO implements Serializable {
         return Collections.unmodifiableList(lowerBuildingRow);
     }
 
+    /**
+     * @return The era of the first card in the tribe deck.
+     */
     public int getFirstCardEra() {
         return firstCardEra;
     }

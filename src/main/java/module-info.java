@@ -1,3 +1,6 @@
+/**
+ * Defines the Mesos application module and its exported packages.
+ */
 module it.polimi.ingsw {
     // JavaFX modules
     requires javafx.controls;

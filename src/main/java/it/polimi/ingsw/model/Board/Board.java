@@ -67,6 +67,16 @@ public class Board {
         this.lowerBuildingCards = new ArrayList<>();
     }
 
+    /**
+     * Recreates the Board from previously saved rows and decks.
+     *
+     * @param tribeDeck draw pile for tribe cards
+     * @param buildingDeck draw pile for building cards of the current era
+     * @param upperTribeCards tribe cards currently visible in the upper row
+     * @param lowerTribeCards tribe cards currently visible in the lower row
+     * @param upperBuildingCards building cards currently visible in the upper row
+     * @param lowerBuildingCards building cards currently visible in the lower row
+     */
     public Board(List<TribeDeck> tribeDeck,
                  List<BuildingCard> buildingDeck,
                  List<TribeDeck> upperTribeCards,
@@ -159,10 +169,20 @@ public class Board {
         return new ArrayList<>(lowerBuildingCards);
     }
 
+    /**
+     * Returns a defensive copy of the tribe draw pile.
+     *
+     * @return list of remaining tribe cards in deck order
+     */
     public List<TribeDeck> getTribeDeck() {
         return new ArrayList<>(tribeDeck);
     }
 
+    /**
+     * Returns a defensive copy of the building draw pile.
+     *
+     * @return list of remaining building cards in deck order
+     */
     public List<BuildingCard> getBuildingDeck() {
         return new ArrayList<>(buildingDeck);
     }
@@ -232,6 +252,11 @@ public class Board {
         }
     }
 
+    /**
+     * Initializes the lower tribe row with character cards, moving event cards to the upper row.
+     *
+     * @param numPlayers number of players, used to compute the lower row target size
+     */
     public void initializeLowerRow(int numPlayers) {
         int needed = numPlayers + LOWER_EXTRA_CARDS;
 

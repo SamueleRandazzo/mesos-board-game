@@ -8,6 +8,9 @@ import it.polimi.ingsw.view.View;
 
 import java.util.List;
 
+/**
+ * Handler for turn order tile updates received from the server.
+ */
 public class DisplayTurnOrderTileHandler implements ServerCommandHandler {
 
     /**

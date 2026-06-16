@@ -11,6 +11,11 @@ import java.nio.charset.StandardCharsets;
  * based on the command-line arguments provided.
  */
 public class Main {
+    /**
+     * Starts the server when {@code --server} is provided, otherwise starts the client.
+     *
+     * @param args command-line arguments used to choose the application mode
+     */
     public static void main(String[] args) {
         if (args.length > 0 && args[0].equalsIgnoreCase("--server")) {
             System.out.println("Starting Mesos Server Infrastructure...");
