@@ -11,7 +11,6 @@ import it.polimi.ingsw.model.Player;
  * interchangeably during card drawing, shifting, and purchasing routines.
  * </p>
  *
- * @see it.polimi.ingsw.model.Cards.CharacterCard
  * @see it.polimi.ingsw.model.Cards.EventCard
  */
 public interface TribeDeck {

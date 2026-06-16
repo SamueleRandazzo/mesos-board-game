@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.Enum;
 
+/** The icons associated to each inventor*/
 public enum InventionIcon {
     CANOE,
     ARROWHEAD,
