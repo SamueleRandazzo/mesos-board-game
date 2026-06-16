@@ -17,13 +17,10 @@ module it.polimi.ingsw {
     requires java.sql;
 
     // Export
-    exports it.polimi.ingsw.view.GUI;
     exports it.polimi.ingsw.network;
-    exports it.polimi.ingsw.client;
     exports it.polimi.ingsw.network.DTO;
     exports it.polimi.ingsw.view;
     exports it.polimi.ingsw.model.Enum;
-    exports it.polimi.ingsw.persistence;
 
     // Opens
     opens it.polimi.ingsw.view.GUI to javafx.graphics, javafx.fxml;
