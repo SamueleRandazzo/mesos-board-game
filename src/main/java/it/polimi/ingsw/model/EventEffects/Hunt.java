@@ -52,24 +52,23 @@ public class Hunt implements EventEffect {
     @Override
     public void resolve(List<Player> players, Game game) {
         if (players == null)
-            throw new IllegalArgumentException("Players list cannot be null");
+            throw new IllegalArgumentException("Players list cannot be null.");
 
         if (players.isEmpty())
-            throw new IllegalStateException("Cannot resolve event with no players");
+            throw new IllegalStateException("Cannot resolve event with no players.");
 
         for (Player p : players) {
             if (p == null)
-                throw new IllegalArgumentException("Player cannot be null");
+                throw new IllegalArgumentException("Player cannot be null.");
 
             int numberOfHunters = p.getTribe().getHuntersCount();
-
             int totalFoodReward = p.getTribe().totalFoodByHuntBuildings() + numberOfHunters;
             int totalPointsReward = p.getTribe().totalPointsByHuntBuildings() + numberOfHunters * pointsPerCard;
 
             p.changeFoodAmount(totalFoodReward);
             p.changePrestigePoints(totalPointsReward);
 
-            game.notifyEventMessage(p, String.format("HUNT EVENT: You earn %d foods and %d prestige points.", totalFoodReward, totalPointsReward));
+            game.notifyEventMessage(p, String.format("HUNT EVENT: You earned %d foods and %d prestige points.", totalFoodReward, totalPointsReward));
         }
     }
 }

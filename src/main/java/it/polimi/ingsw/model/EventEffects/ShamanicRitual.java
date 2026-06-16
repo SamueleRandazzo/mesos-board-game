@@ -105,7 +105,7 @@ public class ShamanicRitual implements EventEffect {
             boolean doubleReward = pl.getTribe().getShamanicAttr().isDoubleOnWinning() && maxPlayers.size() == 1;
             int reward = doubleReward ? victoryPrestigePoints * 2 : victoryPrestigePoints;
             pl.changePrestigePoints(reward);
-            game.notifyEventMessage(pl, String.format("SHAMANIC RITUAL EVENT: You earn %d prestige points.", reward));
+            game.notifyEventMessage(pl, String.format("SHAMANIC RITUAL EVENT: You earned %d prestige points.", reward));
         }
 
         // Apply defeat penalties (subtracting positive points)

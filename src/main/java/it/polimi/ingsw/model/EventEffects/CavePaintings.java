@@ -86,12 +86,12 @@ public class CavePaintings implements EventEffect {
 
             if (numberOfArtists < penaltyThreshold) {
                 p.changePrestigePoints(-penaltyPoints);
-                game.notifyEventMessage(p, String.format("CAVE PAINTINGS EVENT: You earn %d foods and lost %d prestige points.", totalFoodAmount, penaltyPoints));
+                game.notifyEventMessage(p, String.format("CAVE PAINTINGS EVENT: You earned %d foods and lost %d prestige points.", totalFoodAmount, penaltyPoints));
             }
             else {
                 int totalPrestigePoints = bonusPointsPerArtist * numberOfArtists;
                 p.changePrestigePoints(totalPrestigePoints);
-                game.notifyEventMessage(p, String.format("CAVE PAINTINGS EVENT: You earn %d foods and %d prestige points.", totalFoodAmount, totalPrestigePoints));
+                game.notifyEventMessage(p, String.format("CAVE PAINTINGS EVENT: You earned %d foods and %d prestige points.", totalFoodAmount, totalPrestigePoints));
             }
         }
     }
