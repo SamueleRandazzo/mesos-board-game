@@ -28,7 +28,7 @@ public class ClientMain {
     /**
      * The IP address of the server to connect to.
      */
-    static String IP;
+    static String SERVER_IP;
 
     /**
      * The main method that starts the client application.
@@ -43,11 +43,18 @@ public class ClientMain {
      * @param args command-line arguments passed to the application.
      */
     public static void main(String[] args) {
-        //System.setProperty("java.rmi.server.hostname", IP);
-
         List<String> argList = Arrays.asList(args);
         NetworkManager network;
-        IP = argList.getFirst();
+
+        SERVER_IP = argList.getLast();
+
+        String ipv4Regex = "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
+
+        if (SERVER_IP == null || !SERVER_IP.matches(ipv4Regex)) {
+            SERVER_IP = "127.0.0.1";
+            System.out.println("[WARNING] IP '" + SERVER_IP + "' is empty or invalid. Set default to: " + SERVER_IP);
+        }
+
         int currentPort;
 
         if (argList.contains("--socket")) {
@@ -58,20 +65,20 @@ public class ClientMain {
             currentPort = RMI_PORT;
         }
 
-        if (argList.contains("--gui")) {
-            JavaFXMain.startGui(network, IP, currentPort);
-        } else {
+        if (argList.contains("--cli")) {
             View view = new CLIView(network);
             network.setView(view);
 
             try {
-                network.connect(IP, currentPort);
+                network.connect(SERVER_IP, currentPort);
             } catch (Exception e) {
                 System.err.println("Server error: " + e.getMessage());
-                view.showError("Impossible connect to server (" + IP + ":" + currentPort + ")");
+                view.showError("Impossible connect to server (" + SERVER_IP + ":" + currentPort + ")");
             }
 
             view.showLogin();
+        } else {
+            JavaFXMain.startGui(network, SERVER_IP, currentPort);
         }
     }
 }
