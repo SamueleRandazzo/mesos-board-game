@@ -1,6 +1,6 @@
 [
   {
-    "id": "building_11",
+    "id": "building_14",
     "subtype": "scoring",
     "era": 3,
     "minPlayers": 2,
@@ -13,7 +13,7 @@
 	"title": "End-Game (3 PP X Hunters) Building"
 },
   {
-    "id": "building_12",
+    "id": "building_15",
     "subtype": "scoring",
     "era": 3,
     "minPlayers": 2,
@@ -26,7 +26,7 @@
 	"title": "End-Game (4 PP X Gatherers) Building"
 },
   {
-    "id": "building_13",
+    "id": "building_16",
     "subtype": "scoring",
     "era": 3,
     "minPlayers": 2,
@@ -39,7 +39,7 @@
 	"title": "End-Game (4 PP X Shamans) Building"
 },
   {
-    "id": "building_14",
+    "id": "building_17",
     "subtype": "scoring",
     "era": 3,
     "minPlayers": 2,
@@ -52,7 +52,7 @@
 	"title": "End-Game (4 PP X Builders) Building"
 },
   {
-    "id": "building_15",
+    "id": "building_18",
     "subtype": "scoring",
     "era": 3,
     "minPlayers": 2,
@@ -65,7 +65,7 @@
 	"title": "End-Game (4 PP X Artists) Building"
 },
   {
-    "id": "building_16",
+    "id": "building_19",
     "subtype": "scoring",
     "era": 3,
     "minPlayers": 2,
@@ -78,7 +78,7 @@
 	"title": "End-Game (2 PP X Inventors) Building"
 },
   {
-    "id": "building_17",
+    "id": "building_20",
     "subtype": "instant",
     "era": 3,
     "minPlayers": 2,
@@ -92,7 +92,7 @@
 	"title": "End of Round Top Row Card Draft Bonus Building"
 },
   {
-    "id": "building_18",
+    "id": "building_21",
     "subtype": "scoring",
     "era": 3,
     "minPlayers": 2,

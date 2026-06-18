@@ -414,7 +414,12 @@ public class Tribe {
      * @return the sum of prestige points from all scoring buildings
      */
     public int getTotalScoringBuildingsPoints() {
-        return scoringBuildings.stream().mapToInt(x -> x.getTotalPoints(this)).sum();
+        return instantEffectBuildings.stream().mapToInt(InstantEffectBuilding::getPrestigePoints).sum()
+                + sustenanceBuildings.stream().mapToInt(SustenanceBuilding::getPrestigePoints).sum()
+                + cavePaintingBuildings.stream().mapToInt(CavePaintingBuilding::getPrestigePoints).sum()
+                + huntBuildings.stream().mapToInt(HuntBuilding::getPrestigePoints).sum()
+                + cardAddedBuildings.stream().mapToInt(CardAddedBuilding::getPrestigePoints).sum()
+                + scoringBuildings.stream().mapToInt(x -> x.getPrestigePoints() + x.getTotalPoints(this)).sum();
     }
 
     /**

@@ -156,6 +156,7 @@ public class ActionResolutionState extends GameState {
         context.notifyShowTribe(player.getNickname());
 
         player.changeUpperPick(-1);
+        player.changeFoodAmount(-realCost);
 
         if (player.getLowerPick() == 0 && player.getUpperPick() == 0) {
             context.resolveEndTurn();
@@ -190,6 +191,7 @@ public class ActionResolutionState extends GameState {
         context.notifyShowTribe(player.getNickname());
 
         player.changeLowerPick(-1);
+        player.changeFoodAmount(-realCost);
 
         if (player.getLowerPick() == 0 && player.getUpperPick() == 0) {
             context.resolveEndTurn();

@@ -552,10 +552,11 @@ public class Game {
      */
     private void computeFinalScores() {
         for (Player p : players) {
-            p.changePrestigePoints(p.getTribe().getTotalScoringBuildingsPoints());
-            p.changePrestigePoints((p.getTribe().getArtistsCount() / 2) * 10);
-            p.changePrestigePoints(p.getTribe().getInventorsCount() * p.getTribe().totalDifferentInventorIcon());
             p.changePrestigePoints(p.getTribe().totalBuildersPoints());
+            p.changePrestigePoints(p.getTribe().getInventorsCount() * p.getTribe().totalDifferentInventorIcon());
+            p.changePrestigePoints((p.getTribe().getArtistsCount() / 2) * 10);
+            p.changePrestigePoints(p.getTribe().getTotalScoringBuildingsPoints());
+
         }
     }
 
