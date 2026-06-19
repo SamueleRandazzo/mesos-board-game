@@ -3,9 +3,6 @@ package it.polimi.ingsw;
 import it.polimi.ingsw.client.ClientMain;
 import it.polimi.ingsw.server.ServerMain;
 
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
-
 /**
  * Main launcher that routes execution to either the Server or the Client
  * based on the command-line arguments provided.

@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Defines the contract for an asynchronous game event listener.
  * <p>
- * This interface acts as the core listener (Observer) in the game architecture. It dispatch
+ * This interface acts as the core listener (Observer) in the game architecture. It dispatches
  * state updates, turn transitions, action results, and UI synchronization events from the domain
  * model down to the presentation/network layer (View/Controller).
  * </p>
