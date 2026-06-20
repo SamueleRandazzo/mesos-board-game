@@ -177,7 +177,7 @@ public class ActionResolutionState extends GameState {
     @Override
     public void resolveLowerBuildingPick(Game context, Player player, int pos) {
         if (player.getLowerPick() <= 0) {
-            throw new IllegalStateException("You have no upper row picks left!");
+            throw new IllegalStateException("You have no lower row picks left!");
         }
 
         int cost = context.getBoard().getLowerBuildingCards().get(pos).getFoodCost();

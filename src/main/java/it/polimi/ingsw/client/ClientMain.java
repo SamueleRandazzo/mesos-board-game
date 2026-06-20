@@ -61,9 +61,11 @@ public class ClientMain {
         if (argList.contains("--socket")) {
             network = new SocketNetworkManager();
             currentPort = SOCKET_PORT;
+            System.out.println("[SOCKET] Client started.");
         } else {
             network = new RMINetworkManager();
             currentPort = RMI_PORT;
+            System.out.println("[RMI] Client started.");
         }
 
         if (argList.contains("--cli")) {

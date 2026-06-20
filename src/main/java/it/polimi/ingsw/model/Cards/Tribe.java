@@ -565,7 +565,7 @@ public class Tribe {
         // Pre-calculating totals for the View
         int totalPrestige = owner.getPrestigePoints();
         int currentFood = owner.getFoodAmount();
-        int totalSustenanceFoodDiscount = totalSustenanceDiscount();
+        int totalSustenanceFoodDiscount = getGatherersCount() * 3 + totalSustenanceDiscount();
         int totalBuildingDiscount = totalBuildersFoodDiscount();
         int stars = shamanicAttr.getStars();
 
