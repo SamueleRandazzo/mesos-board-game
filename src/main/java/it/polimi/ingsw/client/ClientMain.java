@@ -46,13 +46,14 @@ public class ClientMain {
         List<String> argList = Arrays.asList(args);
         NetworkManager network;
 
-        SERVER_IP = argList.getLast();
-
+        String inputIP = !argList.isEmpty() ? argList.getLast() : "";
         String ipv4Regex = "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
 
-        if (SERVER_IP == null || !SERVER_IP.matches(ipv4Regex)) {
+        if (inputIP.isEmpty() || !inputIP.matches(ipv4Regex)) {
             SERVER_IP = "127.0.0.1";
-            System.out.println("[WARNING] IP '" + SERVER_IP + "' is empty or invalid. Set default to: " + SERVER_IP);
+            System.out.println("[WARNING] IP '" + inputIP + "' is empty or invalid. Set default to: " + SERVER_IP);
+        } else {
+            SERVER_IP = inputIP;
         }
 
         int currentPort;
