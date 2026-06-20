@@ -41,7 +41,7 @@ To launch the system in **Server Mode**, the very first command-line argument mu
 
 > **Prerequisite & Database Info:** A MySQL database server (DBMS) must be active and running on the host machine. If no database credentials are provided at startup, or if the system cannot establish a connection to the DBMS, the server will still start successfully, but the **Leaderboard functionality will be disabled**.
 ```bash
-java -jar app.jar --server <db_username> <db_password>
+java -jar GC35_MESOS.jar --server <db_username> <db_password>
 ```
 
 ### Running the Client
@@ -63,14 +63,14 @@ The last parameter passed to the command line is always treated as the target Se
 ### Execution Examples
 ```bash
 # 1. Default Mode (Launches GUI + RMI, connecting to 127.0.0.1)
-java -jar app.jar
+java -jar GC35_MESOS.jar
 
 # 2. GUI via Sockets (Connecting to a specific server IP)
-java -jar app.jar --socket 192.168.1.50
+java -jar GC35_MESOS.jar --socket 192.168.1.50
 
 # 3. CLI via RMI (Connecting to a specific server IP)
-java -jar app.jar --cli 192.168.1.50
+java -jar GC35_MESOS.jar --cli 192.168.1.50
 
 # 4. Full Command Line Mode (CLI + Sockets, connecting to a specific server IP)
-java -jar app.jar --cli --socket 10.0.0.5
+java -jar GC35_MESOS.jar --cli --socket 10.0.0.5
 ```
