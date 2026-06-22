@@ -43,19 +43,14 @@ public class CLIView implements View {
     /** Stores the last error message to ensure it survives console clearing events. */
     private volatile String lastErrorMessage = null;
 
-    // ANSI Escape Codes for formatting text in the console
+    /** ANSI Escape Codes to format text in the console */
     private static final String RESET = "\u001B[0m";
     private static final String BOLD = "\u001B[1m";
     private static final String ANSI_RED = "\u001B[31m";
     private static final String ANSI_GREEN = "\u001B[32m";
     private static final String ANSI_YELLOW = "\u001B[33m";
-    private static final String ANSI_BLUE = "\u001B[34m";
     private static final String ANSI_PURPLE = "\u001B[35m";
     private static final String ANSI_CYAN = "\u001B[36m";
-    private static final String ANSI_WHITE = "\u001B[37m";
-    private static final String ANSI_BLACK = "\u001B[90m";
-    private static final String ANSI_BROWN = "\u001B[91m";
-
 
     /** ANSI sequence to clear the screen and home the cursor. */
     private static final String CLEAR_SCREEN = "\033[H\033[2J";
@@ -123,7 +118,7 @@ public class CLIView implements View {
      */
     private String colorizeCard(String details, boolean isBuildingRow) {
         if (isBuildingRow) {
-            return ANSI_BLUE + details + RESET;
+            return ANSI_GREEN + details + RESET;
         }
         if (details.startsWith("Hunt") || details.startsWith("Sustenance") ||
                 details.startsWith("Shamanic Ritual") || details.startsWith("Cave Paintings") ||
@@ -152,7 +147,7 @@ public class CLIView implements View {
     }
 
     /**
-     * Builds the left column of the dashboard containing the User's Tribe, the Board, and the Offers.
+     * Builds the left column of the dashboard containing the Board, and the Offer Track and the Turn Order Tile.
      * Dynamically assigns single-letter selection codes to draftable cards in a thread-safe manner.
      *
      * @return A list of strings representing the formatted left column lines.
@@ -162,13 +157,14 @@ public class CLIView implements View {
         Map<String, String> tempLetterMap = new java.util.concurrent.ConcurrentHashMap<>();
         int letterIndex = 0;
 
-        // 1. TURN ORDER TILE
         lines.add("");
+
+        // TURN ORDER TILE
         lines.add(ANSI_YELLOW + BOLD + "=".repeat(30) + " TURN ORDER TILE " + "=".repeat(31) + RESET);
         lines.add("");
 
         if (lastTurnOrderTiles != null && !lastTurnOrderTiles.isEmpty() && lastPlayersOrder != null && !lastPlayersOrder.isEmpty()) {
-            lines.add(String.format(" Tile | Food | Player "));
+            lines.add(" Tile | Food | Player ");
             lines.add(" " + "-".repeat(77));
 
             int pos = 1;
@@ -181,7 +177,7 @@ public class CLIView implements View {
             lines.add(" Waiting for turn order data...");
         }
 
-        // 3. CENTRAL BOARD
+        // BOARD
         lines.add("");
         lines.add(ANSI_YELLOW + BOLD + "=".repeat(35) + " BOARD " + "=".repeat(36) + RESET);
         lines.add("");
@@ -226,7 +222,7 @@ public class CLIView implements View {
 
             // --- UPPER BUILDINGS (Server code: B) ---
             lines.add("");
-            lines.add("Upper Buildings:");
+            lines.add("Upper Buildings Row:");
             for (int i = 0; i < lastBoard.getUpperBuildingRow().size(); i++) {
                 CardDTO c = lastBoard.getUpperBuildingRow().get(i);
                 String details = LocalCardDictionary.getInstance().getCardDetails(c.getCardId());
@@ -238,7 +234,7 @@ public class CLIView implements View {
 
             // --- LOWER BUILDINGS (Server code: G)
             lines.add("");
-            lines.add("Lower Buildings:");
+            lines.add("Lower Buildings Row:");
             for (int i = 0; i < lastBoard.getLowerBuildingRow().size(); i++) {
                 CardDTO c = lastBoard.getLowerBuildingRow().get(i);
                 String details = LocalCardDictionary.getInstance().getCardDetails(c.getCardId());
@@ -260,8 +256,8 @@ public class CLIView implements View {
         lines.add("");
 
         if (lastOfferTrack != null) {
-            lines.add(String.format(" Tile | Food | Draw Top/Btm | Player"));
-            lines.add(String.format(" " + "-".repeat(76)));
+            lines.add(" Tile | Food | Draw Top/Btm | Player");
+            lines.add(" " + "-".repeat(76));
             for (OfferTileDTO tile : lastOfferTrack) {
                 String owner = tile.getNickname() != null ? ANSI_RED + "[" + tile.getNickname() + "]" + RESET : ANSI_GREEN + "[Free]" + RESET;
                 lines.add(String.format(" %d    | %d    | %d / %d        | %s",
@@ -275,15 +271,15 @@ public class CLIView implements View {
     }
 
     /**
-     * Builds the right column of the dashboard containing all the Opponents' Tribes info.
+     * Builds the right column of the dashboard containing all Tribes info.
      *
      * @return A list of strings representing the formatted right column lines.
      */
     private List<String> buildRightColumn() {
         List<String> lines = new java.util.ArrayList<>();
 
+        // MY TRIBE
         lines.add("");
-        // 1. MY TRIBE
         lines.add(ANSI_YELLOW + BOLD + "=".repeat(30) + " MY TRIBE " + "=".repeat(30) + RESET);
         if (myNickname != null && allTribes.containsKey(myNickname)) {
             lines.addAll(formatTribeBlock(myNickname, allTribes.get(myNickname), true));
@@ -292,7 +288,8 @@ public class CLIView implements View {
         }
         lines.add("");
 
-        //2. OPPONENTS
+
+        //OPPONENTS
         lines.add(ANSI_YELLOW + BOLD + "=".repeat(30) + " OPPONENTS " + "=".repeat(30) + RESET);
 
         boolean hasOpponents = false;
@@ -327,8 +324,8 @@ public class CLIView implements View {
 
         lines.add("");
         lines.add(headerColor + title + playerName.toUpperCase() + RESET);
-        lines.add(String.format("   " + ANSI_BROWN + " Food " + RESET + "|" + ANSI_YELLOW + " PP " + RESET + "|"
-                        + ANSI_PURPLE + " Shaman Stars " + RESET + "|" + BOLD + " Sust " + RESET + "|" + ANSI_CYAN + " Build " + RESET + "|" + ANSI_PURPLE + " Extra Draw " + RESET + "|" + ANSI_PURPLE + " Food Bonus " + RESET));
+        lines.add(String.format("   " + ANSI_RED +  " Food " + RESET + "|" + ANSI_YELLOW + " PP " + RESET + "|"
+                        + ANSI_PURPLE + " Shaman Stars " + RESET + "|" + ANSI_CYAN + " Sust " + RESET + "|" + ANSI_CYAN + " Build " + RESET + "|" + ANSI_CYAN + " Extra Draw " + RESET + "|" + ANSI_CYAN + " Food Bonus " + RESET));
         lines.add(String.format("    %-4d | %-2d | %-12d | %-4d | %-5d | %-10s | %-10s",
                                 t.getCurrentFood(), t.getTotalPrestigePoints(), t.getShamanStars(),
                                 -t.getTotalSustenanceDiscount(), -t.getTotalBuildingsFoodDiscount(), t.hasExtraCardFromUpper() ? "Yes" : "No", t.hasExtraFoodFromBonus() ? "Yes" : "No"));
@@ -349,7 +346,7 @@ public class CLIView implements View {
             }
         }
         if (!hasChars) {
-            lines.add(ANSI_CYAN + "     None" + RESET);
+            lines.add(ANSI_RED + "     None" + RESET);
         }
 
         // --- BUILDINGS ---
@@ -361,7 +358,7 @@ public class CLIView implements View {
                 lines.add("     - " + colorizeCard(details, true));
             }
         } else {
-            lines.add(ANSI_BLUE + "     None built." + RESET);
+            lines.add(ANSI_RED + "     None built." + RESET);
         }
 
         return lines;
@@ -504,11 +501,11 @@ public class CLIView implements View {
      */
     @Override
     public void showLogin() {
-        System.out.println("=== WELCOME TO MESOS ===");
+        System.out.println(ANSI_YELLOW + BOLD + "=".repeat(30) + " WELCOME TO MESOS" + "=".repeat(30) + RESET);
         System.out.print("Enter your nickname: ");
         String nickname = readLine();
 
-        System.out.println("Available colors: RED, BLUE, BLACK, YELLOW, WHITE");
+        System.out.println("Available colors: " + ANSI_RED + "RED " + ANSI_CYAN + "BLUE " + ANSI_PURPLE + "BLACK " + ANSI_YELLOW + "YELLOW " + BOLD + "WHITE" + RESET);
         Color selectedColor = null;
         while (selectedColor == null) {
             System.out.print("Choose your color: ");
@@ -850,38 +847,6 @@ public class CLIView implements View {
                 displayBoard(lastBoard);
                 askEndTurnOrBuyBuilding();
             }
-        }
-    }
-
-    /**
-     * Returns the ANSI color code associated with a player color.
-     *
-     * @param playerColor the player's game color
-     * @return the ANSI escape sequence corresponding to the provided color
-     */
-    private String getAnsiColor(Color playerColor) {
-        if (playerColor == null) {
-            return RESET;
-        }
-
-        switch (playerColor) {
-            case RED:
-                return ANSI_RED;
-
-            case BLUE:
-                return ANSI_BLUE;
-
-            case YELLOW:
-                return ANSI_YELLOW;
-
-            case WHITE:
-                return ANSI_WHITE;
-
-            case BLACK:
-                return ANSI_BLACK;
-
-            default:
-                return RESET;
         }
     }
 }

@@ -23,20 +23,20 @@ public class LocalCardDictionary {
     private static final Map<String, String> DESCRIPTION_TEMPLATE = new LinkedHashMap<>();
     static {
         // Clean formatting simulating a physical card layout
-        DESCRIPTION_TEMPLATE.put("foodCost", " | Cost: %s Food");
-        DESCRIPTION_TEMPLATE.put("prestigePoints", " | %s PP");
-        DESCRIPTION_TEMPLATE.put("buildingDiscount", " | -%s Build Cost");
-        DESCRIPTION_TEMPLATE.put("inventionIcon", " | %s");
-        DESCRIPTION_TEMPLATE.put("shamanStars", " | %s Stars");
+        DESCRIPTION_TEMPLATE.put("foodCost", " [Cost: %s Food]");
+        DESCRIPTION_TEMPLATE.put("prestigePoints", " [%s PP]");
+        DESCRIPTION_TEMPLATE.put("buildingDiscount", " [-%s Building Cost]");
+        DESCRIPTION_TEMPLATE.put("inventionIcon", " [%s]");
+        DESCRIPTION_TEMPLATE.put("shamanStars", " [%s Stars]");
 
         // Event specific formatting
-        DESCRIPTION_TEMPLATE.put("prestigePerHunter", " | +%s PP per Hunter");
-        DESCRIPTION_TEMPLATE.put("prestigeLossPerUnfed", " | -%s PP per Unfed");
-        DESCRIPTION_TEMPLATE.put("majorityPrestigeGain", " | Majority: +%s PP");
-        DESCRIPTION_TEMPLATE.put("minorityPrestigeLoss", " | Minority: -%s PP");
-        DESCRIPTION_TEMPLATE.put("minArtists", " | Req. %s Artists:");
-        DESCRIPTION_TEMPLATE.put("prestigeLossIfBelow", " -%s PP if below");
-        DESCRIPTION_TEMPLATE.put("prestigePerArtistIfAbove", " +%s PP per Artist");
+        DESCRIPTION_TEMPLATE.put("prestigePerHunter", " [+%s PP per Hunter]");
+        DESCRIPTION_TEMPLATE.put("prestigeLossPerUnfed", " [-%s PP per Unfed]");
+        DESCRIPTION_TEMPLATE.put("majorityPrestigeGain", " [Most Stars: +%s PP]");
+        DESCRIPTION_TEMPLATE.put("minorityPrestigeLoss", " [Fewest Stars: -%s PP]");
+        DESCRIPTION_TEMPLATE.put("minArtists", " [%s Artists Needed]");
+        DESCRIPTION_TEMPLATE.put("prestigeLossIfBelow", " [<: -%s PP]");
+        DESCRIPTION_TEMPLATE.put("prestigePerArtistIfAbove", " [>=: %s PP per Artist]");
 
         // Building specific effects
         DESCRIPTION_TEMPLATE.put("effectType", " | Effect: %s");
@@ -45,12 +45,6 @@ public class LocalCardDictionary {
     /** Translator map replacing raw internal JSON constants with user-friendly text. */
     private static final Map<String, String> VALUE_TRANSLATOR = new HashMap<>();
     static {
-        // Invention Icons
-        VALUE_TRANSLATOR.put("BREAD", "Bread");
-        VALUE_TRANSLATOR.put("LEATHER", "Leather");
-        VALUE_TRANSLATOR.put("POTTERY", "Pottery");
-
-        // Event Names (No "Event" prefix as requested)
         VALUE_TRANSLATOR.put("HUNT", "Hunt");
         VALUE_TRANSLATOR.put("SUSTENANCE", "Sustenance");
         VALUE_TRANSLATOR.put("SHAMANIC_RITUAL", "Shamanic Ritual");
@@ -181,7 +175,7 @@ public class LocalCardDictionary {
         } else if (subtype.equals("INVENTOR")) {
             // Inventors show type first (e.g., "Leather Inventor")
             String icon = node.has("inventionIcon") ? node.get("inventionIcon").asText() : "";
-            desc.append(VALUE_TRANSLATOR.getOrDefault(icon, icon)).append(" Inventor");
+            desc.append(VALUE_TRANSLATOR.getOrDefault(icon, icon).toUpperCase()).append(" INVENTOR");
         } else {
             // Check if a dedicated custom title field exists in the JSON node
             if (node.has("title")) {
@@ -207,7 +201,7 @@ public class LocalCardDictionary {
 
         // 3. Immediate Food Bonus Check
         if (node.has("immediateFood") && node.get("immediateFood").asInt() == 1) {
-            desc.append(" | +1 Food");
+            desc.append(" [Food]");
         }
 
         return desc.toString().trim();
