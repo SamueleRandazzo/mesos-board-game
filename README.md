@@ -37,10 +37,14 @@ The application features a single unified entry point (`Main`). Depending on the
 
 ### Running the Server
 
-To launch the system in **Server Mode**, the very first command-line argument must be `--server`. You can also provide the username and password for the database as subsequent arguments to initialize the leaderboard and database persistence mechanisms.
+To launch the system in **Server Mode**, the very first command-line argument must be `--server`. You can also provide the username, password and db port for the database as subsequent arguments to initialize the leaderboard and database persistence mechanisms.
 
-> **Prerequisite & Database Info:** A MySQL database server (DBMS) must be active and running on the host machine. If no database credentials are provided at startup, or if the system cannot establish a connection to the DBMS, the server will still start successfully, but the **Leaderboard functionality will be disabled**.
+> **Prerequisite & Database Info:** A MySQL database server (DBMS) must be active and running on the host machine. If no database credentials are provided at startup, or if the system cannot establish a connection to the DBMS, the server will still start successfully, but the **Leaderboard functionality will be disabled**.<br>Note on DB Port: If the <db_port> argument is omitted, the system will automatically fall back to 3306, which is the standard default port for MySQL.
 ```bash
+# Complete syntax
+java -jar GC35_MESOS.jar --server <db_username> <db_password> <db_port>
+
+# Example without port (uses default 3306)
 java -jar GC35_MESOS.jar --server <db_username> <db_password>
 ```
 

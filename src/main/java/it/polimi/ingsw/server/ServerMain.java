@@ -36,8 +36,15 @@ public class ServerMain {
         } else {
             String dbUser = args[1];
             String dbPass = args[2];
+            String dbPort = "3306";
 
-            DatabaseManager.init(dbUser, dbPass);
+            if (args.length >= 4) {
+                dbPort = args[3];
+            } else {
+                System.out.println("[SERVER] Port not provided, set default to 3306.");
+            }
+
+            DatabaseManager.init(dbUser, dbPass, dbPort);
         }
 
         System.setProperty("sun.rmi.transport.tcp.responseTimeout", "5000");

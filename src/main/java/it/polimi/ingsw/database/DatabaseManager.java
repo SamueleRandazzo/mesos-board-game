@@ -28,11 +28,11 @@ public class DatabaseManager {
      * @param username The database username provided via command line.
      * @param password The database password provided via command line.
      */
-    public static void init(String username, String password) {
+    public static void init(String username, String password, String port) {
         user = username;
         pass = password;
 
-        String baseUrl = "jdbc:mysql://localhost:3306/?serverTimezone=UTC";
+        String baseUrl = "jdbc:mysql://localhost:" + port + "/?serverTimezone=UTC";
 
         try (Connection conn = DriverManager.getConnection(baseUrl, user, pass);
              Statement stmt = conn.createStatement()) {
@@ -63,6 +63,7 @@ public class DatabaseManager {
 
         } catch (SQLException e) {
             System.err.println("[DB] Critical Error during initialization: " + e.getMessage());
+            System.err.println("Ranking functionality disabled.");
             available = false;
         }
     }
@@ -107,6 +108,7 @@ public class DatabaseManager {
         try (InputStream is = DatabaseManager.class.getResourceAsStream("/database/schema.sql")) {
             if (is == null) {
                 System.err.println("[DB] Error: SQL script not found at " + "/schema.sql");
+                System.err.println("Ranking functionality disabled.");
                 return;
             }
 
@@ -123,6 +125,7 @@ public class DatabaseManager {
             }
         } catch (Exception e) {
             System.err.println("[DB] Failed to execute initialization script: " + e.getMessage());
+            System.err.println("Ranking functionality disabled.");
         }
     }
 }
