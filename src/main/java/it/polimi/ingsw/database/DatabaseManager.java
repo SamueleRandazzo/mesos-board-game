@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  * across the server application.
  */
 public class DatabaseManager {
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/GC35_Mesos_DB";
+    private static String DB_URL = "jdbc:mysql://localhost:3306/GC35_Mesos_DB";
     private static String user;
     private static String pass;
     private static boolean available = false;
@@ -33,6 +33,7 @@ public class DatabaseManager {
         pass = password;
 
         String baseUrl = "jdbc:mysql://localhost:" + port + "/?serverTimezone=UTC";
+        DB_URL = "jdbc:mysql://localhost:" + port + "/GC35_Mesos_DB";
 
         try (Connection conn = DriverManager.getConnection(baseUrl, user, pass);
              Statement stmt = conn.createStatement()) {
