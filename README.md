@@ -78,3 +78,11 @@ java -jar GC35_MESOS.jar --cli 192.168.1.50
 # 4. Full Command Line Mode (CLI + Sockets, connecting to a specific server IP)
 java -jar GC35_MESOS.jar --cli --socket 10.0.0.5
 ```
+
+---
+
+## License & Copyright
+
+Il Gioco da tavolo Mesos e tutto il relativo materiale grafico è di esclusiva proprietà di Cranio Creations.
+
+> *The board game Mesos and all related graphic material are the exclusive property of Cranio Creations.*
