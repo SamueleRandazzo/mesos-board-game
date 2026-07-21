@@ -1,8 +1,14 @@
+# Mesos - Board Game (Java Implementation)
+
+This repository contains the final project for the **Software Engineering** course at **Politecnico di Milano** (Academic Year 2025/2026). 
+
+It features a full-featured, distributed Java application of the board game **Mesos**, implementing client-server architecture, dual network protocols (RMI & Sockets), dual user interfaces (GUI & TUI), database and local persistence.
+
+---
+
 ## Features and Project Architecture
 
 Our project delivers a full-featured implementation of the game, built on a robust, decoupled architecture that bridges multiple user interfaces and networking protocols, topped with persistent advanced functionalities.
-
----
 
 ### Core Implementation
 
